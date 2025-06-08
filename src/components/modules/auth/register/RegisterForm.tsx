@@ -38,7 +38,11 @@ const RegisterForm = () => {
     { name: "occupation", label: "Occupation" },
     { name: "medical_history", label: "Medical History", type: "textarea" },
     { name: "allergies", label: "Allergies" },
-    { name: "current_medications", label: "Current Medications",type:"textarea" },
+    {
+      name: "current_medications",
+      label: "Current Medications",
+      type: "textarea",
+    },
   ];
 
   return (
