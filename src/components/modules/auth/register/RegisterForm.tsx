@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 import { Button } from "@/components/ui/button";
 import {
@@ -20,9 +21,10 @@ import { Textarea } from "@/components/ui/textarea";
 import { useRegisterMutation } from "@/redux/features/auth/authApi";
 import React from "react";
 import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
+import { toast } from "sonner";
 
 const RegisterForm = () => {
-  const [register, { data, error }] = useRegisterMutation();
+  const [register] = useRegisterMutation();
   const form = useForm();
   const onSubmit: SubmitHandler<FieldValues> = async (userData) => {
     const {
@@ -31,7 +33,6 @@ const RegisterForm = () => {
       relationship,
       ...rest
     } = userData;
-    // console.log(result, "result");
     const emergencyContact = {
       emergencyContactName: emergencyContactName,
       relationship: relationship,
@@ -42,15 +43,38 @@ const RegisterForm = () => {
       ...rest,
       emergencyContact,
     };
-try{
-    const result = await register(modifiedData);
-    if(result.data.success){
-      
+
+    //! Caution!!
+    try {
+    const res = await register(modifiedData);
+
+    if ("data" in res && res.data?.success) {
+      toast.success("Registration successful");
+    } else if ("error" in res) {
+      const error = res.error;
+
+      // Check if it's a FetchBaseQueryError
+      if ("status" in error) {
+        const errData = error.data as any;
+
+        if (Array.isArray(errData?.errorSources)) {
+          errData.errorSources.forEach((e: any) => {
+            toast.error(`${e.path}: ${e.message}`);
+          });
+        } else {
+          toast.error(errData?.message || "Registration failed.");
+        }
+      } else {
+        // SerializedError fallback
+        toast.error("Unexpected error occurred.");
+        console.error(error);
+      }
     }
-}    
-    console.log(modifiedData, "moddata");
-    console.log(result, "result");
-  };
+  } catch (err) {
+    toast.error("Something went wrong.");
+    console.error(err);
+  }
+};
 
   const fields = [
     { name: "name", label: "Full Name" },
