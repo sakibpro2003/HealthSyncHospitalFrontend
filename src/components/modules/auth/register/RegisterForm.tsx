@@ -1,6 +1,13 @@
 "use client";
 import { Button } from "@/components/ui/button";
 import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
   Form,
   FormControl,
   FormField,
@@ -35,7 +42,12 @@ const RegisterForm = () => {
       ...rest,
       emergencyContact,
     };
+try{
     const result = await register(modifiedData);
+    if(result.data.success){
+      
+    }
+}    
     console.log(modifiedData, "moddata");
     console.log(result, "result");
   };
@@ -44,15 +56,29 @@ const RegisterForm = () => {
     { name: "name", label: "Full Name" },
     { name: "phone", label: "Phone *" },
     { name: "email", label: "Email", type: "email" },
-    { name: "gender", label: "Gender" },
+    {
+      name: "gender",
+      label: "Gender",
+      type: "select",
+      options: ["male", "female", "other"],
+    },
     { name: "address", label: "Address" },
     { name: "dateOfBirth", label: "Date of Birth", type: "date" },
-    { name: "bloodGroup", label: "Blood Group" },
-    { name: "maritalStatus", label: "Marital Status" },
+    {
+      name: "bloodGroup",
+      label: "Blood Group",
+      type: "select",
+      options: ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"],
+    },
+    {
+      name: "maritalStatus",
+      label: "Marital Status",
+      type: "select",
+      options: ["single", "married", "divorced", "widowed"],
+    },
     { name: "emergencyContactName", label: "Emergency Contact Name" },
     { name: "emergencyContactPhone", label: "Emergency Contact Phone" },
 
-    // { name: "emergencyContactAddress", label: "Emergency Contact Address" },
     {
       name: "relationship",
       label: "Emergency Contact Relationship",
@@ -76,7 +102,7 @@ const RegisterForm = () => {
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)}>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              {fields.map(({ name, label, type = "text" }) => (
+              {fields.map(({ name, label, options, type = "text" }) => (
                 <FormField
                   key={name}
                   control={form.control}
@@ -91,6 +117,19 @@ const RegisterForm = () => {
                             placeholder=""
                             value={field.value || ""}
                           />
+                        ) : type === "select" ? (
+                          <Select onValueChange={field.onChange}>
+                            <SelectTrigger className="w-[180px]">
+                              <SelectValue placeholder={`${label}`} />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {options?.map((option) => (
+                                <SelectItem key={option} value={option}>
+                                  {option}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
                         ) : (
                           <Input
                             {...field}
