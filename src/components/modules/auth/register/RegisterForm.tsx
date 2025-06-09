@@ -10,13 +10,34 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { useRegisterMutation } from "@/redux/features/auth/authApi";
 import React from "react";
 import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
 
 const RegisterForm = () => {
+  const [register, { data, error }] = useRegisterMutation();
   const form = useForm();
-  const onSubmit: SubmitHandler<FieldValues> = (data) => {
-    console.log(data);
+  const onSubmit: SubmitHandler<FieldValues> = async (userData) => {
+    const {
+      emergencyContactName,
+      emergencyContactPhone,
+      relationship,
+      ...rest
+    } = userData;
+    // console.log(result, "result");
+    const emergencyContact = {
+      emergencyContactName: emergencyContactName,
+      relationship: relationship,
+      emergencyContactPhone: emergencyContactPhone,
+    };
+
+    const modifiedData = {
+      ...rest,
+      emergencyContact,
+    };
+    const result = await register(modifiedData);
+    console.log(modifiedData, "moddata");
+    console.log(result, "result");
   };
 
   const fields = [
@@ -25,21 +46,22 @@ const RegisterForm = () => {
     { name: "email", label: "Email", type: "email" },
     { name: "gender", label: "Gender" },
     { name: "address", label: "Address" },
-    { name: "date_of_birth", label: "Date of Birth", type: "date" },
-    { name: "blood_group", label: "Blood Group" },
-    { name: "marital_status", label: "Marital Status" },
-    { name: "emergency_contact_name", label: "Emergency Contact Name" },
-    { name: "emergency_contact_phone", label: "Emergency Contact Phone" },
-    { name: "emergency_contact_address", label: "Emergency Contact Address" },
+    { name: "dateOfBirth", label: "Date of Birth", type: "date" },
+    { name: "bloodGroup", label: "Blood Group" },
+    { name: "maritalStatus", label: "Marital Status" },
+    { name: "emergencyContactName", label: "Emergency Contact Name" },
+    { name: "emergencyContactPhone", label: "Emergency Contact Phone" },
+
+    // { name: "emergencyContactAddress", label: "Emergency Contact Address" },
     {
-      name: "emergency_contact_relationship",
+      name: "relationship",
       label: "Emergency Contact Relationship",
     },
     { name: "occupation", label: "Occupation" },
-    { name: "medical_history", label: "Medical History", type: "textarea" },
+    { name: "medicalHistory", label: "Medical History", type: "textarea" },
     { name: "allergies", label: "Allergies" },
     {
-      name: "current_medications",
+      name: "currentMedications",
       label: "Current Medications",
       type: "textarea",
     },
