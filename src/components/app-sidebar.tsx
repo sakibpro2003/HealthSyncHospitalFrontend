@@ -65,9 +65,14 @@ const data = {
           title: "Patients",
           url: "/receptionist/patients",
         },
+
         {
           title: "Settings",
           url: "#",
+        },
+        {
+          title: "68469294aec88e95ef869525",
+          url: "/receptionist/patient/68469294aec88e95ef869525",
         },
       ],
     },

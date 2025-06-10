@@ -1,20 +1,26 @@
 "use client";
 import Loader from "@/components/shared/Loader";
+import { Button } from "@/components/ui/button";
 import {
   Table,
   TableBody,
-  TableCaption,
   TableCell,
   TableHead,
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { IPatient, useGetAllPatientQuery } from "@/redux/features/patient/patientApi";
+import {
+  IPatient,
+  useGetAllPatientQuery,
+} from "@/redux/features/patient/patientApi";
+import Link from "next/link";
 import React from "react";
 
 const Patients = () => {
+  // const handleDetails=(_id)=>{
+  //   console.log(_id)
+  // }
   const { data, isLoading, error } = useGetAllPatientQuery();
-
 
   const patients = data?.data?.result ?? [];
 
@@ -23,27 +29,37 @@ const Patients = () => {
   if (patients.length === 0) return <p>No patients found.</p>;
 
   return (
-    <Table>
-      <TableCaption>View All Registered Patients</TableCaption>
-      <TableHeader>
-        <TableRow>
-          <TableHead>Name</TableHead>
-          <TableHead>Email</TableHead>
-          <TableHead>Phone</TableHead>
-          <TableHead>Gender</TableHead>
-        </TableRow>
-      </TableHeader>
-      <TableBody>
-        {patients.map((patient: IPatient) => (
-          <TableRow key={patient._id}>
-            <TableCell className="font-medium">{patient.name}</TableCell>
-            <TableCell>{patient.email}</TableCell>
-            <TableCell>{patient.phone}</TableCell>
-            <TableCell>{patient.gender}</TableCell>
+    <div>
+      <h3 className="text-3xl text-center ">Registered Patients</h3>
+      <Table className="mx-auto w-11/12 mt-4">
+        <TableHeader>
+          <TableRow>
+            <TableHead>Name</TableHead>
+            <TableHead>Email</TableHead>
+            <TableHead>Phone</TableHead>
+            <TableHead>Blood Group</TableHead>
+            <TableHead>Gender</TableHead>
+            <TableHead>Details</TableHead>
           </TableRow>
-        ))}
-      </TableBody>
-    </Table>
+        </TableHeader>
+        <TableBody>
+          {patients.map((patient: IPatient) => (
+            <TableRow key={patient._id}>
+              <TableCell className="font-medium">{patient.name}</TableCell>
+              <TableCell>{patient.email}</TableCell>
+              <TableCell>{patient.phone}</TableCell>
+              <TableCell>{patient.bloodGroup}</TableCell>
+              <TableCell>{patient.gender}</TableCell>
+              <TableCell>
+                <Link href={`/receptionist/patients/${patient._id}`}>
+                  <Button>Detail</Button>
+                </Link>
+              </TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+    </div>
   );
 };
 

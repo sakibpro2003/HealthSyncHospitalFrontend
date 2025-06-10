@@ -6,7 +6,7 @@ export interface IEmergencyContact {
   emergencyContactPhone: string;
 }
 export interface IPatient extends Document {
-    _id:string,
+  _id: string;
   name: string;
   role: string;
   email?: string;
@@ -34,13 +34,23 @@ interface GetAllPatientResponse {
   message: string;
   success: boolean;
 }
+interface GetSinglePatientResponse {
+  data: {
+    result: IPatient;
+  };
+  message: string;
+  success: boolean;
+}
 
 const patientApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
     getAllPatient: builder.query<GetAllPatientResponse, void>({
       query: () => "/patient/all-patient",
     }),
+    getSinglePatient: builder.query<GetSinglePatientResponse, string>({
+      query: (_id) => `/patient/single-patient/${_id}`,
+    }),
   }),
 });
 
-export const { useGetAllPatientQuery } = patientApi;
+export const { useGetAllPatientQuery,useGetSinglePatientQuery } = patientApi;
