@@ -59,11 +59,11 @@ const data = {
       items: [
         {
           title: "Register",
-          url: "/dashboard/patient-register",
+          url: "/receptionist/patient-register",
         },
         {
-          title: "Starred",
-          url: "#",
+          title: "Patients",
+          url: "/receptionist/patients",
         },
         {
           title: "Settings",

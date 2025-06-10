@@ -3,7 +3,7 @@ import React from 'react';
 const RegisterPatient = () => {
     return (
         <div>
-            welcome, receptionist
+            register pattient
         </div>
     );
 };
