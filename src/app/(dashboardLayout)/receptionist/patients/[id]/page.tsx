@@ -21,24 +21,32 @@ import { Textarea } from "@/components/ui/textarea";
 import React, { use, useEffect } from "react";
 import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
 import { toast } from "sonner";
-import { useGetSinglePatientQuery } from "@/redux/features/patient/patientApi";
+import {
+  useGetSinglePatientQuery,
+  useUpdatePatientMutation,
+} from "@/redux/features/patient/patientApi";
+import Loader from "@/components/shared/Loader";
 
 interface IParams {
   params: Promise<{ id: string }>;
 }
 const PatientDetailsPage = ({ params }: IParams) => {
   const { id } = use(params);
-  console.log(id, "get id");
   const { data, isLoading, error } = useGetSinglePatientQuery(id);
-
   const patientData = data?.data?.result;
   const form = useForm();
+  const [updatePatient, { isLoading: isUpdating, error: updateError }] =
+    useUpdatePatientMutation();
+
   useEffect(() => {
     if (patientData) {
       form.reset({
         ...patientData,
-        emergencyContactName: patientData.emergencyContact?.emergencyContactName || "",
-        emergencyContactPhone: patientData.emergencyContact?.emergencyContactPhone || "",
+        emergencyContactName:
+          patientData.emergencyContact?.emergencyContactName || "",
+        bloodGroup: patientData.bloodGroup || "",
+        emergencyContactPhone:
+          patientData.emergencyContact?.emergencyContactPhone || "",
         relationship: patientData.emergencyContact?.relationship || "",
         medicalHistory: Array.isArray(patientData.medicalHistory)
           ? patientData.medicalHistory.join(", ")
@@ -64,44 +72,32 @@ const PatientDetailsPage = ({ params }: IParams) => {
       relationship: relationship,
       emergencyContactPhone: emergencyContactPhone,
     };
-    
 
-    const modifiedData = {
+    const updatePayload = {
       ...rest,
       emergencyContact,
     };
 
     //! Caution!!
     try {
-      // const res = await register(modifiedData);
-
-      if ("data" in res && res.data?.success) {
-        toast.success("Registration successful");
-      } else if ("error" in res) {
-        const error = res.error;
-
-        // Check if it's a FetchBaseQueryError
-        if ("status" in error) {
-          const errData = error.data as any;
-
-          if (Array.isArray(errData?.errorSources)) {
-            errData.errorSources.forEach((e: any) => {
-              toast.error(`${e.path}: ${e.message}`);
-            });
-          } else {
-            toast.error(errData?.message || "Registration failed.");
-          }
-        } else {
-          // SerializedError fallback
-          toast.error("Unexpected error occurred.");
-          console.error(error);
-        }
+      const result2 = await updatePatient({
+        id,
+        updatePayload,
+      });
+      console.log(result2)
+      if (result2?.data?.success) {
+        toast.success("Patient updated successfully");
+      } else if (updateError) {
+        console.log(updateError, "pat update page");
       }
     } catch (err) {
-      toast.error("Something went wrong.");
-      console.error(err);
+      console.log(err);
     }
   };
+
+  if (isLoading || isUpdating) {
+    return <Loader></Loader>;
+  }
 
   const fields = [
     { name: "name", label: "Full Name" },
@@ -169,8 +165,13 @@ const PatientDetailsPage = ({ params }: IParams) => {
                             value={field.value || ""}
                           />
                         ) : type === "select" ? (
-                          <Select onValueChange={field.onChange}>
-                            <SelectTrigger className="w-[180px]">
+                          <Select
+                            onValueChange={(value) => {
+                              form.setValue(name, value);
+                            }}
+                            value={form.getValues(name) || ""}
+                          >
+                            <SelectTrigger className="w-full">
                               <SelectValue placeholder={`${label}`} />
                             </SelectTrigger>
                             <SelectContent>

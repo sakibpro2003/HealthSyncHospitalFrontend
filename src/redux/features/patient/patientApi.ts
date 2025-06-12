@@ -50,7 +50,24 @@ const patientApi = baseApi.injectEndpoints({
     getSinglePatient: builder.query<GetSinglePatientResponse, string>({
       query: (_id) => `/patient/single-patient/${_id}`,
     }),
+    updatePatient: builder.mutation({
+      query: ({
+        id,
+        updatePayload,
+      }: {
+        id: string;
+        updatePayload: Partial<IPatient>;
+      }) => ({
+        url: `/patient/update-patient/${id}`,
+        method: "PUT",
+        body: updatePayload,
+      }),
+    }),
   }),
 });
 
-export const { useGetAllPatientQuery,useGetSinglePatientQuery } = patientApi;
+export const {
+  useGetAllPatientQuery,
+  useGetSinglePatientQuery,
+  useUpdatePatientMutation,
+} = patientApi;
