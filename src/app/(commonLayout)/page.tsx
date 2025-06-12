@@ -1,5 +1,6 @@
 import DepartmentTabs from "@/components/DepartmentTabs";
 import BookAppointment from "@/components/Home/BookAppointment";
+import NewsletterSection from "@/components/Home/NewsletterSection";
 import Banner from "@/components/shared/Banner";
 import { Button } from "@/components/ui/button";
 // import { Carousel } from "@/components/ui/carousel";
@@ -10,7 +11,7 @@ const page = () => {
     <Banner></Banner>
     <DepartmentTabs></DepartmentTabs>
     <BookAppointment></BookAppointment>
-    <Button className="">click</Button>
+    <NewsletterSection></NewsletterSection>
   </div>;
 };
 
