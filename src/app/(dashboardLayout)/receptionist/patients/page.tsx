@@ -1,5 +1,6 @@
 "use client";
 import Loader from "@/components/shared/Loader";
+import Paginate from "@/components/shared/Paginate";
 import { Button } from "@/components/ui/button";
 import {
   Table,
@@ -17,9 +18,7 @@ import Link from "next/link";
 import React from "react";
 
 const Patients = () => {
-  // const handleDetails=(_id)=>{
-  //   console.log(_id)
-  // }
+  
   const { data, isLoading, error } = useGetAllPatientQuery();
 
   const patients = data?.data?.result ?? [];
@@ -59,6 +58,7 @@ const Patients = () => {
           ))}
         </TableBody>
       </Table>
+      <Paginate></Paginate>
     </div>
   );
 };
