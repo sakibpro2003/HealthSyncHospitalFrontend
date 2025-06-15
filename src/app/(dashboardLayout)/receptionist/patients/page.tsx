@@ -15,13 +15,17 @@ import {
   useGetAllPatientQuery,
 } from "@/redux/features/patient/patientApi";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import React from "react";
 
 const Patients = () => {
+  const searchParams = useSearchParams();
+  const page = searchParams.get("page")
+  const { data, isLoading, error } = useGetAllPatientQuery({page});
+  const patients = data?.data?.result?.result || [];
+  const meta = data?.data?.result?.meta;
+  const totalPage = Number(meta?.totalPage);
   
-  const { data, isLoading, error } = useGetAllPatientQuery();
-
-  const patients = data?.data?.result ?? [];
 
   if (isLoading) return <Loader></Loader>;
   if (error) return <p>Failed to load patients.</p>;
@@ -58,7 +62,7 @@ const Patients = () => {
           ))}
         </TableBody>
       </Table>
-      <Paginate></Paginate>
+      <Paginate totalPage={totalPage} ></Paginate>
     </div>
   );
 };

@@ -5,6 +5,12 @@ export interface IEmergencyContact {
   relationship: string;
   emergencyContactPhone: string;
 }
+type TMeta = {
+  limit: number;
+  page: number;
+  total: number;
+  totalPage: number;
+};
 export interface IPatient extends Document {
   _id: string;
   name: string;
@@ -25,11 +31,13 @@ export interface IPatient extends Document {
   createdBy: string;
   createdAt?: Date;
   updatedAt?: Date;
+  meta: TMeta;
 }
 
 interface GetAllPatientResponse {
   data: {
     result: IPatient[];
+    meta: TMeta;
   };
   message: string;
   success: boolean;
@@ -44,8 +52,8 @@ interface GetSinglePatientResponse {
 
 const patientApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
-    getAllPatient: builder.query<GetAllPatientResponse, void>({
-      query: () => "/patient/all-patient",
+    getAllPatient: builder.query<GetAllPatientResponse, { page: number }>({
+      query: ({ page = 1 }) => `/patient/all-patient?page=${page}`,
     }),
     getSinglePatient: builder.query<GetSinglePatientResponse, string>({
       query: (_id) => `/patient/single-patient/${_id}`,
