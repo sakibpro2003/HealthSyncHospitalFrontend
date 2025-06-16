@@ -6,7 +6,7 @@ const nextConfig: NextConfig = {
       "medeasy.health",
       "api.medeasy.health",
       "i.ibb.co",
-      "images.unsplash.com",
+      "images.unsplash.com","uhlbd.com"
     ],
     formats: ["image/webp"],
   },
