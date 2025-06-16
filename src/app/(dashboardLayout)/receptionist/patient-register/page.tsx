@@ -1,9 +1,10 @@
+import RegisterForm from '@/components/modules/auth/register/RegisterForm';
 import React from 'react';
 
 const RegisterPatient = () => {
     return (
         <div>
-            register pattient
+           <RegisterForm></RegisterForm>
         </div>
     );
 };

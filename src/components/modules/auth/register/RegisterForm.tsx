@@ -118,8 +118,8 @@ const RegisterForm = () => {
   ];
 
   return (
-    <div className="min-h-screen w-full bg-gray-50 p-4 md:p-8">
-      <div className="max-w-6xl mx-auto bg-white shadow-md rounded-lg p-6 md:p-10">
+    <div className="md:p-8">
+      <div className="mx-auto md:p-10">
         <h2 className="text-2xl md:text-3xl font-semibold mb-6 text-center">
           Patient Registration
         </h2>

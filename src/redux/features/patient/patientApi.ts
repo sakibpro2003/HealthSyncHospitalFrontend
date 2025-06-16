@@ -52,8 +52,8 @@ interface GetSinglePatientResponse {
 
 const patientApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
-    getAllPatient: builder.query<GetAllPatientResponse, { page: number }>({
-      query: ({ page = 1 }) => `/patient/all-patient?page=${page}`,
+    getAllPatient: builder.query<GetAllPatientResponse, { page: number,searchTerm:string }>({
+      query: ({ page = 1,searchTerm="" }) => `/patient/all-patient?page=${page}&searchTerm=${searchTerm}`,
     }),
     getSinglePatient: builder.query<GetSinglePatientResponse, string>({
       query: (_id) => `/patient/single-patient/${_id}`,

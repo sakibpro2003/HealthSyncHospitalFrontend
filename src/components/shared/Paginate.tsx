@@ -13,8 +13,6 @@ const Paginate = ({ totalPage }: { totalPage: number }) => {
   const searchParams = useSearchParams();
   const page = searchParams.get("page");
 
-  console.log(page, "p2");
-
   return (
     <Pagination>
       <PaginationContent>

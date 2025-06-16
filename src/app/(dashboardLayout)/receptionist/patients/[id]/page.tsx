@@ -84,7 +84,7 @@ const PatientDetailsPage = ({ params }: IParams) => {
         id,
         updatePayload,
       });
-      console.log(result2)
+      console.log(result2);
       if (result2?.data?.success) {
         toast.success("Patient updated successfully");
       } else if (updateError) {
@@ -146,6 +146,8 @@ const PatientDetailsPage = ({ params }: IParams) => {
         <h2 className="text-2xl md:text-3xl font-semibold mb-6 text-center">
           Patient Registration
         </h2>
+        
+
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)}>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
