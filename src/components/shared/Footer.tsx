@@ -2,6 +2,7 @@
 "use client";
 
 import Link from "next/link";
+import Logo from "../ui/Logo";
 
 export default function Footer() {
   return (
@@ -9,7 +10,9 @@ export default function Footer() {
       <div className="w-11/12 mx-auto grid grid-cols-1 md:grid-cols-3 gap-8">
         {/* Logo and short description */}
         <div>
-          <h1 className="text-xl font-bold text-primary mb-2">MediMart💊</h1>
+          <h1 className="text-xl font-bold text-primary mb-2">
+            <Logo></Logo>
+          </h1>
           <p className="text-sm">
             Your trusted online medicine partner. Safe and fast delivery at your doorstep.
           </p>
