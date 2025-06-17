@@ -42,7 +42,11 @@ const doctorApi = baseApi.injectEndpoints({
       query: (department = "") =>
         `/doctor/get-all-doctor?department=${department}`,
     }),
+    getSingleDoctor: builder.query<IDoctor, string | void>({
+      query: (_id) =>
+        `/doctor/get-doctor/${_id}`,
+    }),
   }),
 });
 
-export const { useGetAllDoctorQuery } = doctorApi;
+export const { useGetAllDoctorQuery , useGetSingleDoctorQuery} = doctorApi;
