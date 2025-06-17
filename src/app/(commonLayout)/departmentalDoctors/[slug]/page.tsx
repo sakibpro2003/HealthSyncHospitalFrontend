@@ -6,12 +6,13 @@ import { IDoctor } from "@/redux/features/doctor/doctorApi";
 import React from "react";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
+import Link from "next/link";
 
 const DepartmentDoctorsPage = () => {
   const params = useParams();
-  const id = params?.id as string; // id will be your department name
+  const slug = params?.slug as string; // id will be your department name
 
-  const { data, isLoading, error } = useGetAllDoctorQuery(id);
+  const { data, isLoading, error } = useGetAllDoctorQuery(slug);
   const doctors = data?.data?.result?.result;
 
   if (isLoading) return <p>Loading...</p>;
@@ -21,7 +22,7 @@ const DepartmentDoctorsPage = () => {
 
   return (
     <div className="w-11/12 mx-auto mt-6">
-      <h2 className="text-3xl font-bold text-center mb-6">{id} Doctors</h2>
+      <h2 className="text-3xl font-bold text-center mb-6">{slug} Doctors</h2>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {doctors.map((doctor: IDoctor) => (
           <div
@@ -44,9 +45,11 @@ const DepartmentDoctorsPage = () => {
               <p className="text-sm text-gray-500">
                 {doctor.education.join(", ")}
               </p>
-              <Button className="mt-2 px-3 py-1 text-white rounded  text-sm w-fit">
-                View Details
-              </Button>
+              <Link href={`/doctor-details/${doctor._id}`}>
+                <Button className="mt-2 px-3 py-1 text-white rounded  text-sm w-fit">
+                  View Details
+                </Button>
+              </Link>
             </div>
           </div>
         ))}
