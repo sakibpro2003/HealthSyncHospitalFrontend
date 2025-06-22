@@ -2,13 +2,6 @@
 "use client";
 import { Button } from "@/components/ui/button";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import {
   Form,
   FormControl,
   FormField,
@@ -17,47 +10,34 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { useLoginMutation } from "@/redux/features/auth/authApi";
 import React from "react";
 import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
 import { toast } from "sonner";
 
 const LoginForm = () => {
-  //   const [register] = useRegisterMutation();
   const [login] = useLoginMutation();
   const form = useForm();
+
+  const handleReceptionist = ()=>{
+    form.setValue("email","sakibprodhan2003@gmail.com")
+    form.setValue("password","123456")
+  }
+  const handleUser = ()=>{
+    form.setValue("email","user1@gmail.com")
+    form.setValue("password","123456")
+  }
+  
   const onSubmit: SubmitHandler<FieldValues> = async (userData) => {
-    const {
-      emergencyContactName,
-      emergencyContactPhone,
-      relationship,
-      ...rest
-    } = userData;
-    const emergencyContact = {
-      emergencyContactName: emergencyContactName,
-      relationship: relationship,
-      emergencyContactPhone: emergencyContactPhone,
-    };
-
-    const modifiedData = {
-      ...rest,
-      emergencyContact,
-    };
-
-    //! Caution!!
     try {
-      const res = await login(modifiedData);
+      const res = await login(userData);
 
       if ("data" in res && res.data?.success) {
         toast.success("Login successful");
       } else if ("error" in res) {
         const error = res.error;
-
-        // Check if it's a FetchBaseQueryError
         if ("status" in error) {
           const errData = error.data as any;
-
           if (Array.isArray(errData?.errorSources)) {
             errData.errorSources.forEach((e: any) => {
               toast.error(`${e.path}: ${e.message}`);
@@ -66,7 +46,6 @@ const LoginForm = () => {
             toast.error(errData?.message || "Login failed.");
           }
         } else {
-          // SerializedError fallback
           toast.error("Unexpected error occurred.");
           console.error(error);
         }
@@ -78,83 +57,48 @@ const LoginForm = () => {
   };
 
   const fields = [
-    // { name: "name", label: "Full Name" },
-    // { name: "phone", label: "Phone *" },
     { name: "email", label: "Email", type: "email" },
-    // {
-    //   name: "gender",
-    //   label: "Gender",
-    //   type: "select",
-    //   options: ["male", "female", "other"],
-    // },
-    // { name: "address", label: "Address" },
-    // { name: "dateOfBirth", label: "Date of Birth", type: "date" },
-    // {
-    //   name: "bloodGroup",
-    //   label: "Blood Group",
-    //   type: "select",
-    //   options: ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"],
-    // },
-    {name:"password",label:"Password",type:"password"}
+    { name: "password", label: "Password", type: "password" },
   ];
 
   return (
-    <div className="md:p-8">
-      <div className="mx-auto md:p-10">
-        <h2 className="text-2xl md:text-3xl font-semibold mb-6 text-center">
-          Patient Registration
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
+      <div className="w-full max-w-md bg-white shadow-lg rounded-2xl p-8">
+        <h2 className="text-3xl font-bold mb-6 text-center text-gray-800">
+          Welcome Back
         </h2>
+
+        <div className="flex gap-4">
+            <Button onClick={handleReceptionist} className="bg-red-500 mb-4">Receptionist Credentials</Button>
+        <Button onClick={handleUser} className="bg-red-500 mb-4">User Credentials</Button>
+        </div>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)}>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              {fields.map(({ name, label, type = "text" }) => (
-                <FormField
-                  key={name}
-                  control={form.control}
-                  name={name}
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>{label}</FormLabel>
-                      <FormControl>
-                        {type === "textarea" ? (
-                          <Textarea
-                            {...field}
-                            placeholder=""
-                            value={field.value || ""}
-                          />
-                        ) : type === "select" ? (
-                          <Select onValueChange={field.onChange}>
-                            <SelectTrigger className="w-[180px]">
-                              <SelectValue placeholder={`${label}`} />
-                            </SelectTrigger>
-                            {/* <SelectContent>
-                              {options?.map((option) => (
-                                <SelectItem key={option} value={option}>
-                                  {option}
-                                </SelectItem>
-                              ))}
-                            </SelectContent> */}
-                          </Select>
-                        ) : (
-                          <Input
-                            {...field}
-                            type={type}
-                            placeholder=""
-                            value={field.value || ""}
-                          />
-                        )}
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              ))}
-            </div>
-            <div className="mt-8 text-center">
-              <Button type="submit" className="w-full md:w-1/3">
-                Submit
-              </Button>
-            </div>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
+            {fields.map(({ name, label, type }) => (
+              <FormField
+                key={name}
+                control={form.control}
+                name={name}
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-gray-700">{label}</FormLabel>
+                    <FormControl>
+                      <Input
+                        {...field}
+                        type={type}
+                        className="w-full"
+                        value={field.value || ""}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            ))}
+
+            <Button type="submit" className="w-full text-base font-semibold">
+              Log In
+            </Button>
           </form>
         </Form>
       </div>
