@@ -7,7 +7,7 @@ const CommonLayoout = ({ children }: { children: React.ReactNode }) => {
     <div>
       <Navbar></Navbar>
       {children}
-      <Footer></Footer>
+      {/* <Footer></Footer> */}
     </div>
   );
 };

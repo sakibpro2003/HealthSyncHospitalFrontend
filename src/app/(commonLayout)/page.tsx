@@ -1,6 +1,6 @@
 // import DepartmentTabs from "@/components/DepartmentTabs";
 import BookAppointment from "@/components/Home/BookAppointment";
-import NewsletterSection from "@/components/Home/NewsletterSection";
+// import NewsletterSection from "@/components/Home/NewsletterSection";
 import Banner from "@/components/shared/Banner";
 import DepartmentButtons from "@/components/shared/DepartmentButtons";
 import Footer from "@/components/shared/Footer";
@@ -12,9 +12,9 @@ const page = () => {
   return <div className="h-screen">
     <Banner></Banner>
     {/* <DepartmentTabs></DepartmentTabs>          uninstall it */}
-    <DepartmentButtons></DepartmentButtons>
     <BookAppointment></BookAppointment>
-    <NewsletterSection></NewsletterSection>
+    <DepartmentButtons></DepartmentButtons>
+    {/* <NewsletterSection></NewsletterSection> */}
     <Footer></Footer>
   </div>;
 };

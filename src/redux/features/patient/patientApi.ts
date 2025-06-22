@@ -52,8 +52,12 @@ interface GetSinglePatientResponse {
 
 const patientApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
-    getAllPatient: builder.query<GetAllPatientResponse, { page: number,searchTerm:string }>({
-      query: ({ page = 1,searchTerm="" }) => `/patient/all-patient?page=${page}&searchTerm=${searchTerm}`,
+    getAllPatient: builder.query<
+      GetAllPatientResponse,
+      { page: number; searchTerm: string }
+    >({
+      query: ({ page = 1, searchTerm = "" }) =>
+        `/patient/all-patient?page=${page}&searchTerm=${searchTerm}`,
     }),
     getSinglePatient: builder.query<GetSinglePatientResponse, string>({
       query: (_id) => `/patient/single-patient/${_id}`,
@@ -69,6 +73,14 @@ const patientApi = baseApi.injectEndpoints({
         url: `/patient/update-patient/${id}`,
         method: "PUT",
         body: updatePayload,
+      }),
+    }),
+
+    register: builder.mutation({
+      query: (userInfo) => ({
+        url: "/patient/register-patient",
+        method: "POST",
+        body: userInfo,
       }),
     }),
   }),
