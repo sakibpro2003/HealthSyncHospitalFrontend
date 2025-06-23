@@ -31,25 +31,27 @@ const LoginForm = () => {
   const onSubmit: SubmitHandler<FieldValues> = async (userData) => {
     try {
       const res = await login(userData);
+      console.log(res,'resssss')
+      // console.log(res.data.data.result.accessToken,'token')
 
-      if ("data" in res && res.data?.success) {
-        toast.success("Login successful");
-      } else if ("error" in res) {
-        const error = res.error;
-        if ("status" in error) {
-          const errData = error.data as any;
-          if (Array.isArray(errData?.errorSources)) {
-            errData.errorSources.forEach((e: any) => {
-              toast.error(`${e.path}: ${e.message}`);
-            });
-          } else {
-            toast.error(errData?.message || "Login failed.");
-          }
-        } else {
-          toast.error("Unexpected error occurred.");
-          console.error(error);
-        }
-      }
+      // if ("data" in res && res.data?.success) {
+      //   toast.success("Login successful");
+      // } else if ("error" in res) {
+      //   const error = res.error;
+      //   if ("status" in error) {
+      //     const errData = error.data as any;
+      //     if (Array.isArray(errData?.errorSources)) {
+      //       errData.errorSources.forEach((e: any) => {
+      //         toast.error(`${e.path}: ${e.message}`);
+      //       });
+      //     } else {
+      //       toast.error(errData?.message || "Login failed.");
+      //     }
+      //   } else {
+      //     toast.error("Unexpected error occurred.");
+      //     console.error(error);
+      //   }
+      // }
     } catch (err) {
       toast.error("Something went wrong.");
       console.error(err);
