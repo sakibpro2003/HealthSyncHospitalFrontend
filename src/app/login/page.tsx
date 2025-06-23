@@ -25,6 +25,7 @@ import { useLoginMutation } from "@/redux/features/auth/authApi";
 const LoginForm = () => {
   const router = useRouter();
   const [login] = useLoginMutation();
+  
   const form = useForm();
 
   const handleReceptionist = () => {
@@ -46,7 +47,6 @@ const LoginForm = () => {
         const token = res.data.data.accessToken;
         if (token) {
           const decoded = jwtDecode(token);
-          console.log("Decoded JWT:", decoded);
 
           if (decoded?.role === "user") {
             router.push("/");

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { jwtVerify } from "jose";
+import { getDecodedToken } from "./utils/decodeTokens";
 // import { Router, useRouter } from "next/router";
 
 const authRoutes = ["/login", "/register"];
@@ -9,6 +10,8 @@ export async function middleware(request: NextRequest) {
   console.log("hello");
 
   const token = request.cookies.get("token")?.value;
+  console.log(token,"middlesware token")
+  getDecodedToken(token);
   const pathname = request.nextUrl.pathname;
 
   if (token) {
@@ -16,6 +19,7 @@ export async function middleware(request: NextRequest) {
       const secret = new TextEncoder().encode(JWT_ACCESS_SECRET);
       const { payload } = await jwtVerify(token, secret);
       console.log("Token is valid:", payload);
+      
 
       if (authRoutes.includes(pathname)) {
         return NextResponse.redirect(new URL("/", request.url));

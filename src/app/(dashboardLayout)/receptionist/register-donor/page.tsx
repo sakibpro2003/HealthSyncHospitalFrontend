@@ -18,14 +18,14 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { useRegisterMutation } from "@/redux/features/auth/authApi";
+// import { useRegisterMutation } from "@/redux/features/auth/authApi";
 import React from "react";
 import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { useRegisterDonorMutation } from "@/redux/features/donor/donorApi";
 
-const RegisterForm = () => {
-  const [register] = useRegisterDonorMutation();
+const RegisterDonorForm = () => {
+  const [registerDonor] = useRegisterDonorMutation();
   const form = useForm();
   const onSubmit: SubmitHandler<FieldValues> = async (userData) => {
     const {
@@ -47,75 +47,56 @@ const RegisterForm = () => {
 
     //! Caution!!
     try {
-    const res = await register(modifiedData);
+      const res = await registerDonor(modifiedData);
 
-    if ("data" in res && res.data?.success) {
-      toast.success("Registration successful");
-    } else if ("error" in res) {
-      const error = res.error;
+      if ("data" in res && res.data?.success) {
+        toast.success("Registration successful");
+      } else if ("error" in res) {
+        const error = res.error;
 
-      // Check if it's a FetchBaseQueryError
-      if ("status" in error) {
-        const errData = error.data as any;
+        // Check if it's a FetchBaseQueryError
+        if ("status" in error) {
+          const errData = error.data as any;
 
-        if (Array.isArray(errData?.errorSources)) {
-          errData.errorSources.forEach((e: any) => {
-            toast.error(`${e.path}: ${e.message}`);
-          });
+          if (Array.isArray(errData?.errorSources)) {
+            errData.errorSources.forEach((e: any) => {
+              toast.error(`${e.path}: ${e.message}`);
+            });
+          } else {
+            toast.error(errData?.message || "Registration failed.");
+          }
         } else {
-          toast.error(errData?.message || "Registration failed.");
+          // SerializedError fallback
+          toast.error("Unexpected error occurred.");
+          console.error(error);
         }
-      } else {
-        // SerializedError fallback
-        toast.error("Unexpected error occurred.");
-        console.error(error);
       }
+    } catch (err) {
+      toast.error("Something went wrong.");
+      console.error(err);
     }
-  } catch (err) {
-    toast.error("Something went wrong.");
-    console.error(err);
-  }
-};
+  };
 
   const fields = [
     { name: "name", label: "Full Name" },
     { name: "phone", label: "Phone *" },
+    { name: "address", label: "Address *" },
     { name: "email", label: "Email", type: "email" },
+    { name: "age", label: "Age", type: "number" },
     {
       name: "gender",
       label: "Gender",
       type: "select",
       options: ["male", "female", "other"],
     },
-    { name: "address", label: "Address" },
-    { name: "dateOfBirth", label: "Date of Birth", type: "date" },
     {
       name: "bloodGroup",
       label: "Blood Group",
       type: "select",
       options: ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"],
     },
-    {
-      name: "maritalStatus",
-      label: "Marital Status",
-      type: "select",
-      options: ["single", "married", "divorced", "widowed"],
-    },
-    { name: "emergencyContactName", label: "Emergency Contact Name" },
-    { name: "emergencyContactPhone", label: "Emergency Contact Phone" },
-
-    {
-      name: "relationship",
-      label: "Emergency Contact Relationship",
-    },
-    { name: "occupation", label: "Occupation" },
-    { name: "medicalHistory", label: "Medical History", type: "textarea" },
-    { name: "allergies", label: "Allergies" },
-    {
-      name: "currentMedications",
-      label: "Current Medications",
-      type: "textarea",
-    },
+    { name: "quantity", label: "Quantity", type: "number" },
+    { name: "lastDonationDate", type: "date", label: "Last Donation Date" },
   ];
 
   return (
@@ -182,4 +163,4 @@ const RegisterForm = () => {
   );
 };
 
-export default RegisterForm;
+export default RegisterDonorForm;

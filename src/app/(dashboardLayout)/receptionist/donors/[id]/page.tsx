@@ -18,15 +18,50 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { useRegisterMutation } from "@/redux/features/auth/authApi";
-import React from "react";
+import React, { use, useEffect } from "react";
 import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
 import { toast } from "sonner";
-import { useRegisterDonorMutation } from "@/redux/features/donor/donorApi";
+import {
+  // useGetSinglePatientQuery,
+  useUpdatePatientMutation,
+} from "@/redux/features/patient/patientApi";
+import Loader from "@/components/shared/Loader";
+import { useGetSingleDonorQuery } from "@/redux/features/donor/donorApi";
 
-const RegisterForm = () => {
-  const [register] = useRegisterDonorMutation();
+interface IParams {
+  params: Promise<{ id: string }>;
+}
+const PatientDetailsPage = ({ params }: IParams) => {
+  const { id } = use(params);
+  const { data, isLoading, error } = useGetSingleDonorQuery(id);
+  const donor = data?.data?.result;
+  console.log(donor,'donor')
   const form = useForm();
+  const [updatePatient, { isLoading: isUpdating, error: updateError }] =
+    useUpdatePatientMutation();
+
+  useEffect(() => {
+    if (donor) {
+      form.reset({
+        ...donor,
+        emergencyContactName:
+          donor.emergencyContact?.emergencyContactName || "",
+        bloodGroup: donor.bloodGroup || "",
+        emergencyContactPhone:
+          donor.emergencyContact?.emergencyContactPhone || "",
+        relationship: donor.emergencyContact?.relationship || "",
+        medicalHistory: Array.isArray(donor.medicalHistory)
+          ? donor.medicalHistory.join(", ")
+          : donor.medicalHistory || "",
+        allergies: Array.isArray(donor.allergies)
+          ? donor.allergies.join(", ")
+          : donor.allergies || "",
+        currentMedications: Array.isArray(donor.currentMedications)
+          ? donor.currentMedications.join(", ")
+          : donor.currentMedications || "",
+      });
+    }
+  }, [donor, form]);
   const onSubmit: SubmitHandler<FieldValues> = async (userData) => {
     const {
       emergencyContactName,
@@ -40,90 +75,62 @@ const RegisterForm = () => {
       emergencyContactPhone: emergencyContactPhone,
     };
 
-    const modifiedData = {
+    const updatePayload = {
       ...rest,
       emergencyContact,
     };
 
     //! Caution!!
     try {
-    const res = await register(modifiedData);
-
-    if ("data" in res && res.data?.success) {
-      toast.success("Registration successful");
-    } else if ("error" in res) {
-      const error = res.error;
-
-      // Check if it's a FetchBaseQueryError
-      if ("status" in error) {
-        const errData = error.data as any;
-
-        if (Array.isArray(errData?.errorSources)) {
-          errData.errorSources.forEach((e: any) => {
-            toast.error(`${e.path}: ${e.message}`);
-          });
-        } else {
-          toast.error(errData?.message || "Registration failed.");
-        }
-      } else {
-        // SerializedError fallback
-        toast.error("Unexpected error occurred.");
-        console.error(error);
+      const result2 = await updatePatient({
+        id,
+        updatePayload,
+      });
+      console.log(result2);
+      if (result2?.data?.success) {
+        toast.success("Patient updated successfully");
+      } else if (updateError) {
+        console.log(updateError, "pat update page");
       }
+    } catch (err) {
+      console.log(err);
     }
-  } catch (err) {
-    toast.error("Something went wrong.");
-    console.error(err);
+  };
+
+  if (isLoading || isUpdating) {
+    return <Loader></Loader>;
   }
-};
 
   const fields = [
     { name: "name", label: "Full Name" },
     { name: "phone", label: "Phone *" },
+    { name: "address", label: "Address *" },
     { name: "email", label: "Email", type: "email" },
+    { name: "age", label: "Age", type: "number" },
     {
       name: "gender",
       label: "Gender",
       type: "select",
       options: ["male", "female", "other"],
     },
-    { name: "address", label: "Address" },
-    { name: "dateOfBirth", label: "Date of Birth", type: "date" },
+
     {
       name: "bloodGroup",
       label: "Blood Group",
       type: "select",
       options: ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"],
     },
-    {
-      name: "maritalStatus",
-      label: "Marital Status",
-      type: "select",
-      options: ["single", "married", "divorced", "widowed"],
-    },
-    { name: "emergencyContactName", label: "Emergency Contact Name" },
-    { name: "emergencyContactPhone", label: "Emergency Contact Phone" },
-
-    {
-      name: "relationship",
-      label: "Emergency Contact Relationship",
-    },
-    { name: "occupation", label: "Occupation" },
-    { name: "medicalHistory", label: "Medical History", type: "textarea" },
-    { name: "allergies", label: "Allergies" },
-    {
-      name: "currentMedications",
-      label: "Current Medications",
-      type: "textarea",
-    },
+    { name: "quantity", label: "Quantity", type: "number" },
+    { name: "lastDonationDate", type: "date", label: "Last Donation Date" },
   ];
 
   return (
-    <div className="md:p-8">
-      <div className="mx-auto md:p-10">
+    <div className="p-4 md:p-8">
+      <div className="mx-auto rounded-lg">
         <h2 className="text-2xl md:text-3xl font-semibold mb-6 text-center">
           Patient Registration
         </h2>
+
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)}>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -143,8 +150,13 @@ const RegisterForm = () => {
                             value={field.value || ""}
                           />
                         ) : type === "select" ? (
-                          <Select onValueChange={field.onChange}>
-                            <SelectTrigger className="w-[180px]">
+                          <Select
+                            onValueChange={(value) => {
+                              form.setValue(name, value);
+                            }}
+                            value={form.getValues(name) || ""}
+                          >
+                            <SelectTrigger className="w-full">
                               <SelectValue placeholder={`${label}`} />
                             </SelectTrigger>
                             <SelectContent>
@@ -182,4 +194,4 @@ const RegisterForm = () => {
   );
 };
 
-export default RegisterForm;
+export default PatientDetailsPage;
