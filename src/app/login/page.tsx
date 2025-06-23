@@ -1,5 +1,12 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
+
+import React from "react";
+import { useForm, FieldValues, SubmitHandler } from "react-hook-form";
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
+import {jwtDecode} from "jwt-decode";
+
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -10,48 +17,51 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+
 import { useLoginMutation } from "@/redux/features/auth/authApi";
-import React from "react";
-import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
-import { toast } from "sonner";
+
+
 
 const LoginForm = () => {
+  const router = useRouter();
   const [login] = useLoginMutation();
   const form = useForm();
 
-  const handleReceptionist = ()=>{
-    form.setValue("email","sakibprodhan2003@gmail.com")
-    form.setValue("password","123456")
-  }
-  const handleUser = ()=>{
-    form.setValue("email","user1@gmail.com")
-    form.setValue("password","123456")
-  }
-  
+  const handleReceptionist = () => {
+    form.setValue("email", "sakibprodhan2003@gmail.com");
+    form.setValue("password", "123456");
+  };
+
+  const handleUser = () => {
+    form.setValue("email", "user1@gmail.com");
+    form.setValue("password", "123456");
+  };
+
   const onSubmit: SubmitHandler<FieldValues> = async (userData) => {
     try {
       const res = await login(userData);
-      console.log(res,'resssss')
-      // console.log(res.data.data.result.accessToken,'token')
+      console.log(res,"resss")
+      if (res?.data?.success) {
+        console.log(res.data.data.accessToken,"sakib")
+        const token = res.data.data.accessToken;
+        if (token) {
+          const decoded = jwtDecode(token);
+          console.log("Decoded JWT:", decoded);
 
-      // if ("data" in res && res.data?.success) {
-      //   toast.success("Login successful");
-      // } else if ("error" in res) {
-      //   const error = res.error;
-      //   if ("status" in error) {
-      //     const errData = error.data as any;
-      //     if (Array.isArray(errData?.errorSources)) {
-      //       errData.errorSources.forEach((e: any) => {
-      //         toast.error(`${e.path}: ${e.message}`);
-      //       });
-      //     } else {
-      //       toast.error(errData?.message || "Login failed.");
-      //     }
-      //   } else {
-      //     toast.error("Unexpected error occurred.");
-      //     console.error(error);
-      //   }
-      // }
+          if (decoded?.role === "user") {
+            router.push("/");
+          } else if (decoded?.role === "receptionist") {
+            router.push("/receptionist");
+          } else {
+            // fallback redirect or show error
+            toast.error("Unknown role detected.");
+          }
+        } else {
+          toast.error("No access token received.");
+        }
+      } else {
+        toast.error("Login failed.");
+      }
     } catch (err) {
       toast.error("Something went wrong.");
       console.error(err);
@@ -71,9 +81,14 @@ const LoginForm = () => {
         </h2>
 
         <div className="flex gap-4">
-            <Button onClick={handleReceptionist} className="bg-red-500 mb-4">Receptionist Credentials</Button>
-        <Button onClick={handleUser} className="bg-red-500 mb-4">User Credentials</Button>
+          <Button onClick={handleReceptionist} className="bg-red-500 mb-4">
+            Receptionist Credentials
+          </Button>
+          <Button onClick={handleUser} className="bg-red-500 mb-4">
+            User Credentials
+          </Button>
         </div>
+
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
             {fields.map(({ name, label, type }) => (
