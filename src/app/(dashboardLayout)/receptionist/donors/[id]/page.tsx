@@ -26,63 +26,130 @@ import {
   useUpdatePatientMutation,
 } from "@/redux/features/patient/patientApi";
 import Loader from "@/components/shared/Loader";
-import { useGetSingleDonorQuery } from "@/redux/features/donor/donorApi";
+import { useGetSingleDonorQuery, useUpdateDonorMutation } from "@/redux/features/donor/donorApi";
 
 interface IParams {
   params: Promise<{ id: string }>;
 }
+const fields = [
+  { name: "name", label: "Full Name" },
+  { name: "phone", label: "Phone *" },
+  { name: "address", label: "Address *" },
+  { name: "email", label: "Email", type: "email" },
+  { name: "age", label: "Age", type: "number" },
+  {
+    name: "gender",
+    label: "Gender",
+    type: "select",
+    options: ["male", "female", "other"],
+  },
+
+  {
+    name: "bloodGroup",
+    label: "Blood Group",
+    type: "select",
+    options: ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"],
+  },
+  { name: "quantity", label: "Quantity", type: "number" },
+  { name: "lastDonationDate", type: "date", label: "Last Donation Date" },
+];
 const PatientDetailsPage = ({ params }: IParams) => {
   const { id } = use(params);
   const { data, isLoading, error } = useGetSingleDonorQuery(id);
   const donor = data?.data?.result;
-  console.log(donor,'donor')
+  console.log(donor, "donor");
   const form = useForm();
-  const [updatePatient, { isLoading: isUpdating, error: updateError }] =
-    useUpdatePatientMutation();
+  const [updateDonor, { isLoading: isUpdating, error: updateError }] =
+    useUpdateDonorMutation();
+
+  // useEffect(() => {
+  //   if (donor) {
+  //     form.reset({
+  //       ...donor,
+  //       emergencyContactName:
+  //         donor.emergencyContact?.emergencyContactName || "",
+  //       bloodGroup: donor.bloodGroup || "",
+  //       emergencyContactPhone:
+  //         donor.emergencyContact?.emergencyContactPhone || "",
+  //       relationship: donor.emergencyContact?.relationship || "",
+  //       medicalHistory: Array.isArray(donor.medicalHistory)
+  //         ? donor.medicalHistory.join(", ")
+  //         : donor.medicalHistory || "",
+  //       allergies: Array.isArray(donor.allergies)
+  //         ? donor.allergies.join(", ")
+  //         : donor.allergies || "",
+  //       currentMedications: Array.isArray(donor.currentMedications)
+  //         ? donor.currentMedications.join(", ")
+  //         : donor.currentMedications || "",
+  //     });
+  //   }
+  // }, [donor, form]);
 
   useEffect(() => {
     if (donor) {
-      form.reset({
-        ...donor,
-        emergencyContactName:
-          donor.emergencyContact?.emergencyContactName || "",
-        bloodGroup: donor.bloodGroup || "",
-        emergencyContactPhone:
-          donor.emergencyContact?.emergencyContactPhone || "",
-        relationship: donor.emergencyContact?.relationship || "",
-        medicalHistory: Array.isArray(donor.medicalHistory)
-          ? donor.medicalHistory.join(", ")
-          : donor.medicalHistory || "",
-        allergies: Array.isArray(donor.allergies)
-          ? donor.allergies.join(", ")
-          : donor.allergies || "",
-        currentMedications: Array.isArray(donor.currentMedications)
-          ? donor.currentMedications.join(", ")
-          : donor.currentMedications || "",
+      const resetData: Record<string, any> = {};
+
+      fields.forEach(({ name }) => {
+        if (
+          name === "emergencyContactName" ||
+          name === "emergencyContactPhone" ||
+          name === "relationship"
+        ) {
+          // These come from donor.emergencyContact — skip here since you handle separately below
+          return;
+        }
+
+        // For fields that might be arrays (medicalHistory, allergies, currentMedications), handle specially
+        if (name === "medicalHistory" && donor.medicalHistory) {
+          resetData.medicalHistory = Array.isArray(donor.medicalHistory)
+            ? donor.medicalHistory.join(", ")
+            : donor.medicalHistory;
+        } else if (name === "allergies" && donor.allergies) {
+          resetData.allergies = Array.isArray(donor.allergies)
+            ? donor.allergies.join(", ")
+            : donor.allergies;
+        } else if (name === "currentMedications" && donor.currentMedications) {
+          resetData.currentMedications = Array.isArray(donor.currentMedications)
+            ? donor.currentMedications.join(", ")
+            : donor.currentMedications;
+        } else {
+          // Default: copy from donor or empty string
+          resetData[name] = donor[name] ?? "";
+        }
       });
+
+      // Add emergencyContact fields separately
+      resetData.emergencyContactName =
+        donor.emergencyContact?.emergencyContactName || "";
+      resetData.emergencyContactPhone =
+        donor.emergencyContact?.emergencyContactPhone || "";
+      resetData.relationship = donor.emergencyContact?.relationship || "";
+
+      // Add bloodGroup specifically if not already present
+      if (!resetData.bloodGroup) {
+        resetData.bloodGroup = donor.bloodGroup || "";
+      }
+
+      form.reset(resetData);
     }
-  }, [donor, form]);
+  }, [donor, form, fields]);
+
   const onSubmit: SubmitHandler<FieldValues> = async (userData) => {
-    const {
-      emergencyContactName,
-      emergencyContactPhone,
-      relationship,
+    const  {
+      
+      
       ...rest
     } = userData;
-    const emergencyContact = {
-      emergencyContactName: emergencyContactName,
-      relationship: relationship,
-      emergencyContactPhone: emergencyContactPhone,
-    };
+    
 
     const updatePayload = {
       ...rest,
-      emergencyContact,
+     
     };
 
     //! Caution!!
     try {
-      const result2 = await updatePatient({
+      const result2 = await updateDonor({
         id,
         updatePayload,
       });
@@ -100,29 +167,6 @@ const PatientDetailsPage = ({ params }: IParams) => {
   if (isLoading || isUpdating) {
     return <Loader></Loader>;
   }
-
-  const fields = [
-    { name: "name", label: "Full Name" },
-    { name: "phone", label: "Phone *" },
-    { name: "address", label: "Address *" },
-    { name: "email", label: "Email", type: "email" },
-    { name: "age", label: "Age", type: "number" },
-    {
-      name: "gender",
-      label: "Gender",
-      type: "select",
-      options: ["male", "female", "other"],
-    },
-
-    {
-      name: "bloodGroup",
-      label: "Blood Group",
-      type: "select",
-      options: ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"],
-    },
-    { name: "quantity", label: "Quantity", type: "number" },
-    { name: "lastDonationDate", type: "date", label: "Last Donation Date" },
-  ];
 
   return (
     <div className="p-4 md:p-8">

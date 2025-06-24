@@ -21,11 +21,18 @@ const donorApi = baseApi.injectEndpoints({
         method: "GET",
       }),
     }),
+    updateDonor: builder.mutation({
+      query: ({_id,donorPayload}) => ({
+        url: `/donor/update-donor/${_id}`,
+        method: "PUT",
+        body: donorPayload,
+      }),
+    }),
   }),
 });
 
 export const {
   useRegisterDonorMutation,
   useViewDonorQuery,
-  useGetSingleDonorQuery,
+  useGetSingleDonorQuery,useUpdateDonorMutation
 } = donorApi;

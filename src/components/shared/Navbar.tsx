@@ -19,14 +19,10 @@ const Navbar = () => {
   const [logoutUser] = useLogoutUserMutation();
 
   const handleLogout = () => {
-    // ✅ Remove token from cookies
     logoutUser({});
-    // Cookies.remove("token");
 
-    // ✅ Clear Redux auth state
     dispatch(logOut());
 
-    // ✅ Redirect to login page
     router.push("/login");
   };
 
@@ -39,7 +35,7 @@ const Navbar = () => {
   ];
 
   return (
-    <nav className="w-11/12 mx-auto border-gray-200 dark:bg-gray-900 sticky top-0 z-50">
+    <nav className="w-11/12 mx-auto bg-white border-gray-200 dark:bg-gray-900 sticky top-0 z-50">
       <div className="flex flex-wrap items-center justify-between mx-auto p-4">
         <Link
           href="/"

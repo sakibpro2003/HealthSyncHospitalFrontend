@@ -1,12 +1,7 @@
 "use client";
 
 import * as React from "react";
-import {
-  Bot,
-  GalleryVerticalEnd,
-  
-  SquareTerminal,
-} from "lucide-react";
+import { Bot, GalleryVerticalEnd, SquareTerminal } from "lucide-react";
 
 import { NavMain } from "@/components/nav-main";
 import { NavUser } from "@/components/nav-user";
@@ -19,7 +14,6 @@ import {
   SidebarRail,
 } from "@/components/ui/sidebar";
 
-// This is sample data.
 const data = {
   user: {
     name: "shadcn",
@@ -31,7 +25,7 @@ const data = {
       name: "HealthSync Hospital",
       logo: GalleryVerticalEnd,
       plan: "Enterprise",
-    }
+    },
   ],
   navMain: [
     {
@@ -47,7 +41,7 @@ const data = {
         {
           title: "Patients",
           url: "/receptionist/patients",
-        }
+        },
       ],
     },
     {
@@ -62,6 +56,17 @@ const data = {
         {
           title: "View Donor",
           url: "/receptionist/donors",
+        },
+      ],
+    },
+    {
+      title: "Blood Bank",
+      url: "/receptionist/blood-bank",
+      icon: Bot,
+      items: [
+        {
+          title: "View Blood Bank",
+          url: "/receptionist/blood-bank",
         },
       ],
     },
