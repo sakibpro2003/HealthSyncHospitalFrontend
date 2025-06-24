@@ -2,9 +2,7 @@
 
 import * as React from "react";
 import {
-  AudioWaveform,
   Bot,
-  Command,
   GalleryVerticalEnd,
   
   SquareTerminal,
@@ -30,20 +28,10 @@ const data = {
   },
   teams: [
     {
-      name: "Acme Inc",
+      name: "HealthSync Hospital",
       logo: GalleryVerticalEnd,
       plan: "Enterprise",
-    },
-    {
-      name: "Acme Corp.",
-      logo: AudioWaveform,
-      plan: "Startup",
-    },
-    {
-      name: "Evil Corp.",
-      logo: Command,
-      plan: "Free",
-    },
+    }
   ],
   navMain: [
     {
@@ -59,16 +47,7 @@ const data = {
         {
           title: "Patients",
           url: "/receptionist/patients",
-        },
-
-        {
-          title: "Settings",
-          url: "#",
-        },
-        {
-          title: "68469294aec88e95ef869525",
-          url: "/receptionist/patient/68469294aec88e95ef869525",
-        },
+        }
       ],
     },
     {
