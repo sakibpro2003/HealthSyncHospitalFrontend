@@ -1,4 +1,5 @@
 // import DepartmentTabs from "@/components/DepartmentTabs";
+import AccordioSection from "@/components/Home/AccordioSection";
 import BookAppointment from "@/components/Home/BookAppointment";
 // import NewsletterSection from "@/components/Home/NewsletterSection";
 import Banner from "@/components/shared/Banner";
@@ -15,6 +16,7 @@ const page = () => {
     <BookAppointment></BookAppointment>
     <DepartmentButtons></DepartmentButtons>
     {/* <NewsletterSection></NewsletterSection> */}
+    <AccordioSection></AccordioSection>
     <Footer></Footer>
   </div>;
 };
