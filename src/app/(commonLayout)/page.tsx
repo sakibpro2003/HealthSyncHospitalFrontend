@@ -1,6 +1,6 @@
 // import DepartmentTabs from "@/components/DepartmentTabs";
 import AccordioSection from "@/components/Home/AccordioSection";
-import BookAppointment from "@/components/Home/BookAppointment";
+import BookAppointment from "@/components/Home/DiscountSection";
 // import NewsletterSection from "@/components/Home/NewsletterSection";
 import Banner from "@/components/shared/Banner";
 import DepartmentButtons from "@/components/shared/DepartmentButtons";
@@ -14,6 +14,7 @@ const page = () => {
   return (
     <div className="h-screen">
       <Banner></Banner>
+      {/* TODO:              uninstall slider js */}
       {/* <Slider></Slider> */}
       {/* <DepartmentTabs></DepartmentTabs>          uninstall it */}
       <BookAppointment></BookAppointment>

@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import discountImage from "../../assets/discount.jpg";
 
 const BookAppointment = () => {
   return (
@@ -8,10 +9,13 @@ const BookAppointment = () => {
         {/* Text Content */}
         <div>
           <h2 className="text-4xl font-extrabold text-gray-800 mb-4">
-            Get Up to <span className="text-red-500">30% Off</span> on Your Medicine Order!
+            Get Up to <span className="text-red-500">50% Off</span> on Your
+            Medicine Order!
           </h2>
           <p className="text-gray-600 mb-6">
-            Save big on essential medicines and healthcare products. Limited-time offer for first-time customers. Fast delivery and quality assurance, just for you!
+            Save big on essential medicines and healthcare products.
+            Limited-time offer for first-time customers. Fast delivery and
+            quality assurance, just for you!
           </p>
           <Link href="/products">
             <button className="btn-custom p-3 rounded-full font-medium shadow hover:bg-blue-700 transition">
@@ -23,10 +27,10 @@ const BookAppointment = () => {
         {/* Image */}
         <div className="relative w-full h-64 md:h-80">
           <Image
-            src="https://medeasy.health/_next/image?url=https%3A%2F%2Fapi.medeasy.health%2Fmedia%2Fsliders%2Fadp-4.png&w=3840&q=https://i.ibb.co/Ghtbh7x/pexels-photo-1379636.jpg" // replace with your image path
-            alt="Discount Offer"
-            width={300}
-            height={300}
+            src={discountImage}
+            alt="discount image"
+            fill
+            sizes="500px"
             className="object-cover rounded-xl shadow-lg"
             priority
           />
