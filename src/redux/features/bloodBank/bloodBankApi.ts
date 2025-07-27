@@ -11,7 +11,7 @@ const bloodBankApi = baseApi.injectEndpoints({
     handleBloodDonateQuery: builder.mutation({
       query: () => ({
         url: "/blood-bank/donate-blood",
-        method: "PUT",
+        method: "POST",
       }),
     }),
   }),

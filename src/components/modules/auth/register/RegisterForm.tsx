@@ -18,7 +18,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { useRegisterMutation } from "@/redux/features/auth/authApi";
+// import { useRegisterMutation } from "@/redux/features/auth/authApi";
 import React from "react";
 import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
 import { toast } from "sonner";
