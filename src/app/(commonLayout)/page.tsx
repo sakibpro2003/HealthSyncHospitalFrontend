@@ -1,6 +1,7 @@
 // import DepartmentTabs from "@/components/DepartmentTabs";
 import AccordioSection from "@/components/Home/AccordioSection";
 import BookAppointment from "@/components/Home/DiscountSection";
+import PackageCard from "@/components/Home/PackageCard";
 // import NewsletterSection from "@/components/Home/NewsletterSection";
 import Banner from "@/components/shared/Banner";
 import DepartmentButtons from "@/components/shared/DepartmentButtons";
@@ -19,6 +20,7 @@ const page = () => {
       {/* <DepartmentTabs></DepartmentTabs>          uninstall it */}
       <BookAppointment></BookAppointment>
       <DepartmentButtons></DepartmentButtons>
+      <PackageCard></PackageCard>
       {/* <NewsletterSection></NewsletterSection> */}
       <AccordioSection></AccordioSection>
       <Footer></Footer>
