@@ -12,6 +12,7 @@ const nextConfig: NextConfig = {
       "i.ibb.co",
       "images.unsplash.com",
       "uhlbd.com",
+      "www.squarehospital.com"
     ],
     formats: ["image/webp"],
   },
