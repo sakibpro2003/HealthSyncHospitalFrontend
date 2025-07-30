@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Logo from "../ui/Logo";
 import Link from "next/link";
 import { Button } from "../ui/button";
@@ -12,11 +12,31 @@ import { useRouter } from "next/navigation";
 import { useLogoutUserMutation } from "@/redux/features/auth/authApi";
 // import { useLogoutMutation } from "@/redux/features/auth/authApi";
 
+
+
+
 const Navbar = () => {
   const dispatch = useAppDispatch();
   const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
   const [logoutUser] = useLogoutUserMutation();
+    const [user, setUser] = useState<{ email?: string; name?: string; role?: string } | null>(null);
+
+
+    useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const res = await fetch("/api/me");
+        if (!res.ok) throw new Error("Unauthorized");
+
+        const data = await res.json();
+        setUser(data.user);
+      } catch (error) {
+        console.error("Not logged in");
+      }
+    };
+     fetchUser();
+  }, []);
 
   const handleLogout = () => {
     logoutUser({});
@@ -45,6 +65,13 @@ const Navbar = () => {
             <Logo />
           </span>
         </Link>
+
+          {/* 🔐 Show email or name if logged in */}
+        {user && (
+          <span className="mr-4 text-gray-600 dark:text-white">
+            Hello, {user.name || user.email}
+          </span>
+        )}
 
         {/* Hamburger Menu Button */}
         <button

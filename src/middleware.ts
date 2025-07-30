@@ -7,7 +7,7 @@ const authRoutes = ["/login", "/register"];
 
 // Role-based access map
 const roleBasedAccess: Record<string, RegExp[]> = {
-  receptionist: [/^\/receptionist/],
+  receptionist: [/^\/receptionist/,/^\//],
   user: [/^\/user/, /^\/profile/,/^\/departmentalDoctors/,/^\//],
 };
 

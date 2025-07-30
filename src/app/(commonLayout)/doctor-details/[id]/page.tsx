@@ -9,6 +9,8 @@ export default function DoctorDetailsPage() {
   const { id } = useParams();
   const { data, isLoading, isError } = useGetSingleDoctorQuery(id as string);
   const doctor = data?.data?.result;
+  //  const token = cookies().get("token")?.value;
+  // const user = token ? await verifyToken(token) : null;
 
   if (isLoading)
     return <div className="w-11/12 mx-auto mt-10 text-center">Loading...</div>;
