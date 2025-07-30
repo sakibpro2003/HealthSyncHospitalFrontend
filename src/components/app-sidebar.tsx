@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { useState, useEffect } from "react";
 import { Bot, GalleryVerticalEnd, SquareTerminal } from "lucide-react";
 
 import { NavMain } from "@/components/nav-main";
@@ -15,11 +16,6 @@ import {
 } from "@/components/ui/sidebar";
 
 const data = {
-  user: {
-    name: "shadcn",
-    email: "m@example.com",
-    avatar: "https://i.ibb.co/WNTsHZq2/9434621.png",
-  },
   teams: [
     {
       name: "HealthSync Hospital",
@@ -74,6 +70,24 @@ const data = {
 };
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+  const [user, setUser] = useState<{ email?: string; name?: string; role?: string } | null>(null);
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const res = await fetch("/api/me");
+        if (!res.ok) throw new Error("Unauthorized");
+
+        const data = await res.json();
+        setUser(data.user);
+      } catch (error) {
+        console.error("Not logged in");
+      }
+    };
+
+    fetchUser();
+  }, []);
+
   return (
     <Sidebar collapsible="icon" {...props}>
       <SidebarHeader>
@@ -83,7 +97,13 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <NavMain items={data.navMain} />
       </SidebarContent>
       <SidebarFooter>
-        <NavUser user={data.user} />
+        <NavUser
+          user={{
+            name: user?.name || "Guest",
+            email: user?.email || "unknown@example.com",
+            avatar: "https://i.ibb.co/WNTsHZq2/9434621.png", // you can use a default avatar or attach to JWT
+          }}
+        />
       </SidebarFooter>
       <SidebarRail />
     </Sidebar>
