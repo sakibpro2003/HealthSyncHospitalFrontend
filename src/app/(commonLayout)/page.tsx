@@ -2,6 +2,7 @@
 import AccordioSection from "@/components/Home/AccordioSection";
 import BookAppointment from "@/components/Home/DiscountSection";
 import PackageCard from "@/components/Home/PackageCard";
+import VideoSection from "@/components/Home/VideoSection";
 // import NewsletterSection from "@/components/Home/NewsletterSection";
 import Banner from "@/components/shared/Banner";
 import DepartmentButtons from "@/components/shared/DepartmentButtons";
@@ -21,6 +22,7 @@ const page = () => {
       <BookAppointment></BookAppointment>
       <DepartmentButtons></DepartmentButtons>
       <PackageCard></PackageCard>
+      <VideoSection title="Intro Video" videoUrl="https://www.youtube.com/embed/FHeq7a_2AiE?si=ytMC-rc7mD5a9q1N"></VideoSection>
       {/* <NewsletterSection></NewsletterSection> */}
       <AccordioSection></AccordioSection>
       <Footer></Footer>
