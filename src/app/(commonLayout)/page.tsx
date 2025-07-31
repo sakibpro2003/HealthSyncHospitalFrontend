@@ -1,6 +1,7 @@
 // import DepartmentTabs from "@/components/DepartmentTabs";
 import AccordioSection from "@/components/Home/AccordioSection";
 import BookAppointment from "@/components/Home/DiscountSection";
+import MyGallery from "@/components/Home/GallerySection";
 import PackageCard from "@/components/Home/PackageCard";
 import VideoSection from "@/components/Home/VideoSection";
 // import NewsletterSection from "@/components/Home/NewsletterSection";
@@ -24,12 +25,14 @@ const page = () => {
       <PackageCard></PackageCard>
       <VideoSection title="Intro Video" videoUrl="https://www.youtube.com/embed/FHeq7a_2AiE?si=ytMC-rc7mD5a9q1N"></VideoSection>
       {/* <NewsletterSection></NewsletterSection> */}
-      <AccordioSection></AccordioSection>
+       {/* <h1 className="text-center text-2xl font-bold mb-6">Photo Gallery</h1> */}
+      <div className="flex w-11/12 mx-auto gap-4">
+        <AccordioSection></AccordioSection>
+      <MyGallery />
+      </div>
       <Footer></Footer>
       <p className="text-6xl"> gallery images</p>
       <p className="text-6xl"> add animations</p>
-      <p className="text-6xl"> add video section</p>
-      <p className="text-6xl"> add health package section</p>
     </div>
   );
 };

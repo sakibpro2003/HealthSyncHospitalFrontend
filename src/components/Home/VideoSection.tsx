@@ -3,15 +3,18 @@ import React from "react";
 
 interface VideoSectionProps {
   title?: string;
-  videoUrl: string; // e.g., https://www.youtube.com/embed/dQw4w9WgXcQ
+  videoUrl: string; // Use proper embed link
 }
 
-const VideoSection: React.FC<VideoSectionProps> = ({ title = "Watch Our Introduction", videoUrl }) => {
+const VideoSection: React.FC<VideoSectionProps> = ({
+  title = "Watch Our Introduction",
+  videoUrl,
+}) => {
   return (
-    <section className="w-full h-500px px-4 py-10 bg-gray-100 dark:bg-gray-900">
-      <div className="max-w-5xl mx-auto text-center">
+    <section className="w-full px-4 py-10 dark:bg-gray-900">
+      <div className="w-11/12 mx-auto text-center">
         <h2 className="text-3xl font-bold mb-6 text-gray-800 dark:text-gray-100">{title}</h2>
-        <div className="aspect-w-16 aspect-h-9 rounded-lg shadow-lg overflow-hidden">
+        <div className="w-full h-[500px] rounded-lg shadow-lg overflow-hidden">
           <iframe
             className="w-full h-full"
             src={videoUrl}
@@ -19,7 +22,6 @@ const VideoSection: React.FC<VideoSectionProps> = ({ title = "Watch Our Introduc
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
             allowFullScreen
           ></iframe>
-          
         </div>
       </div>
     </section>
