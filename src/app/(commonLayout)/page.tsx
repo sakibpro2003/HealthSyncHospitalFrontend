@@ -31,8 +31,9 @@ const page = () => {
       <MyGallery />
       </div>
       <Footer></Footer>
-      <p className="text-6xl"> gallery images</p>
-      <p className="text-6xl"> add animations</p>
+      <p className="text-6xl text-yellow-400"> gallery images</p>
+      <p className="text-6xl text-yellow-400"> add animations</p>
+      <p className="text-6xl text-yellow-400"> notice board</p>
     </div>
   );
 };

@@ -123,6 +123,8 @@ import {
   ClipboardList,
   UserPlus,
   Home,
+  Heart,
+  HeartPulse,
 } from "lucide-react";
 
 import { NavMain } from "@/components/nav-main";
@@ -224,9 +226,9 @@ export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
           case "user":
             setNavItems([
               {
-                title: "My Dashboard",
+                title: "My Health Packages",
                 url: "/patient",
-                icon: Home,
+                icon: HeartPulse,
               },
               {
                 title: "Appointments",
