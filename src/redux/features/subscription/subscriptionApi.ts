@@ -4,23 +4,9 @@ const subscriptionApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
     getSubscriptions: builder.query({
       query: (patientId) => `/subscription/${patientId}`,
+      providesTags:["subscription"]
     }),
-    // getSinglePatient: builder.query<GetSinglePatientResponse, string>({
-    //   query: (_id) => `/patient/single-patient/${_id}`,
-    // }),
-    // updatePatient: builder.mutation({
-    //   query: ({
-    //     id,
-    //     updatePayload,
-    //   }: {
-    //     id: string;
-    //     updatePayload: Partial<IPatient>;
-    //   }) => ({
-    //     url: `/patient/update-patient/${id}`,
-    //     method: "PUT",
-    //     body: updatePayload,
-    //   }),
-    // }),
+    
 
     createSubscription: builder.mutation({
       query: ({ subscriptionInfo }) => ({
@@ -29,7 +15,18 @@ const subscriptionApi = baseApi.injectEndpoints({
         body: subscriptionInfo,
       }),
     }),
+    cancelSubscription: builder.mutation({
+      query: (packageId) => ({
+        url: `/subscription/cancel/${packageId}`,
+        method: "PUT",
+      }),
+      invalidatesTags:["subscription"]
+    }),
   }),
 });
 
-export const { useCreateSubscriptionMutation,useGetSubscriptionsQuery } = subscriptionApi;
+export const {
+  useCreateSubscriptionMutation,
+  useGetSubscriptionsQuery,
+  useCancelSubscriptionMutation,
+} = subscriptionApi;

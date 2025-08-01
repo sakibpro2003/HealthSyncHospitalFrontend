@@ -1,118 +1,9 @@
-// "use client";
-
-// import { useGetSubscriptionsQuery } from "@/redux/features/subscription/subscriptionApi";
-// import { useEffect, useState } from "react";
-// import { CheckCircle, Clock, Calendar, PackageSearch } from "lucide-react";
-
-// const MySubscription = () => {
-//   const [user, setUser] = useState<{
-//     email?: string;
-//     name?: string;
-//     role?: string;
-//     userId?: string;
-//   } | null>(null);
-
-//   useEffect(() => {
-//     const fetchUser = async () => {
-//       try {
-//         const res = await fetch("/api/me");
-//         if (!res.ok) throw new Error("Unauthorized");
-//         const data = await res.json();
-//         setUser(data.user);
-//       } catch (error) {
-//         console.error("Not logged in");
-//       }
-//     };
-//     fetchUser();
-//   }, []);
-
-//   const {
-//     data: subscriptionData,
-//     isLoading,
-//     isError,
-//   } = useGetSubscriptionsQuery(user?.userId, {
-//     skip: !user?.userId,
-//   });
-
-//   const subscriptions = subscriptionData?.data || [];
-
-//   return (
-//     <div className="p-4">
-//       <h2 className="text-xl font-semibold mb-4 text-gray-800">
-//         <PackageSearch className="inline-block w-5 h-5 mr-2 text-blue-500" />
-//         My Subscriptions
-//       </h2>
-
-//       {isLoading && <p className="text-gray-500">Loading subscriptions...</p>}
-//       {isError && <p className="text-red-500">Failed to load subscriptions.</p>}
-
-//       {!isLoading && subscriptions.length === 0 && (
-//         <div className="text-gray-500">No active packages.</div>
-//       )}
-
-//       <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-//         {subscriptions.map((sub: any) => (
-//           <div
-//             key={sub._id}
-//             className="bg-white shadow rounded-xl p-4 border border-gray-200"
-//           >
-//             <div className="flex items-center justify-between mb-2">
-//               <h3 className="text-lg font-semibold text-blue-600">
-//                 {sub.package?.title}
-//               </h3>
-//               <span
-//                 className={`text-xs font-medium px-2 py-1 rounded-full ${
-//                   sub.status === "active"
-//                     ? "bg-green-100 text-green-700"
-//                     : "bg-gray-100 text-gray-600"
-//                 }`}
-//               >
-//                 {sub.status}
-//               </span>
-//             </div>
-
-//             <p className="text-sm text-gray-600 mb-1">
-//               <Calendar className="inline w-4 h-4 mr-1" />
-//               {new Date(sub.startDate).toLocaleDateString()} →{" "}
-//               {new Date(sub.endDate).toLocaleDateString()}
-//             </p>
-
-//             <p className="text-sm text-gray-600 mb-1">
-//               <Clock className="inline w-4 h-4 mr-1" />
-//               Duration: {sub.package?.durationInDays} days
-//             </p>
-
-//             <p className="text-sm text-gray-600 mb-2">
-//               💰 Price: ৳{sub.package?.price}
-//             </p>
-
-//             <div className="text-sm text-gray-700">
-//               <p className="font-medium">Includes:</p>
-//               <ul className="list-disc list-inside text-sm">
-//                 {sub.package?.includes?.slice(0, 3).map((item: string, i: number) => (
-//                   <li key={i}>{item}</li>
-//                 ))}
-//                 {sub.package?.includes?.length > 3 && (
-//                   <li className="text-gray-400">+ more</li>
-//                 )}
-//               </ul>
-//             </div>
-
-//             <div className="text-xs text-gray-500 mt-2">
-//               Auto Renew: {sub.autoRenew ? "Yes" : "No"}
-//             </div>
-//           </div>
-//         ))}
-//       </div>
-//     </div>
-//   );
-// };
-
-// export default MySubscription;
-
 "use client";
 
-import { useGetSubscriptionsQuery } from "@/redux/features/subscription/subscriptionApi";
+import {
+  useCancelSubscriptionMutation,
+  useGetSubscriptionsQuery,
+} from "@/redux/features/subscription/subscriptionApi";
 import { useEffect, useState } from "react";
 import {
   Calendar,
@@ -123,6 +14,20 @@ import {
 } from "lucide-react";
 
 const MySubscription = () => {
+
+  const [cancelSubscription, { isLoading: isCancelling }] =
+    useCancelSubscriptionMutation();
+
+  const handleCancelSubscription = async(id)=>{
+    try{
+      const res = await cancelSubscription(id);
+      console.log(res, "cance res data new")
+    }catch(err){
+      console.log(err)
+    }
+  }
+  
+  // console.log(cancelSubscription, "cancel result");
   const [user, setUser] = useState<{
     email?: string;
     name?: string;
@@ -234,11 +139,14 @@ const MySubscription = () => {
             <div className="mt-3 text-xs text-gray-500 flex items-center justify-between gap-1">
               <div className="flex">
                 <ShieldCheck className="w-4 h-4" />
-              Auto Renew: {sub.autoRenew ? "Yes" : "No"}
+                Auto Renew: {sub.autoRenew ? "Yes" : "No"}
               </div>
               <div className="mt-4 flex justify-end">
                 {sub.status === "active" && (
-                  <button className="px-4 py-1.5 text-sm rounded-md bg-red-100 text-red-600 hover:bg-red-200 transition">
+                  <button
+                    onClick={() => handleCancelSubscription(sub._id)}
+                    className="px-4 py-1.5 text-sm rounded-md bg-red-100 text-red-600 hover:bg-red-200 transition"
+                  >
                     Deactivate
                   </button>
                 )}
