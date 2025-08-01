@@ -1,0 +1,241 @@
+// "use client";
+
+// import { useGetSubscriptionsQuery } from "@/redux/features/subscription/subscriptionApi";
+// import { useEffect, useState } from "react";
+// import { CheckCircle, Clock, Calendar, PackageSearch } from "lucide-react";
+
+// const MySubscription = () => {
+//   const [user, setUser] = useState<{
+//     email?: string;
+//     name?: string;
+//     role?: string;
+//     userId?: string;
+//   } | null>(null);
+
+//   useEffect(() => {
+//     const fetchUser = async () => {
+//       try {
+//         const res = await fetch("/api/me");
+//         if (!res.ok) throw new Error("Unauthorized");
+//         const data = await res.json();
+//         setUser(data.user);
+//       } catch (error) {
+//         console.error("Not logged in");
+//       }
+//     };
+//     fetchUser();
+//   }, []);
+
+//   const {
+//     data: subscriptionData,
+//     isLoading,
+//     isError,
+//   } = useGetSubscriptionsQuery(user?.userId, {
+//     skip: !user?.userId,
+//   });
+
+//   const subscriptions = subscriptionData?.data || [];
+
+//   return (
+//     <div className="p-4">
+//       <h2 className="text-xl font-semibold mb-4 text-gray-800">
+//         <PackageSearch className="inline-block w-5 h-5 mr-2 text-blue-500" />
+//         My Subscriptions
+//       </h2>
+
+//       {isLoading && <p className="text-gray-500">Loading subscriptions...</p>}
+//       {isError && <p className="text-red-500">Failed to load subscriptions.</p>}
+
+//       {!isLoading && subscriptions.length === 0 && (
+//         <div className="text-gray-500">No active packages.</div>
+//       )}
+
+//       <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+//         {subscriptions.map((sub: any) => (
+//           <div
+//             key={sub._id}
+//             className="bg-white shadow rounded-xl p-4 border border-gray-200"
+//           >
+//             <div className="flex items-center justify-between mb-2">
+//               <h3 className="text-lg font-semibold text-blue-600">
+//                 {sub.package?.title}
+//               </h3>
+//               <span
+//                 className={`text-xs font-medium px-2 py-1 rounded-full ${
+//                   sub.status === "active"
+//                     ? "bg-green-100 text-green-700"
+//                     : "bg-gray-100 text-gray-600"
+//                 }`}
+//               >
+//                 {sub.status}
+//               </span>
+//             </div>
+
+//             <p className="text-sm text-gray-600 mb-1">
+//               <Calendar className="inline w-4 h-4 mr-1" />
+//               {new Date(sub.startDate).toLocaleDateString()} →{" "}
+//               {new Date(sub.endDate).toLocaleDateString()}
+//             </p>
+
+//             <p className="text-sm text-gray-600 mb-1">
+//               <Clock className="inline w-4 h-4 mr-1" />
+//               Duration: {sub.package?.durationInDays} days
+//             </p>
+
+//             <p className="text-sm text-gray-600 mb-2">
+//               💰 Price: ৳{sub.package?.price}
+//             </p>
+
+//             <div className="text-sm text-gray-700">
+//               <p className="font-medium">Includes:</p>
+//               <ul className="list-disc list-inside text-sm">
+//                 {sub.package?.includes?.slice(0, 3).map((item: string, i: number) => (
+//                   <li key={i}>{item}</li>
+//                 ))}
+//                 {sub.package?.includes?.length > 3 && (
+//                   <li className="text-gray-400">+ more</li>
+//                 )}
+//               </ul>
+//             </div>
+
+//             <div className="text-xs text-gray-500 mt-2">
+//               Auto Renew: {sub.autoRenew ? "Yes" : "No"}
+//             </div>
+//           </div>
+//         ))}
+//       </div>
+//     </div>
+//   );
+// };
+
+// export default MySubscription;
+
+"use client";
+
+import { useGetSubscriptionsQuery } from "@/redux/features/subscription/subscriptionApi";
+import { useEffect, useState } from "react";
+import {
+  Calendar,
+  Clock,
+  PackageSearch,
+  ShieldCheck,
+  Loader2,
+} from "lucide-react";
+
+const MySubscription = () => {
+  const [user, setUser] = useState<{
+    email?: string;
+    name?: string;
+    role?: string;
+    userId?: string;
+  } | null>(null);
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const res = await fetch("/api/me");
+        if (!res.ok) throw new Error("Unauthorized");
+        const data = await res.json();
+        setUser(data.user);
+      } catch (error) {
+        console.error("Not logged in");
+      }
+    };
+    fetchUser();
+  }, []);
+
+  const {
+    data: subscriptionData,
+    isLoading,
+    isError,
+  } = useGetSubscriptionsQuery(user?.userId, {
+    skip: !user?.userId,
+  });
+
+  const subscriptions = subscriptionData?.data || [];
+
+  return (
+    <div className="p-6 bg-gradient-to-tr from-blue-50 to-white min-h-screen">
+      <h2 className="text-2xl font-semibold mb-6 text-gray-800 flex items-center gap-2">
+        <PackageSearch className="w-6 h-6 text-blue-500" />
+        My Subscriptions
+      </h2>
+
+      {isLoading && (
+        <div className="flex items-center gap-2 text-gray-500">
+          <Loader2 className="animate-spin w-5 h-5" /> Loading subscriptions...
+        </div>
+      )}
+      {isError && (
+        <div className="text-red-500">Failed to load subscriptions.</div>
+      )}
+
+      {!isLoading && subscriptions.length === 0 && (
+        <div className="text-gray-500">No active subscriptions found.</div>
+      )}
+
+      <div className="grid sm:grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+        {subscriptions.map((sub: any) => (
+          <div
+            key={sub._id}
+            className="backdrop-blur-md bg-white/60 border border-gray-200 rounded-2xl shadow-md p-5 hover:shadow-lg transition-all duration-300"
+          >
+            <div className="flex items-center justify-between mb-3">
+              <h3 className="text-xl font-semibold text-gray-800">
+                {sub.package?.title}
+              </h3>
+              <span
+                className={`text-xs font-medium px-2 py-1 rounded-full ${
+                  sub.status === "active"
+                    ? "bg-green-100 text-green-700"
+                    : "bg-gray-100 text-gray-600"
+                }`}
+              >
+                {sub.status}
+              </span>
+            </div>
+
+            <p className="text-sm text-gray-600 flex items-center gap-1">
+              <Calendar className="w-4 h-4" />
+              {new Date(sub.startDate).toLocaleDateString()} →{" "}
+              {new Date(sub.endDate).toLocaleDateString()}
+            </p>
+
+            <p className="text-sm text-gray-600 flex items-center gap-1 mt-1">
+              <Clock className="w-4 h-4" />
+              {sub.package?.durationInDays} days
+            </p>
+
+            <p className="text-sm text-gray-600 mt-1">
+              💰 <strong>৳{sub.package?.price}</strong>
+            </p>
+
+            <div className="mt-3">
+              <p className="text-sm text-gray-700 font-medium mb-1">Includes:</p>
+              <div className="flex flex-wrap gap-2">
+                {sub.package?.includes?.slice(0, 4).map((item: string, i: number) => (
+                  <span
+                    key={i}
+                    className="bg-blue-100 text-blue-700 text-xs px-2 py-0.5 rounded-full"
+                  >
+                    {item}
+                  </span>
+                ))}
+                {sub.package?.includes?.length > 4 && (
+                  <span className="text-gray-400 text-xs">+ more</span>
+                )}
+              </div>
+            </div>
+
+            <div className="mt-3 text-xs text-gray-500 flex items-center gap-1">
+              <ShieldCheck className="w-4 h-4" />
+              Auto Renew: {sub.autoRenew ? "Yes" : "No"}
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
+
+export default MySubscription;

@@ -172,18 +172,19 @@
 "use client";
 import { useGetAllhealthPackageQuery } from "@/redux/features/healthPackage/healthPackageApi";
 import { useCreateSubscriptionMutation } from "@/redux/features/subscription/subscriptionApi";
-import React from "react";
+import React, { useEffect, useState } from "react";
 // import { useGetAllHealthPackageQuery } from "@/redux/features/healthPackage/healthPackage.api";
 // import { useCreateSubscriptionMutation } from "@/redux/features/subscription/subscription.api";
 
 const PackageCard = () => {
+  const [user, setUser] = useState<{ email?: string; name?: string; role?: string } | null>(null);
   const { data } = useGetAllhealthPackageQuery(undefined);
   console.log(data,'dataaaaaaaaaaaaa5')
   const [createSubscription] = useCreateSubscriptionMutation();
 
   const handleSubscription = async (packageId: string) => {
     const subscriptionInfo = {
-      patientId: "685797e4fcc3e3cb87970461", // replace with dynamic ID later
+      patientId: `${user?.userId}`, // replace with dynamic ID later
       packageId,
     };
     try {
@@ -193,6 +194,24 @@ const PackageCard = () => {
       console.error("Error subscribing:", err);
     }
   };
+
+    
+    useEffect(() => {
+      const fetchUser = async () => {
+        try {
+          const res = await fetch("/api/me");
+          if (!res.ok) throw new Error("Unauthorized");
+  
+          const data = await res.json();
+          // console.log(data?.user?.userId,"user data")
+          setUser(data.user);
+        } catch (error) {
+          console.error("Not logged in");
+        }
+      };
+      fetchUser();
+    }, []);
+    console.log(user?.userId,'user data id ')
 
   return (
     <div className="mt-10">

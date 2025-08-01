@@ -34,6 +34,7 @@ const page = () => {
       <p className="text-6xl text-yellow-400"> gallery images</p>
       <p className="text-6xl text-yellow-400"> add animations</p>
       <p className="text-6xl text-yellow-400"> notice board</p>
+      <p className="text-6xl text-yellow-400"> department wise capcity /admit</p>
     </div>
   );
 };
