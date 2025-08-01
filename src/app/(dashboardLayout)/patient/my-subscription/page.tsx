@@ -211,25 +211,38 @@ const MySubscription = () => {
             </p>
 
             <div className="mt-3">
-              <p className="text-sm text-gray-700 font-medium mb-1">Includes:</p>
+              <p className="text-sm text-gray-700 font-medium mb-1">
+                Includes:
+              </p>
               <div className="flex flex-wrap gap-2">
-                {sub.package?.includes?.slice(0, 4).map((item: string, i: number) => (
-                  <span
-                    key={i}
-                    className="bg-blue-100 text-blue-700 text-xs px-2 py-0.5 rounded-full"
-                  >
-                    {item}
-                  </span>
-                ))}
-                {sub.package?.includes?.length > 4 && (
+                {sub.package?.includes
+                  ?.slice(0, 4)
+                  .map((item: string, i: number) => (
+                    <span
+                      key={i}
+                      className="bg-blue-100 text-blue-700 text-xs px-2 py-0.5 rounded-full"
+                    >
+                      {item}
+                    </span>
+                  ))}
+                {/* {sub.package?.includes?.length > 4 && (
                   <span className="text-gray-400 text-xs">+ more</span>
-                )}
+                )} */}
               </div>
             </div>
 
-            <div className="mt-3 text-xs text-gray-500 flex items-center gap-1">
-              <ShieldCheck className="w-4 h-4" />
+            <div className="mt-3 text-xs text-gray-500 flex items-center justify-between gap-1">
+              <div className="flex">
+                <ShieldCheck className="w-4 h-4" />
               Auto Renew: {sub.autoRenew ? "Yes" : "No"}
+              </div>
+              <div className="mt-4 flex justify-end">
+                {sub.status === "active" && (
+                  <button className="px-4 py-1.5 text-sm rounded-md bg-red-100 text-red-600 hover:bg-red-200 transition">
+                    Deactivate
+                  </button>
+                )}
+              </div>
             </div>
           </div>
         ))}
