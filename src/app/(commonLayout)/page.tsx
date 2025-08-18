@@ -26,10 +26,10 @@ const page = () => {
       <VideoSection title="Intro Video" videoUrl="https://www.youtube.com/embed/FHeq7a_2AiE?si=ytMC-rc7mD5a9q1N"></VideoSection>
       {/* <NewsletterSection></NewsletterSection> */}
        {/* <h1 className="text-center text-2xl font-bold mb-6">Photo Gallery</h1> */}
-      <div className="flex w-11/12 mx-auto gap-4">
+      {/* <div className="flex w-11/12 mx-auto gap-4"> */}
         <AccordioSection></AccordioSection>
       <MyGallery />
-      </div>
+      {/* </div> */}
       <Footer></Footer>
       <p className="text-6xl text-yellow-400"> gallery images</p>
       <p className="text-6xl text-yellow-400"> add animations</p>

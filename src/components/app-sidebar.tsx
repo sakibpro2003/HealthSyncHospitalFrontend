@@ -158,7 +158,7 @@ export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
   const [user, setUser] = useState<{
     email?: string;
     name?: string;
-    role?: "receptionist" | "admin" | "patient";
+    role?: "receptionist" | "admin" | "user";
   } | null>(null);
 
   const [navItems, setNavItems] = useState<NavItem[]>([]);
@@ -182,7 +182,7 @@ export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
                 icon: SquareTerminal,
                 items: [
                   { title: "Register", url: "/receptionist/patient-register" },
-                  { title: "Patients", url: "/receptionist/patients" },
+                  { title: "Patients", url: "/receptionist/" },
                 ],
               },
               {
@@ -210,6 +210,7 @@ export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
                 title: "Dashboard",
                 url: "/admin",
                 icon: Home,
+                
               },
               {
                 title: "Users",
@@ -229,6 +230,9 @@ export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
                 title: "My Health Packages",
                 url: "/patient",
                 icon: HeartPulse,
+                items:[
+                  {title: "My Subscription",url:"/patient/my-subscription"}
+                ]
               },
               {
                 title: "Appointments",

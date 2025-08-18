@@ -7,7 +7,7 @@ import {
 
 const AccordioSection = () => {
   return (
-    <div className="w-1/2 mx-auto mt-5">
+    <div className="w-11/12 mx-auto mt-5">
       <h3 className="text-3xl text-center font-bold">Frequently Asked Questions</h3>
       <Accordion type="single" collapsible>
         <AccordionItem value="item-1">
