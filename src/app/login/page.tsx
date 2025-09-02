@@ -37,6 +37,10 @@ const LoginForm = () => {
     form.setValue("email", "user1@gmail.com");
     form.setValue("password", "123456");
   };
+  const handleAdmin = () => {
+    form.setValue("email", "admin@gmail.com");
+    form.setValue("password", "12345678");
+  };
 
   const onSubmit: SubmitHandler<FieldValues> = async (userData) => {
     try {
@@ -52,6 +56,8 @@ const LoginForm = () => {
             router.push("/");
           } else if (decoded?.role === "receptionist") {
             router.push("/receptionist");
+          } else if (decoded?.role === "admin") {
+            router.push("/admin");
           } else {
             // fallback redirect or show error
             toast.error("Unknown role detected.");
@@ -80,12 +86,15 @@ const LoginForm = () => {
           Welcome Back
         </h2>
 
-        <div className="flex gap-4">
+        <div className="flex gap-1">
           <Button onClick={handleReceptionist} className="bg-red-500 mb-4">
             Receptionist Credentials
           </Button>
           <Button onClick={handleUser} className="bg-red-500 mb-4">
             User Credentials
+          </Button>
+          <Button onClick={handleAdmin} className="bg-red-500 mb-4">
+            Admin Credentials
           </Button>
         </div>
 

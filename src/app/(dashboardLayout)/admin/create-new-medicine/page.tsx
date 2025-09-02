@@ -1,14 +1,11 @@
 "use client";
 
 import React, { useState } from "react";
-import { useRouter } from "next/navigation";
 import { useCreateProductMutation } from "@/redux/features/product/productApi";
-// import { toast } from "react-toastify";
-// import "react-toastify/dist/ReactToastify.css";
+
 import { toast } from "sonner";
 
 const ProductForm = () => {
-  const router = useRouter();
   const [createProduct, { isLoading }] = useCreateProductMutation();
 
   const [product, setProduct] = useState({

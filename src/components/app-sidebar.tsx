@@ -1,115 +1,3 @@
-// "use client";
-
-// import * as React from "react";
-// import { useState, useEffect } from "react";
-// import { Bot, GalleryVerticalEnd, SquareTerminal } from "lucide-react";
-
-// import { NavMain } from "@/components/nav-main";
-// import { NavUser } from "@/components/nav-user";
-// import { TeamSwitcher } from "@/components/team-switcher";
-// import {
-//   Sidebar,
-//   SidebarContent,
-//   SidebarFooter,
-//   SidebarHeader,
-//   SidebarRail,
-// } from "@/components/ui/sidebar";
-
-// const data = {
-//   teams: [
-//     {
-//       name: "HealthSync Hospital",
-//       logo: GalleryVerticalEnd,
-//       plan: "Enterprise",
-//     },
-//   ],
-//   navMain: [
-//     {
-//       title: "Patient",
-//       url: "#",
-//       icon: SquareTerminal,
-//       isActive: true,
-//       items: [
-//         {
-//           title: "Register",
-//           url: "/receptionist/patient-register",
-//         },
-//         {
-//           title: "Patients",
-//           url: "/receptionist/patients",
-//         },
-//       ],
-//     },
-//     {
-//       title: "Blood Donor",
-//       url: "#",
-//       icon: Bot,
-//       items: [
-//         {
-//           title: "Register Donor",
-//           url: "/receptionist/register-donor",
-//         },
-//         {
-//           title: "View Donor",
-//           url: "/receptionist/donors",
-//         },
-//       ],
-//     },
-//     {
-//       title: "Blood Bank",
-//       url: "/receptionist/blood-bank",
-//       icon: Bot,
-//       items: [
-//         {
-//           title: "View Blood Bank",
-//           url: "/receptionist/blood-bank",
-//         },
-//       ],
-//     },
-//   ],
-// };
-
-// export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
-//   const [user, setUser] = useState<{ email?: string; name?: string; role?: string } | null>(null);
-
-//   useEffect(() => {
-//     const fetchUser = async () => {
-//       try {
-//         const res = await fetch("/api/me");
-//         if (!res.ok) throw new Error("Unauthorized");
-
-//         const data = await res.json();
-//         setUser(data.user);
-//       } catch (error) {
-//         console.error("Not logged in");
-//       }
-//     };
-
-//     fetchUser();
-//   }, []);
-
-//   return (
-//     <Sidebar collapsible="icon" {...props}>
-//       <SidebarHeader>
-//         <TeamSwitcher teams={data.teams} />
-//       </SidebarHeader>
-//       <SidebarContent>
-//         <NavMain items={data.navMain} />
-//       </SidebarContent>
-//       <SidebarFooter>
-//         <NavUser
-//           user={{
-//             name: user?.name || "Guest",
-//             email: user?.email || "unknown@example.com",
-//             avatar: "https://i.ibb.co/WNTsHZq2/9434621.png", // you can use a default avatar or attach to JWT
-//           }}
-//         />
-//       </SidebarFooter>
-//       <SidebarRail />
-//     </Sidebar>
-//   );
-// }
-
 "use client";
 
 import * as React from "react";
@@ -121,9 +9,9 @@ import {
   Users,
   Settings,
   ClipboardList,
-  UserPlus,
+  // UserPlus,
   Home,
-  Heart,
+  // Heart,
   HeartPulse,
 } from "lucide-react";
 
@@ -210,9 +98,16 @@ export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
           case "admin":
             setNavItems([
               {
-                title: "Dashboard",
-                url: "/admin",
-                icon: Home,
+                title: "Manage Medicines",
+                url: "#",
+                icon: Bot,
+                items: [
+                  {
+                    title: "Add Medicine",
+                    url: "/admin/create-new-medicine",
+                  },
+                  { title: "View Donor", url: "/receptionist/donors" },
+                ],
               },
               {
                 title: "Users",
