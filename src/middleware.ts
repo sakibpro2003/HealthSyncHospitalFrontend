@@ -7,8 +7,8 @@ const authRoutes = ["/login", "/register"];
 
 // Role-based access map
 const roleBasedAccess: Record<string, RegExp[]> = {
-  receptionist: [/^\/receptionist/,/^\//],
-  user: [/^\/user/, /^\/profile/,/^\/departmentalDoctors/,/^\//],
+  receptionist: [/^\/receptionist/,/^\//,/^\/additems/],
+  user: [/^\/user/, /^\/profile/,/^\/departmentalDoctors/,/^\//,/^\/additems/],
 };
 
 // Secret for JWT verification

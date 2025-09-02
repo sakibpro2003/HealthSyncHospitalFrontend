@@ -76,7 +76,7 @@ const patientApi = baseApi.injectEndpoints({
       }),
     }),
 
-    register: builder.mutation({
+    registerPatient: builder.mutation({
       query: (userInfo) => ({
         url: "/patient/register-patient",
         method: "POST",
@@ -90,4 +90,5 @@ export const {
   useGetAllPatientQuery,
   useGetSinglePatientQuery,
   useUpdatePatientMutation,
+  useRegisterPatientMutation
 } = patientApi;

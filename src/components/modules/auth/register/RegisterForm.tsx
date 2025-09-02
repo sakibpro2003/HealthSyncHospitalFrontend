@@ -22,10 +22,11 @@ import { Textarea } from "@/components/ui/textarea";
 import React from "react";
 import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
 import { toast } from "sonner";
-import { useRegisterDonorMutation } from "@/redux/features/donor/donorApi";
+// import { useRegisterDonorMutation } from "@/redux/features/donor/donorApi";
+import { useRegisterPatientMutation } from "@/redux/features/patient/patientApi";
 
 const RegisterForm = () => {
-  const [register] = useRegisterDonorMutation();
+  const [register] = useRegisterPatientMutation();
   const form = useForm();
   const onSubmit: SubmitHandler<FieldValues> = async (userData) => {
     const {
@@ -122,7 +123,7 @@ const RegisterForm = () => {
     <div className="md:p-8">
       <div className="mx-auto md:p-10">
         <h2 className="text-2xl md:text-3xl font-semibold mb-6 text-center">
-          Patient Registration
+          Patient Registration 
         </h2>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)}>

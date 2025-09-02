@@ -103,7 +103,7 @@ const RegisterDonorForm = () => {
     <div className="md:p-8">
       <div className="mx-auto md:p-10">
         <h2 className="text-2xl md:text-3xl font-semibold mb-6 text-center">
-          Patient Registration
+          Register Donor
         </h2>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)}>
