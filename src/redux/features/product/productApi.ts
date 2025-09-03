@@ -1,4 +1,6 @@
 import { baseApi } from "@/redux/api/baseApi";
+import { TProduct } from "@/types/product";
+import { use } from "react";
 
 // export interface IEmergencyContact {
 //   emergencyContactName: string;
@@ -53,23 +55,25 @@ import { baseApi } from "@/redux/api/baseApi";
 const productApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
     getAllMedicine: builder.query({
-      query: () =>
-        `/products`,
+      query: () => `/products`,
     }),
-  
-    // updatePatient: builder.mutation({
-    //   query: ({
-    //     id,
-    //     updatePayload,
-    //   }: {
-    //     id: string;
-    //     updatePayload: Partial<IPatient>;
-    //   }) => ({
-    //     url: `/patient/update-patient/${id}`,
-    //     method: "PUT",
-    //     body: updatePayload,
-    //   }),
-    // }),
+    getSingleProduct: builder.query({
+      query: (_id) => `/products/${_id}`,
+    }),
+
+    updateProduct: builder.mutation({
+      query: ({
+        id,
+        updatePayload,
+      }: {
+        id: string;
+        updatePayload: Partial<TProduct>;
+      }) => ({
+        url: `/products/update-products/${id}`,
+        method: "PUT",
+        body: updatePayload,
+      }),
+    }),
 
     createProduct: builder.mutation({
       query: (productInfo) => ({
@@ -78,6 +82,13 @@ const productApi = baseApi.injectEndpoints({
         body: productInfo,
       }),
     }),
+    // getSingleProduct: builder.query({
+    //   query: (_id) => ({
+    //     url: "/products",
+    //     method: "GE",
+    //     body: _id,
+    //   }),
+    // }),
     removeMedicine: builder.mutation({
       query: (_id) => ({
         url: "/products",
@@ -89,10 +100,9 @@ const productApi = baseApi.injectEndpoints({
 });
 
 export const {
-  // useGetAllPatientQuery,
-  // useGetSinglePatientQuery,
-  // useUpdatePatientMutation,
   useGetAllMedicineQuery,
   useCreateProductMutation,
-  useRemoveMedicineMutation
+  useRemoveMedicineMutation,
+  useGetSingleProductQuery,
+  useUpdateProductMutation,
 } = productApi;
