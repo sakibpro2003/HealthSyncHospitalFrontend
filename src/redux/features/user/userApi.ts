@@ -1,5 +1,5 @@
 import { baseApi } from "@/redux/api/baseApi";
-import { TProduct } from "@/types/product";
+// import { TProduct } from "@/types/product";
 
 // export interface IEmergencyContact {
 //   emergencyContactName: string;
@@ -51,36 +51,36 @@ import { TProduct } from "@/types/product";
 //   success: boolean;
 // }
 
-const productApi = baseApi.injectEndpoints({
+const userAPi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
-    getAllMedicine: builder.query({
-      query: () => `/products`,
+    getAllUser: builder.query({
+      query: () => `/user/get-all-users`,
     }),
-    getSingleProduct: builder.query({
-      query: (_id) => `/products/${_id}`,
-    }),
+    // getSingleProduct: builder.query({
+    //   query: (_id) => `/products/${_id}`,
+    // }),
 
-    updateProduct: builder.mutation({
-      query: ({
-        id,
-        updatePayload,
-      }: {
-        id: string;
-        updatePayload: Partial<TProduct>;
-      }) => ({
-        url: `/products/${id}`,
-        method: "PUT",
-        body: updatePayload,
-      }),
-    }),
+    // updateProduct: builder.mutation({
+    //   query: ({
+    //     id,
+    //     updatePayload,
+    //   }: {
+    //     id: string;
+    //     updatePayload: Partial<TProduct>;
+    //   }) => ({
+    //     url: `/products/${id}`,
+    //     method: "PUT",
+    //     body: updatePayload,
+    //   }),
+    // }),
 
-    createProduct: builder.mutation({
-      query: (productInfo) => ({
-        url: "/products",
-        method: "POST",
-        body: productInfo,
-      }),
-    }),
+    // createProduct: builder.mutation({
+    //   query: (productInfo) => ({
+    //     url: "/products",
+    //     method: "POST",
+    //     body: productInfo,
+    //   }),
+    // }),
     // getSingleProduct: builder.query({
     //   query: (_id) => ({
     //     url: "/products",
@@ -88,20 +88,14 @@ const productApi = baseApi.injectEndpoints({
     //     body: _id,
     //   }),
     // }),
-    removeMedicine: builder.mutation({
-      query: (_id) => ({
-        url: "/products",
-        method: "DELETE",
-        body: _id,
-      }),
-    }),
+    // removeMedicine: builder.mutation({
+    //   query: (_id) => ({
+    //     url: "/products",
+    //     method: "DELETE",
+    //     body: _id,
+    //   }),
+    // }),
   }),
 });
 
-export const {
-  useGetAllMedicineQuery,
-  useCreateProductMutation,
-  useRemoveMedicineMutation,
-  useGetSingleProductQuery,
-  useUpdateProductMutation,
-} = productApi;
+export const { useGetAllUserQuery } = userAPi;

@@ -1,113 +1,92 @@
-"use client";
-
+"use client"
 import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { useGetSingleProductQuery } from "@/redux/features/product/productApi";
+import { useGetSingleProductQuery, useUpdateProductMutation } from "@/redux/features/product/productApi";
 import { toast } from "sonner";
-// import {
-//   useGetSingleProductQuery,
-//   useUpdateProductMutation,
-// } from "@/redux/features/product/productApi";
-// import { toast } from "react-toastify";
-// import withAdminAuth from "@/hoc/withAdminAuth";
-// import { TProduct } from "@/types/product";
+
+type ProductType = {
+  _id: string;
+  name: string;
+  image: string;
+  description: string;
+  price: number;
+  quantity: number;
+  inStock: boolean;
+  requiredPrescription: boolean;
+  expiryDate: string;
+  manufacturer: {
+    name: string;
+    address: string;
+    contact: string;
+  };
+};
 
 const UpdateProductPage = () => {
   const router = useRouter();
   const { updateId } = useParams();
 
-  // ✅ Fetch product by ID
-  const {
-    data: productData,
-    isLoading,
-    error,
-  } = useGetSingleProductQuery(updateId as string, {
+  const { data: productData, isLoading, error } = useGetSingleProductQuery(updateId as string, {
     skip: !updateId,
   });
 
-  // ✅ Mutation hook
-  const [updateProduct] = useUpdateProductMutation();
+  const [updateProduct] = useUpdateProductMutation(updateId);
 
-  // ✅ Local state for form
-  const [product, setProduct] = useState(null);
+  // ✅ Use typed state
+  const [product, setProduct] = useState<ProductType | null>(null);
 
-  // Load product into state
   useEffect(() => {
     if (productData?.data) {
       setProduct(productData.data);
     }
   }, [productData]);
 
-  if (isLoading) {
-    return <p className="text-center text-gray-500">Loading...</p>;
-  }
-
-  if (error) {
-    return <p className="text-center text-red-500">Failed to load product.</p>;
-  }
-
-  // ✅ Handle input changes
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value, type } = e.target;
     const isCheckbox = type === "checkbox";
 
     setProduct((prev) =>
       prev
-        ? {
-            ...prev,
-            [name]: isCheckbox ? (e.target as HTMLInputElement).checked : value,
-          }
+        ? { ...prev, [name]: isCheckbox ? (e.target as HTMLInputElement).checked : value }
         : prev
     );
   };
 
-  const handleManufacturerChange = (
-    e: React.ChangeEvent<HTMLInputElement>
-  ) => {
+  const handleManufacturerChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
 
     setProduct((prev) =>
       prev
-        ? {
-            ...prev,
-            manufacturer: {
-              ...prev.manufacturer,
-              [name]: value,
-            },
-          }
+        ? { ...prev, manufacturer: { ...prev.manufacturer, [name]: value } }
         : prev
     );
   };
 
-  // ✅ Update handler
   const handleUpdate = async () => {
     if (!product) return;
 
     try {
-      await updateProduct({ id: updateId, product }).unwrap();
-      toast.success("Medicine updated successfully");
-      router.push("/manage-medicines");
+      const result = await updateProduct({ id: updateId, product }).unwrap();
+      // toast.success("Medicine updated successfully");
+      console.log(result, "Update result");
+      // router.push("/manage-medicines");
     } catch (err) {
-      console.error("Error updating product:", err);
+      console.error(err);
       toast.error("Failed to update medicine");
     }
   };
 
+  if (isLoading) return <p className="text-center text-gray-500">Loading...</p>;
+  if (error) return <p className="text-center text-red-500">Failed to load product.</p>;
+
   return (
     <div className="p-2 bg-gray-50 rounded-lg shadow-xl w-full mx-auto">
-      <h1 className="text-2xl font-bold text-gray-800 text-center">
-        Update Product
-      </h1>
+      <h1 className="text-2xl font-bold text-gray-800 text-center">Update Product</h1>
 
       {product && (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
           {/* Product Name */}
           <div>
-            <label className="font-semibold text-gray-700 mb-2 block">
-              Product Name
-            </label>
+            <label className="font-semibold text-gray-700 mb-2 block">Product Name</label>
             <input
               type="text"
               name="name"
@@ -119,9 +98,7 @@ const UpdateProductPage = () => {
 
           {/* Description */}
           <div>
-            <label className="font-semibold text-gray-700 mb-2 block">
-              Description
-            </label>
+            <label className="font-semibold text-gray-700 mb-2 block">Description</label>
             <textarea
               name="description"
               value={product.description}
@@ -132,9 +109,7 @@ const UpdateProductPage = () => {
 
           {/* Price */}
           <div>
-            <label className="font-semibold text-gray-700 mb-2 block">
-              Price
-            </label>
+            <label className="font-semibold text-gray-700 mb-2 block">Price</label>
             <input
               type="number"
               name="price"
@@ -146,9 +121,7 @@ const UpdateProductPage = () => {
 
           {/* Quantity */}
           <div>
-            <label className="font-semibold text-gray-700 mb-2 block">
-              Quantity
-            </label>
+            <label className="font-semibold text-gray-700 mb-2 block">Quantity</label>
             <input
               type="number"
               name="quantity"
@@ -160,9 +133,7 @@ const UpdateProductPage = () => {
 
           {/* Expiry Date */}
           <div>
-            <label className="font-semibold text-gray-700 mb-2 block">
-              Expiry Date
-            </label>
+            <label className="font-semibold text-gray-700 mb-2 block">Expiry Date</label>
             <input
               type="date"
               name="expiryDate"
@@ -174,9 +145,7 @@ const UpdateProductPage = () => {
 
           {/* Image URL */}
           <div>
-            <label className="font-semibold text-gray-700 mb-2 block">
-              Image URL
-            </label>
+            <label className="font-semibold text-gray-700 mb-2 block">Image URL</label>
             <input
               type="text"
               name="image"
@@ -207,20 +176,16 @@ const UpdateProductPage = () => {
               onChange={handleChange}
               className="checkbox checkbox-primary"
             />
-            <label className="font-semibold text-gray-700">
-              Requires Prescription
-            </label>
+            <label className="font-semibold text-gray-700">Requires Prescription</label>
           </div>
 
           {/* Manufacturer Name */}
           <div>
-            <label className="font-semibold text-gray-700 mb-2 block">
-              Manufacturer Name
-            </label>
+            <label className="font-semibold text-gray-700 mb-2 block">Manufacturer Name</label>
             <input
               type="text"
               name="name"
-              value={product.manufacturer?.name}
+              value={product.manufacturer.name}
               onChange={handleManufacturerChange}
               className="input input-bordered w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
             />
@@ -228,13 +193,11 @@ const UpdateProductPage = () => {
 
           {/* Manufacturer Address */}
           <div>
-            <label className="font-semibold text-gray-700 mb-2 block">
-              Manufacturer Address
-            </label>
+            <label className="font-semibold text-gray-700 mb-2 block">Manufacturer Address</label>
             <input
               type="text"
               name="address"
-              value={product.manufacturer?.address}
+              value={product.manufacturer.address}
               onChange={handleManufacturerChange}
               className="input input-bordered w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
             />
@@ -242,13 +205,11 @@ const UpdateProductPage = () => {
 
           {/* Manufacturer Contact */}
           <div>
-            <label className="font-semibold text-gray-700 mb-2 block">
-              Manufacturer Contact
-            </label>
+            <label className="font-semibold text-gray-700 mb-2 block">Manufacturer Contact</label>
             <input
               type="text"
               name="contact"
-              value={product.manufacturer?.contact}
+              value={product.manufacturer.contact}
               onChange={handleManufacturerChange}
               className="input input-bordered w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
             />
