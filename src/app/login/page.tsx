@@ -57,7 +57,7 @@ const LoginForm = () => {
           } else if (decoded?.role === "receptionist") {
             router.push("/receptionist");
           } else if (decoded?.role === "admin") {
-            router.push("/admin");
+            router.push("/admin/create-new-medicine");
           } else {
             // fallback redirect or show error
             toast.error("Unknown role detected.");

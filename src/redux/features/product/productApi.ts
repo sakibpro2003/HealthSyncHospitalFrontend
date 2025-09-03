@@ -50,18 +50,13 @@ import { baseApi } from "@/redux/api/baseApi";
 //   success: boolean;
 // }
 
-const patientApi = baseApi.injectEndpoints({
+const productApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
-    // getAllPatient: builder.query<
-    //   GetAllPatientResponse,
-    //   { page: number; searchTerm: string }
-    // >({
-    //   query: ({ page = 1, searchTerm = "" }) =>
-    //     `/patient/all-patient?page=${page}&searchTerm=${searchTerm}`,
-    // }),
-    // getSinglePatient: builder.query<GetSinglePatientResponse, string>({
-    //   query: (_id) => `/patient/single-patient/${_id}`,
-    // }),
+    getAllMedicine: builder.query({
+      query: () =>
+        `/products`,
+    }),
+  
     // updatePatient: builder.mutation({
     //   query: ({
     //     id,
@@ -83,6 +78,13 @@ const patientApi = baseApi.injectEndpoints({
         body: productInfo,
       }),
     }),
+    removeMedicine: builder.mutation({
+      query: (_id) => ({
+        url: "/products",
+        method: "DELETE",
+        body: _id,
+      }),
+    }),
   }),
 });
 
@@ -90,5 +92,7 @@ export const {
   // useGetAllPatientQuery,
   // useGetSinglePatientQuery,
   // useUpdatePatientMutation,
+  useGetAllMedicineQuery,
   useCreateProductMutation,
-} = patientApi;
+  useRemoveMedicineMutation
+} = productApi;

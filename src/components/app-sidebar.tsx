@@ -10,6 +10,7 @@ import {
   Settings,
   ClipboardList,
   // UserPlus,
+  Pill,
   Home,
   // Heart,
   HeartPulse,
@@ -98,15 +99,15 @@ export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
           case "admin":
             setNavItems([
               {
-                title: "Manage Medicines",
+                title: "Medicines",
                 url: "#",
-                icon: Bot,
+                icon: Pill,
                 items: [
                   {
                     title: "Add Medicine",
                     url: "/admin/create-new-medicine",
                   },
-                  { title: "View Donor", url: "/receptionist/donors" },
+                  { title: "Manage Medicines", url: "/admin/manage-medicine" },
                 ],
               },
               {

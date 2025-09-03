@@ -1,24 +1,45 @@
-import type { NextConfig } from "next";
-import dotenv from "dotenv";
-
-// Load your `.env` variables manually
-dotenv.config();
-
-const nextConfig: NextConfig = {
+/** @type {import('next').NextConfig} */
+const nextConfig = {
   images: {
-    domains: [
-      "medeasy.health",
-      "api.medeasy.health",
-      "i.ibb.co",
-      "images.unsplash.com",
-      "uhlbd.com",
-      "www.squarehospital.com"
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "onemg.gumlet.io",
+      },
+      {
+        protocol: "https",
+        hostname: "emami-production-2.s3.amazonaws.com",
+      },
+      {
+        protocol: "https",
+        hostname: "5.imimg.com",
+      },
+      {
+        protocol: "https",
+        hostname: "encrypted-tbn0.gstatic.com",
+      },
+      {
+        protocol: "https",
+        hostname: "images.apollo247.in",
+      },
+      {
+        protocol: "https",
+        hostname: "samirahan.com.bd",
+      },
+      {
+        protocol: "https",
+        hostname: "cdn2.arogga.com",
+      },
+      {
+        protocol: "https",
+        hostname: "medex.com.bd",
+      },
+      {
+        protocol: "https",
+        hostname: "naturesway.com",
+      },
     ],
-    formats: ["image/webp"],
-  },
-  env: {
-    JWT_ACCESS_SECRET: process.env.JWT_ACCESS_SECRET,
   },
 };
 
-export default nextConfig;
+module.exports = nextConfig;
