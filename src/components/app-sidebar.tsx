@@ -112,8 +112,14 @@ export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
               },
               {
                 title: "Users",
-                url: "/admin/users",
+                url: "/admin/manage-user",
                 icon: Users,
+                items: [
+                  {
+                    title: "Manage Users",
+                    url: "/admin/manage-user",
+                  },
+                ],
               },
               {
                 title: "Settings",

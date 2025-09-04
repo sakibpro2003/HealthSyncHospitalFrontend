@@ -48,7 +48,8 @@ const Navbar = () => {
     { name: "About", path: "/about" },
     { name: "Services", path: "/services" },
     { name: "Contact", path: "/contact" },
-    { name: "login", path: "/login" },
+    { name: "Login", path: "/login" },
+    { name: "Signup", path: "/register" },
   ];
 
   if (user?.role === "user") {
