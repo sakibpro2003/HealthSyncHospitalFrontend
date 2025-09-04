@@ -5,6 +5,7 @@ import {
   Bell,
   ChevronsUpDown,
   CreditCard,
+  Home,
   // Link,
   LogOut,
   Sparkles,
@@ -84,7 +85,7 @@ export function NavUser({
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
               <DropdownMenuItem>
-                <Sparkles />
+                <Home />
                 <Link href="/">Home</Link>
               </DropdownMenuItem>
             </DropdownMenuGroup>

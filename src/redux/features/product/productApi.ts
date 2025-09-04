@@ -81,13 +81,6 @@ const productApi = baseApi.injectEndpoints({
         body: productInfo,
       }),
     }),
-    // getSingleProduct: builder.query({
-    //   query: (_id) => ({
-    //     url: "/products",
-    //     method: "GE",
-    //     body: _id,
-    //   }),
-    // }),
     removeMedicine: builder.mutation({
       query: (_id) => ({
         url: "/products",

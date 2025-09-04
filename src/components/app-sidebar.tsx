@@ -9,10 +9,7 @@ import {
   Users,
   Settings,
   ClipboardList,
-  // UserPlus,
   Pill,
-  Home,
-  // Heart,
   HeartPulse,
 } from "lucide-react";
 

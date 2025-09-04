@@ -60,8 +60,6 @@ const ManageUser = () => {
       const res = await updateUserRole({ userId, role }).unwrap();
       toast.success(res?.message + ` to ${role}`);
       refetch();
-      console.log(`Role of user ${userId} changed to ${role}`);
-      refetch();
     } catch (error) {
       toast.error("Failed to change user role:");
     }
