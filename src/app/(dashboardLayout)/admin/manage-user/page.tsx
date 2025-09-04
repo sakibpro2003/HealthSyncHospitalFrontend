@@ -1,7 +1,10 @@
 "use client";
 
-import React from "react";
-import { useGetAllUserQuery } from "@/redux/features/user/userApi";
+import React, { useState } from "react";
+import {
+  useBlockUserMutation,
+  useGetAllUserQuery,
+} from "@/redux/features/user/userApi";
 import {
   Table,
   TableBody,
@@ -14,18 +17,34 @@ import {
 import { Button } from "@/components/ui/button";
 
 const ManageUser = () => {
-  const { data: usersData, isLoading, isError, refetch } =
-    useGetAllUserQuery(undefined);
+  const {
+    data: usersData,
+    isLoading,
+    isError,
+    refetch,
+  } = useGetAllUserQuery(undefined);
+
+  const [blockUser] = useBlockUserMutation();
+
+  const [blockingUserId, setBlockingUserId] = useState<string | null>(null);
+
+  const handleBlock = async (userId: string) => {
+    try {
+      setBlockingUserId(userId); // mark this user as blocking
+      const res = await blockUser(userId).unwrap();
+      console.log(res, "block res");
+      refetch(); // refresh users after blocking
+    } catch (error) {
+      console.error("Failed to block user:", error);
+    } finally {
+      setBlockingUserId(null); // reset after action
+    }
+  };
 
   if (isLoading)
     return <p className="text-center text-gray-500">Loading users...</p>;
   if (isError)
     return <p className="text-center text-red-500">Failed to load users.</p>;
-
-  const handleBlock = (userId: string) => {
-    console.log("Block user:", userId);
-    // TODO: Add API call to block user
-  };
 
   return (
     <div className="p-6">
@@ -54,13 +73,25 @@ const ManageUser = () => {
               <TableCell>{user.bloodGroup}</TableCell>
               <TableCell>{user.role}</TableCell>
               <TableCell className="text-right">
-                <Button
-                  variant="destructive"
-                  size="sm"
-                  onClick={() => handleBlock(user._id)}
-                >
-                  Block
-                </Button>
+                {user.isBlocked === true ? (
+                  <Button
+                    className="w-28 bg-green-700"
+                    disabled={blockingUserId === user._id}
+                    onClick={() => handleBlock(user._id)}
+                  >
+                    {blockingUserId === user._id ? "Unblocking..." : "Unblock"}
+                  </Button>
+                ) : (
+                  <Button
+                    className="w-28"
+                    variant="destructive"
+                    size="sm"
+                    disabled={blockingUserId === user._id}
+                    onClick={() => handleBlock(user._id)}
+                  >
+                    {blockingUserId === user._id ? "Blocking..." : "Block"}
+                  </Button>
+                )}
               </TableCell>
             </TableRow>
           ))}

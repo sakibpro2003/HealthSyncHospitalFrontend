@@ -56,6 +56,13 @@ const userAPi = baseApi.injectEndpoints({
     getAllUser: builder.query({
       query: () => `/user/get-all-users`,
     }),
+
+   blockUser: builder.mutation({
+      query: (userId) => ({
+        url: `/user/block/${userId}`,
+        method: "PUT",
+      }),
+    }),
     // getSingleProduct: builder.query({
     //   query: (_id) => `/products/${_id}`,
     // }),
@@ -98,4 +105,4 @@ const userAPi = baseApi.injectEndpoints({
   }),
 });
 
-export const { useGetAllUserQuery } = userAPi;
+export const { useGetAllUserQuery,useBlockUserMutation } = userAPi;
