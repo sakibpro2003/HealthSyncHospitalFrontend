@@ -4,6 +4,8 @@ import React, { useState } from "react";
 import {
   useBlockUserMutation,
   useGetAllUserQuery,
+  useUnblockUserMutation,
+  useUpdateUserRoleMutation,
 } from "@/redux/features/user/userApi";
 import {
   Table,
@@ -15,6 +17,14 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
+import {
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Select } from "@/components/ui/select";
+import { toast } from "sonner";
 
 const ManageUser = () => {
   const {
@@ -25,19 +35,48 @@ const ManageUser = () => {
   } = useGetAllUserQuery(undefined);
 
   const [blockUser] = useBlockUserMutation();
+  const [unblockUser] = useUnblockUserMutation();
+  const [updateUserRole] = useUpdateUserRoleMutation();
 
   const [blockingUserId, setBlockingUserId] = useState<string | null>(null);
+  const [unblockingUserId, setUnBlockingUserId] = useState<string | null>(null);
 
   const handleBlock = async (userId: string) => {
     try {
-      setBlockingUserId(userId); // mark this user as blocking
+      setBlockingUserId(userId);
       const res = await blockUser(userId).unwrap();
-      console.log(res, "block res");
-      refetch(); // refresh users after blocking
+
+      refetch();
     } catch (error) {
       console.error("Failed to block user:", error);
     } finally {
-      setBlockingUserId(null); // reset after action
+      setBlockingUserId(null);
+    }
+  };
+
+  const handleRoleChange = async (userId: string, role: string) => {
+    console.log(role, "new role");
+    try {
+      const res = await updateUserRole({ userId, role }).unwrap();
+      toast.success(res?.message + ` to ${role}`);
+      refetch();
+      console.log(`Role of user ${userId} changed to ${role}`);
+      refetch();
+    } catch (error) {
+      toast.error("Failed to change user role:");
+    }
+  };
+
+  const handleUnBlock = async (userId: string) => {
+    try {
+      setUnBlockingUserId(userId);
+      const res = await unblockUser(userId).unwrap();
+      console.log(res, "unblock");
+      refetch();
+    } catch (error) {
+      console.error("Failed to block user:", error);
+    } finally {
+      setUnBlockingUserId(null);
     }
   };
 
@@ -71,15 +110,33 @@ const ManageUser = () => {
               <TableCell>{user.phone}</TableCell>
               <TableCell>{user.gender}</TableCell>
               <TableCell>{user.bloodGroup}</TableCell>
-              <TableCell>{user.role}</TableCell>
+              <TableCell>
+                <Select
+                  value={user.role}
+                  onValueChange={(newRole) =>
+                    handleRoleChange(user._id, newRole)
+                  }
+                >
+                  <SelectTrigger className="w-[180px]">
+                    <SelectValue placeholder="Select Role" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="user">User</SelectItem>
+                    <SelectItem value="receptionist">Receptionist</SelectItem>
+                    <SelectItem value="admin">Admin</SelectItem>
+                  </SelectContent>
+                </Select>
+              </TableCell>
               <TableCell className="text-right">
                 {user.isBlocked === true ? (
                   <Button
                     className="w-28 bg-green-700"
-                    disabled={blockingUserId === user._id}
-                    onClick={() => handleBlock(user._id)}
+                    disabled={unblockingUserId === user._id}
+                    onClick={() => handleUnBlock(user._id)}
                   >
-                    {blockingUserId === user._id ? "Unblocking..." : "Unblock"}
+                    {unblockingUserId === user._id
+                      ? "Unblocking..."
+                      : "Unblock"}
                   </Button>
                 ) : (
                   <Button
