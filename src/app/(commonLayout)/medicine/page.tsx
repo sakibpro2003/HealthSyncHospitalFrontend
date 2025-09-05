@@ -12,6 +12,7 @@ import { Button } from "@/components/ui/button";
 import { useGetAllMedicineQuery } from "@/redux/features/product/productApi";
 import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
+import { addToCart } from "@/utils/cart";
 
 export default function MedicineCard() {
   const { data, isLoading, isError } = useGetAllMedicineQuery(undefined);
@@ -105,7 +106,7 @@ export default function MedicineCard() {
           {/* Footer */}
           <CardFooter className="px-5">
             <div className="flex w-1/2justify-between items-center gap-2">
-              <Button className="w-full" disabled={!medicine.inStock}>
+              <Button onClick={()=>addToCart(medicine)} className="w-full" disabled={!medicine.inStock}>
                 {medicine.inStock ? "Add to Cart" : "Out of Stock"}
               </Button>
               <Button className="w-1/2">

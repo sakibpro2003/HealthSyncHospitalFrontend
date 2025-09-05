@@ -4,13 +4,13 @@ import Image from "next/image";
 import { useGetSingleProductQuery } from "@/redux/features/product/productApi";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { addToCart } from "@/utils/cart";
 
 export default function ProductDetails() {
   const { id } = useParams();
   const { data, isLoading, isError } = useGetSingleProductQuery(id);
 
-  if (isLoading)
-    return <div className="text-center py-10">Loading...</div>;
+  if (isLoading) return <div className="text-center py-10">Loading...</div>;
   if (isError)
     return (
       <div className="text-center py-10 text-red-500">
@@ -87,6 +87,7 @@ export default function ProductDetails() {
 
           {/* Add to Cart */}
           <Button
+            onClick={() => addToCart(medicine)}
             className="w-full md:w-2/3 rounded-xl py-6 text-lg font-semibold bg-gradient-to-r from-green-500 to-emerald-600 text-white shadow-md hover:from-green-600 hover:to-emerald-700"
             disabled={!medicine.inStock}
           >
@@ -122,7 +123,6 @@ export default function ProductDetails() {
           </ul>
         </div>
 
-        {/* Manufacturer Info */}
         <div className="p-6 rounded-2xl border shadow-sm bg-white hover:shadow-md transition">
           <h2 className="text-2xl font-semibold mb-4 border-b pb-2">
             Manufacturer
