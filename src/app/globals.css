@@ -24,6 +24,9 @@
 } */
 
 @theme inline {
+    /* ...other variables... */
+  --primary: #25A8D6; /* your new primary color */
+  --primary-foreground: #ffffff; /* text on primary color */
 
   --radius-sm: calc(var(--radius) - 4px);
 
