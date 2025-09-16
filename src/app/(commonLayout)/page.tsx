@@ -1,18 +1,12 @@
-// import DepartmentTabs from "@/components/DepartmentTabs";
-import DepartmentTabs from "@/components/DepartmentTabs";
 import AccordioSection from "@/components/Home/AccordioSection";
-import BookAppointment from "@/components/Home/DiscountSection";
+import DiscountSection from "@/components/Home/DiscountSection";
 import MyGallery from "@/components/Home/GallerySection";
 import NewsletterSection from "@/components/Home/NewsletterSection";
 import PackageCard from "@/components/Home/PackageCard";
 import VideoSection from "@/components/Home/VideoSection";
-// import NewsletterSection from "@/components/Home/NewsletterSection";
 import Banner from "@/components/shared/Banner";
 import DepartmentButtons from "@/components/shared/DepartmentButtons";
 import Footer from "@/components/shared/Footer";
-// import Slider from "@/components/shared/Slider";
-// import { Button } from "@/components/ui/button";
-// import { Carousel } from "@/components/ui/carousel";
 import React from "react";
 
 const page = () => {
@@ -22,9 +16,9 @@ const page = () => {
       {/* TODO:              uninstall slider js */}
       {/* <Slider></Slider> */}
       {/* <DepartmentTabs></DepartmentTabs> */}
-      <BookAppointment></BookAppointment>
       <DepartmentButtons></DepartmentButtons>
       <PackageCard></PackageCard>
+      <DiscountSection></DiscountSection>
       <VideoSection
         title="Intro Video"
         videoUrl="https://www.youtube.com/embed/FHeq7a_2AiE?si=ytMC-rc7mD5a9q1N"

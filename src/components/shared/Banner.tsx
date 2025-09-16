@@ -3,9 +3,12 @@ import Image from "next/image";
 import { useState, useEffect } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
-import b1 from "../../assets/b1.jpg";
-import b2 from "../../assets/b2.jpg";
-import b3 from "../../assets/b3.jpg";
+import b1 from "../../assets/b1.png";
+import b2 from "../../assets/b2.png";
+import b3 from "../../assets/b3.png";
+import b4 from "../../assets/b4.png";
+import b5 from "../../assets/b5.png";
+import b6 from "../../assets/b6.png";
 
 const slides = [
   {
@@ -23,6 +26,24 @@ const slides = [
   {
     id: 3,
     image: b3,
+    title: "Secure & Scalable",
+    description: "Built with modern technologies and secured by design.",
+  },
+  {
+    id: 4,
+    image: b4,
+    title: "Secure & Scalable",
+    description: "Built with modern technologies and secured by design.",
+  },
+  {
+    id: 5,
+    image: b5,
+    title: "Secure & Scalable",
+    description: "Built with modern technologies and secured by design.",
+  },
+  {
+    id: 6,
+    image: b6,
     title: "Secure & Scalable",
     description: "Built with modern technologies and secured by design.",
   },
@@ -49,30 +70,31 @@ const Banner = () => {
 
   return (
     <div className="w-11/12 mx-auto relative overflow-hidden rounded-2xl shadow-xl">
-      <div className="relative h-[500px]">
+      <div className="relative h-[350px] w-full">
         <Image
           src={slides[current].image}
           alt={slides[current].title}
           fill
-          className="object-cover transition-opacity duration-500"
+          quality={100}
+          sizes="100vw"
+          className="object-cover" 
+          // 🔄 Change to "object-contain bg-black" if you want NO cropping
           priority
         />
-        {/* <div className="relative inset-0 bg-opacity-20 bg-blue-300 w-1/3 flex flex-col content-center justify-center items-center text-white text-center px-4">
-          <h2 className="text-3xl md:text-4xl font-bold mb-2">{slides[current].title}</h2>
-          <p className="text-lg md:text-xl">{slides[current].description}</p>
-        </div> */}
       </div>
 
       {/* Navigation Buttons */}
       <button
         onClick={prevSlide}
-        className="absolute top-1/2 left-4 transform -translate-y-1/2 bg-black bg-opacity-40 p-2 rounded-full text-white hover:bg-opacity-70"
+        className="absolute top-1/2 left-4 transform -translate-y-1/2 
+        bg-black bg-opacity-40 p-2 rounded-full text-white hover:bg-opacity-70"
       >
         <ChevronLeft />
       </button>
       <button
         onClick={nextSlide}
-        className="absolute top-1/2 right-4 transform -translate-y-1/2 bg-black bg-opacity-40 p-2 rounded-full text-white hover:bg-opacity-70"
+        className="absolute top-1/2 right-4 transform -translate-y-1/2 
+        bg-black bg-opacity-40 p-2 rounded-full text-white hover:bg-opacity-70"
       >
         <ChevronRight />
       </button>

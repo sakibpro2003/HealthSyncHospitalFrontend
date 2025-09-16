@@ -12,8 +12,10 @@ import {
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { getCart, removeFromCart, clearCart } from "@/utils/cart";
+// import { useCreatePaymentMutation } from "@/redux/features/payment/paymentApi";
 
 export default function CartPage() {
+  // const [createPayment] = useCreatePaymentMutation();
   const [cart, setCart] = useState<any[]>([]);
 
   useEffect(() => {
@@ -29,6 +31,40 @@ export default function CartPage() {
     setCart([]);
   };
 
+ const handleCreatePayment = async () => {
+  const paymentData = {
+    email: "dd@gmail.com",
+    price: 44, // better use actual cart total
+    transactionId: `txn_${Date.now()}`, // make unique
+    date: new Date(),
+    status: "pending",
+  };
+  console.log("Sending paymentData:", paymentData);
+
+  try {
+    const res = await fetch("http://localhost:5000/api/v1/payment", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(paymentData),
+    });
+
+    if (!res.ok) {
+      throw new Error("Failed to create payment");
+    }
+
+    const data = await res.json(); // ✅ parse the response body
+    console.log("Backend response:", data);
+
+    // redirect to SSLCommerz Gateway if URL exists
+    if (data.GatewayPageURL) {
+      window.location.href = data.GatewayPageURL;
+    }
+  } catch (error) {
+    console.error("Payment error:", error);
+  }
+};
+
+
   const totalPrice = cart.reduce(
     (sum, item) => sum + item.price * item.quantity,
     0
@@ -36,7 +72,10 @@ export default function CartPage() {
 
   return (
     <div className="max-w-5xl mx-auto p-6">
-      <h1 className="text-3xl font-bold mb-6">🛒 Your Cart</h1>
+      <div className="flex justify-between">
+        <h1 className="text-3xl font-bold mb-6">🛒 Your Cart</h1>
+        <Button onClick={handleCreatePayment}>Checkout</Button>
+      </div>
 
       {cart.length === 0 ? (
         <p className="text-gray-500 text-lg">Your cart is empty</p>
