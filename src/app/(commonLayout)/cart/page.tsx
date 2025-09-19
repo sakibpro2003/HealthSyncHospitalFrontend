@@ -10,13 +10,13 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { loadStripe } from "@stripe/stripe-js";
 import { Button } from "@/components/ui/button";
 import { getCart, removeFromCart, clearCart } from "@/utils/cart";
-// import { useCreatePaymentMutation } from "@/redux/features/payment/paymentApi";
+import { TProduct } from "@/types/product";
 
 export default function CartPage() {
-  // const [createPayment] = useCreatePaymentMutation();
-  const [cart, setCart] = useState<any[]>([]);
+  const [cart, setCart] = useState<TProduct[]>([]);
 
   useEffect(() => {
     setCart(getCart());
@@ -31,39 +31,33 @@ export default function CartPage() {
     setCart([]);
   };
 
- const handleCreatePayment = async () => {
-  const paymentData = {
-    email: "dd@gmail.com",
-    price: 44, // better use actual cart total
-    transactionId: `txn_${Date.now()}`, // make unique
-    date: new Date(),
-    status: "pending",
-  };
-  console.log("Sending paymentData:", paymentData);
+  const handleCreatePayment = async () => {
+    const stripe = await loadStripe(
+      process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!
+    );
+    const response = await fetch(
+      "http://localhost:5000/api/v1/payment/create-checkout-session",
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(cart),
+      }
+    );
 
-  try {
-    const res = await fetch("http://localhost:5000/api/v1/payment", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(paymentData),
+    const data = await response.json();
+
+    console.log(data,"data yaaaaa")
+
+    const result = await stripe?.redirectToCheckout({
+      sessionId: data.data.id, // use the id from backend
     });
 
-    if (!res.ok) {
-      throw new Error("Failed to create payment");
+    console.log(result,"result yaaaaa")
+
+    if (result?.error) {
+      console.error("Stripe redirect error:", result.error.message);
     }
-
-    const data = await res.json(); // ✅ parse the response body
-    console.log("Backend response:", data);
-
-    // redirect to SSLCommerz Gateway if URL exists
-    if (data.GatewayPageURL) {
-      window.location.href = data.GatewayPageURL;
-    }
-  } catch (error) {
-    console.error("Payment error:", error);
-  }
-};
-
+  };
 
   const totalPrice = cart.reduce(
     (sum, item) => sum + item.price * item.quantity,
@@ -73,7 +67,7 @@ export default function CartPage() {
   return (
     <div className="max-w-5xl mx-auto p-6">
       <div className="flex justify-between">
-        <h1 className="text-3xl font-bold mb-6">🛒 Your Cart</h1>
+        <h1 className="text-3xl font-bold mb-6">Your Cart</h1>
         <Button onClick={handleCreatePayment}>Checkout</Button>
       </div>
 
@@ -103,7 +97,7 @@ export default function CartPage() {
                       width={60}
                       height={60}
                       className="rounded-md object-contain"
-                    />
+                    />undefined
                   </TableCell>
                   <TableCell className="font-medium">{item.name}</TableCell>
                   <TableCell>{item.quantity}</TableCell>

@@ -2,19 +2,24 @@ import { NextRequest, NextResponse } from "next/server";
 import { jwtVerify } from "jose";
 
 // Routes that don't require authentication
-const publicRoutes = ["/login", "/register", "/unauthorized", "/"];
+const publicRoutes = [
+  "/login",
+  "/register",
+  "/unauthorized",
+  "/success-payment",
+];
 const authRoutes = ["/login", "/register"];
 
 // Role-based access map
 const roleBasedAccess: Record<string, RegExp[]> = {
-  receptionist: [/^\/receptionist/, /^\//, /^\/additems/],
+  receptionist: [/^\/receptionist/, /^\//, /^\/additems/, /^\/success-payment/,/^\/failed-payment/],
   admin: [/^\/receptionist/, /^\//, /^\//],
   user: [
     /^\/user/,
     /^\/profile/,
     /^\/departmentalDoctors/,
     /^\//,
-    /^\/additems/,
+    /^\/additems/,/^\/success-payment/,/^\/failed-payment/
   ],
 };
 

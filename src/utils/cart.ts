@@ -1,3 +1,5 @@
+import { TProduct } from "@/types/product";
+
 export const getCart = () => {
   if (typeof window !== "undefined") {
     const cart = localStorage.getItem("cart");
@@ -6,15 +8,15 @@ export const getCart = () => {
   return [];
 };
 
-export const saveCart = (cart) => {
+export const saveCart = (cart: TProduct[]) => {
   if (typeof window !== "undefined") {
     localStorage.setItem("cart", JSON.stringify(cart));
   }
 };
 
-export const addToCart = (product) => {
+export const addToCart = (product: TProduct) => {
   const cart = getCart();
-  const existing = cart.find((item) => item._id === product._id);
+  const existing = cart.find((item: TProduct) => item._id === product._id);
   if (existing) {
     existing.quantity += 1;
   } else {
@@ -24,9 +26,9 @@ export const addToCart = (product) => {
   return cart;
 };
 
-export const removeFromCart = (id) => {
+export const removeFromCart = (id: string) => {
   let cart = getCart();
-  cart = cart.filter((item) => item._id !== id);
+  cart = cart.filter((item: TProduct) => item._id !== id);
   saveCart(cart);
   return cart;
 };
