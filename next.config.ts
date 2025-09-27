@@ -38,6 +38,14 @@ const nextConfig = {
         protocol: "https",
         hostname: "naturesway.com",
       },
+      {
+        protocol: "https",
+        hostname: "www.squarehospital.com",
+      },
+      {
+        protocol: "https",
+        hostname: "squarehospital.com",
+      },
     ],
   },
 };
