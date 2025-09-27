@@ -17,9 +17,31 @@ import { TProduct } from "@/types/product";
 
 export default function CartPage() {
   const [cart, setCart] = useState<TProduct[]>([]);
+  const [user, setUser] = useState<{
+    userId?: string;
+    _id?: string;
+    email?: string;
+  } | null>(null);
 
   useEffect(() => {
     setCart(getCart());
+  }, []);
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const res = await fetch("/api/me");
+        if (!res.ok) {
+          throw new Error("Unauthenticated");
+        }
+        const data = await res.json();
+        setUser(data.user);
+      } catch (error) {
+        console.error("Unable to fetch user info", error);
+      }
+    };
+
+    fetchUser();
   }, []);
 
   const handleRemove = (id: string) => {
@@ -31,28 +53,43 @@ export default function CartPage() {
     setCart([]);
   };
 
+  // TODO: refactor with redux
   const handleCreatePayment = async () => {
+    const resolvedUserId = user?.userId ?? user?._id;
+    if (!resolvedUserId) {
+      console.error("Unable to resolve user id for checkout");
+      return;
+    }
+
     const stripe = await loadStripe(
       process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!
     );
+    const payload = {
+      userId: resolvedUserId,
+      email: user?.email,
+      items: cart.map((item) => ({
+        productId: item._id,
+        title: item.name,
+        price: item.price,
+        quantity: item.quantity,
+        image: item.image,
+        type: "product" as const,
+      })),
+    };
     const response = await fetch(
       "http://localhost:5000/api/v1/payment/create-checkout-session",
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(cart),
+        body: JSON.stringify(payload),
       }
     );
 
     const data = await response.json();
 
-    console.log(data,"data yaaaaa")
-
     const result = await stripe?.redirectToCheckout({
       sessionId: data.data.id, // use the id from backend
     });
-
-    console.log(result,"result yaaaaa")
 
     if (result?.error) {
       console.error("Stripe redirect error:", result.error.message);
@@ -97,7 +134,8 @@ export default function CartPage() {
                       width={60}
                       height={60}
                       className="rounded-md object-contain"
-                    />undefined
+                    />
+                    undefined
                   </TableCell>
                   <TableCell className="font-medium">{item.name}</TableCell>
                   <TableCell>{item.quantity}</TableCell>
@@ -109,7 +147,7 @@ export default function CartPage() {
                     <Button
                       size="sm"
                       variant="destructive"
-                      onClick={() => handleRemove(item._id)}
+                      onClick={() => item._id && handleRemove(item._id)}
                     >
                       Remove
                     </Button>
