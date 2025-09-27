@@ -1,6 +1,5 @@
 "use client";
 import { useGetAllhealthPackageQuery } from "@/redux/features/healthPackage/healthPackageApi";
-import { useCreateSubscriptionMutation } from "@/redux/features/subscription/subscriptionApi";
 import { loadStripe } from "@stripe/stripe-js";
 import React, { useEffect, useState } from "react";
 
@@ -14,7 +13,6 @@ const PackageCard = () => {
   } | null>(null);
   const { data } = useGetAllhealthPackageQuery(undefined);
   console.log(data, "package data");
-  const [createSubscription] = useCreateSubscriptionMutation();
 
   const handleSubscription = async (
     packageId: string,

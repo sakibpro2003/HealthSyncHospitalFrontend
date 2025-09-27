@@ -18,12 +18,13 @@ const MySubscription = () => {
   const [cancelSubscription, { isLoading: isCancelling }] =
     useCancelSubscriptionMutation();
 
-  const handleCancelSubscription = async(id)=>{
-    try{
-      const res = await cancelSubscription(id);
-      console.log(res, "cance res data new")
-    }catch(err){
-      console.log(err)
+  const handleCancelSubscription = async (id: string) => {
+    try {
+      const res = await cancelSubscription(id).unwrap();
+      console.log(res, "cancel res data");
+      await refetch();
+    } catch (err) {
+      console.error("Failed to cancel subscription", err);
     }
   }
   
@@ -49,12 +50,15 @@ const MySubscription = () => {
     fetchUser();
   }, []);
 
+  const effectiveUserId = user?.userId ?? (user as { _id?: string })?._id;
+
   const {
     data: subscriptionData,
     isLoading,
     isError,
-  } = useGetSubscriptionsQuery(user?.userId, {
-    skip: !user?.userId,
+    refetch,
+  } = useGetSubscriptionsQuery(effectiveUserId, {
+    skip: !effectiveUserId,
   });
 
   const subscriptions = subscriptionData?.data || [];
@@ -145,9 +149,10 @@ const MySubscription = () => {
                 {sub.status === "active" && (
                   <button
                     onClick={() => handleCancelSubscription(sub._id)}
-                    className="px-4 py-1.5 text-sm rounded-md bg-red-100 text-red-600 hover:bg-red-200 transition"
+                    disabled={isCancelling}
+                    className="px-4 py-1.5 text-sm rounded-md bg-red-100 text-red-600 hover:bg-red-200 disabled:opacity-60 disabled:cursor-not-allowed transition"
                   >
-                    Deactivate
+                    {isCancelling ? "Processing..." : "Deactivate"}
                   </button>
                 )}
               </div>
