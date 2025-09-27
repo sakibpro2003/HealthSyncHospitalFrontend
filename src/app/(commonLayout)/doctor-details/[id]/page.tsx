@@ -1,11 +1,11 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useParams, useRouter } from "next/navigation";
+import { useParams } from "next/navigation";
 import Image from "next/image";
 import { toast } from "sonner";
 import { useGetSingleDoctorQuery } from "@/redux/features/doctor/doctorApi";
-import { useCreateAppointmentMutation } from "@/redux/features/appointment/appointmentApi";
+import { useCreateAppointmentCheckoutMutation } from "@/redux/features/appointment/appointmentApi";
 import { Button } from "@/components/ui/button";
 import {
   Sheet,
@@ -17,6 +17,7 @@ import {
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { loadStripe } from "@stripe/stripe-js";
 
 type AuthedUser = {
   userId?: string;
@@ -26,12 +27,31 @@ type AuthedUser = {
   role?: string;
 };
 
+const BOOKING_START_MINUTE = 8 * 60; // 08:00
+const BOOKING_END_MINUTE = 22 * 60; // 22:00
+
+const timeToMinutes = (time: string) => {
+  const [hourStr, minuteStr] = time.split(":");
+  const hours = Number(hourStr);
+  const minutes = Number(minuteStr);
+  if (
+    Number.isNaN(hours) ||
+    Number.isNaN(minutes) ||
+    hours < 0 ||
+    hours > 23 ||
+    minutes < 0 ||
+    minutes > 59
+  ) {
+    return NaN;
+  }
+  return hours * 60 + minutes;
+};
+
 export default function DoctorDetailsPage() {
-  const router = useRouter();
   const { id } = useParams();
   const { data, isLoading, isError } = useGetSingleDoctorQuery(id as string);
-  const [createAppointment, { isLoading: isBooking }] =
-    useCreateAppointmentMutation();
+  const [createAppointmentCheckout, { isLoading: isBooking }] =
+    useCreateAppointmentCheckoutMutation();
   const [user, setUser] = useState<AuthedUser | null>(null);
   const [sheetOpen, setSheetOpen] = useState(false);
   const [formState, setFormState] = useState({
@@ -82,19 +102,54 @@ export default function DoctorDetailsPage() {
       return;
     }
 
+    const totalMinutes = timeToMinutes(formState.appointmentTime);
+    if (Number.isNaN(totalMinutes)) {
+      toast.error("Please provide a valid time in HH:MM format");
+      return;
+    }
+
+    if (
+      totalMinutes < BOOKING_START_MINUTE ||
+      totalMinutes > BOOKING_END_MINUTE
+    ) {
+      toast.error("Appointments are available between 08:00 and 22:00");
+      return;
+    }
+
     try {
-      await createAppointment({
+      const publishableKey = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY;
+
+      if (!publishableKey) {
+        toast.error("Stripe publishable key is not configured");
+        return;
+      }
+
+      const stripe = await loadStripe(publishableKey);
+
+      if (!stripe) {
+        toast.error("Stripe is not configured");
+        return;
+      }
+
+      const response = await createAppointmentCheckout({
         patient: patientId,
+        patientEmail: user?.email,
         doctor: doctor._id,
         appointmentDate: formState.appointmentDate,
         appointmentTime: formState.appointmentTime,
         reason: formState.reason,
       }).unwrap();
 
-      toast.success("Appointment booked successfully");
+      toast.success("Redirecting to payment...");
+      const result = await stripe.redirectToCheckout({
+        sessionId: response.data.id,
+      });
+
+      if (result.error) {
+        toast.error(result.error.message ?? "Stripe redirect failed");
+      }
       setFormState({ appointmentDate: "", appointmentTime: "", reason: "" });
       setSheetOpen(false);
-      router.push("/patient/appointments");
     } catch (error: any) {
       const message =
         error?.data?.message || "Failed to book appointment. Please try again.";
@@ -186,6 +241,12 @@ export default function DoctorDetailsPage() {
             </SheetHeader>
             <form className="flex flex-col gap-4 p-4" onSubmit={handleSubmit}>
               <div className="grid gap-2">
+                <Label>Consultation Fee</Label>
+                <p className="text-lg font-semibold text-blue-600">
+                  ৳{doctor.consultationFee}
+                </p>
+              </div>
+              <div className="grid gap-2">
                 <Label htmlFor="appointmentDate">Preferred Date</Label>
                 <Input
                   id="appointmentDate"
@@ -237,8 +298,12 @@ export default function DoctorDetailsPage() {
                 />
               </div>
 
-              <Button type="submit" disabled={isBooking} className="w-full">
-                {isBooking ? "Booking..." : "Confirm Appointment"}
+              <Button
+                type="submit"
+                disabled={isBooking || !patientId}
+                className="w-full"
+              >
+                {isBooking ? "Preparing..." : "Proceed to Payment"}
               </Button>
               {!patientId && (
                 <p className="text-xs text-red-500 text-center">

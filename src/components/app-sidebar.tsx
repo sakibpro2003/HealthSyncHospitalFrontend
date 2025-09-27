@@ -126,6 +126,7 @@ export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
             ]);
             break;
           case "user":
+          case "patient":
             setNavItems([
               {
                 title: "My Health Packages",
@@ -139,6 +140,9 @@ export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
                 title: "Appointments",
                 url: "/patient/appointments",
                 icon: ClipboardList,
+                items: [
+                  { title: "Appointments", url: "/patient/appointments" },
+                ],
               },
             ]);
             break;

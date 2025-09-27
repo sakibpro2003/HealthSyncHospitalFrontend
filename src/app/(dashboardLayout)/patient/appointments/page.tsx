@@ -40,6 +40,9 @@ const AppointmentsPage = () => {
     refetch,
   } = useGetAppointmentsByPatientQuery(patientId as string, {
     skip: !patientId,
+    refetchOnMountOrArgChange: true,
+    refetchOnReconnect: true,
+    refetchOnFocus: true,
   });
 
   useEffect(() => {
