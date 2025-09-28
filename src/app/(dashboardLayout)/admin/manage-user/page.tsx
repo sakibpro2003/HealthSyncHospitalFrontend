@@ -17,6 +17,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import {
   SelectContent,
   SelectItem,
@@ -27,16 +28,27 @@ import { Select } from "@/components/ui/select";
 import { toast } from "sonner";
 
 const ManageUser = () => {
+  const [page, setPage] = useState(1);
+  const [search, setSearch] = useState("");
+  const normalizedSearch = search.trim();
+
   const {
     data: usersData,
     isLoading,
     isError,
     refetch,
-  } = useGetAllUserQuery(undefined);
+  } = useGetAllUserQuery({
+    page,
+    limit: 10,
+    searchTerm: normalizedSearch || undefined,
+  });
 
   const [blockUser] = useBlockUserMutation();
   const [unblockUser] = useUnblockUserMutation();
   const [updateUserRole] = useUpdateUserRoleMutation();
+
+  const users = usersData?.data ?? [];
+  const meta = usersData?.meta;
 
   const [blockingUserId, setBlockingUserId] = useState<string | null>(null);
   const [unblockingUserId, setUnBlockingUserId] = useState<string | null>(null);
@@ -78,17 +90,35 @@ const ManageUser = () => {
     }
   };
 
-  if (isLoading)
+  if (isLoading) {
     return <p className="text-center text-gray-500">Loading users...</p>;
-  if (isError)
+  }
+  if (isError) {
     return <p className="text-center text-red-500">Failed to load users.</p>;
+  }
 
   return (
     <div className="p-6">
-      <h1 className="text-2xl font-bold mb-6">Manage Users</h1>
+      <h1 className="text-2xl font-bold mb-4">Manage Users</h1>
 
-      <Table>
-        <TableCaption>A list of all registered users.</TableCaption>
+      <div className="mb-4 flex items-center gap-2">
+        <Input
+          value={search}
+          onChange={(e) => {
+            setSearch(e.target.value);
+            setPage(1);
+          }}
+          placeholder="Search by name, email, or phone"
+          className="w-64"
+        />
+        <Button variant="outline" onClick={() => refetch()}>Refresh</Button>
+      </div>
+
+      {users.length === 0 ? (
+        <p className="text-center text-gray-500">No users found for the current filters.</p>
+      ) : (
+        <Table>
+          <TableCaption>A list of all registered users.</TableCaption>
         <TableHeader>
           <TableRow>
             <TableHead>Name</TableHead>
@@ -101,7 +131,7 @@ const ManageUser = () => {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {usersData?.data?.result?.map((user: any) => (
+          {users.map((user: any) => (
             <TableRow key={user._id}>
               <TableCell className="font-medium">{user.name}</TableCell>
               <TableCell>{user.email}</TableCell>
@@ -152,6 +182,24 @@ const ManageUser = () => {
           ))}
         </TableBody>
       </Table>
+      )}
+      <div className="mt-4 flex justify-end items-center gap-2">
+        <span className="text-sm text-gray-500">Page {meta?.page ?? page} of {meta?.totalPage ?? 1}</span>
+        <Button
+          variant="outline"
+          disabled={(meta?.page ?? page) <= 1}
+          onClick={() => setPage((prev) => Math.max(1, prev - 1))}
+        >
+          Previous
+        </Button>
+        <Button
+          variant="outline"
+          disabled={(meta?.page ?? page) >= (meta?.totalPage ?? 1)}
+          onClick={() => setPage((prev) => (meta?.totalPage ? Math.min(meta.totalPage, prev + 1) : prev + 1))}
+        >
+          Next
+        </Button>
+      </div>
     </div>
   );
 };

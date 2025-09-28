@@ -3,7 +3,18 @@ import { baseApi } from "@/redux/api/baseApi";
 const userAPi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
     getAllUser: builder.query({
-      query: () => `/user/get-all-users`,
+      query: ({ page = 1, limit = 10, searchTerm }: { page?: number; limit?: number; searchTerm?: string }) => {
+        const params: Record<string, string | number> = { page, limit };
+        if (searchTerm) params.searchTerm = searchTerm;
+        return {
+          url: `/user/get-all-users`,
+          params,
+        };
+      },
+      transformResponse: (response: { data?: any; meta?: any }) => ({
+        data: Array.isArray(response?.data) ? response.data : [],
+        meta: response?.meta ?? { page: 1, limit: 10, total: 0, totalPage: 1 },
+      }),
     }),
 
     blockUser: builder.mutation({

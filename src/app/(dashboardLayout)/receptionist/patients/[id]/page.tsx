@@ -164,20 +164,22 @@ const PatientDetailsPage = ({ params }: IParams) => {
                           <Textarea
                             {...field}
                             placeholder=""
-                            value={field.value || ""}
+                            value={field.value ?? ""}
                           />
                         ) : type === "select" ? (
                           <Select
-                            onValueChange={(value) => {
-                              form.setValue(name, value);
-                            }}
-                            value={form.getValues(name) || ""}
+                            onValueChange={(value) => field.onChange(value)}
+                            value={(field.value as string) ?? ""}
                           >
                             <SelectTrigger className="w-full">
                               <SelectValue placeholder={`${label}`} />
                             </SelectTrigger>
                             <SelectContent>
-                              {options?.map((option) => (
+                              {(options || []).concat(
+                                field.value && options && !options.includes(field.value)
+                                  ? [field.value]
+                                  : []
+                              ).map((option) => (
                                 <SelectItem key={option} value={option}>
                                   {option}
                                 </SelectItem>
@@ -189,7 +191,7 @@ const PatientDetailsPage = ({ params }: IParams) => {
                             {...field}
                             type={type}
                             placeholder=""
-                            value={field.value || ""}
+                            value={field.value ?? ""}
                           />
                         )}
                       </FormControl>

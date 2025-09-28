@@ -14,10 +14,7 @@ import Link from "next/link";
 import React from "react";
 
 const BloodBank = () => {
-  const { data, isLoading, error } = useGetAllAvailableQuantityQuery({});
-  // console.log(data,"full data")
-  const bloodData = data?.data?.result;
-  console.log(bloodData,'data')
+  const { data: bloodData = {}, isLoading, error } = useGetAllAvailableQuantityQuery();
 
   const handleDonate = (bloodGroup)=>{
     
