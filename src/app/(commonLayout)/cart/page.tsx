@@ -1,6 +1,7 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import { loadStripe } from "@stripe/stripe-js";
 import { Button } from "@/components/ui/button";
 import { getCart, removeFromCart, clearCart } from "@/utils/cart";
@@ -29,9 +30,12 @@ export default function CartPage() {
     fetchUser();
   }, []);
 
-  const handleRemove = (id: string) => {
-    setCart(removeFromCart(id));
-  };
+  const totalPrice = useMemo(
+    () => cart.reduce((sum, item) => sum + item.price * item.quantity, 0),
+    [cart],
+  );
+
+  const handleRemove = (id: string) => setCart(removeFromCart(id));
 
   const handleClear = () => {
     clearCart();
@@ -81,93 +85,153 @@ export default function CartPage() {
     if (result?.error) toast.error(result.error.message ?? "Stripe redirect failed");
   };
 
-  const totalPrice = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
+  if (!cart.length) {
+    return (
+      <section className="min-h-screen bg-gradient-to-br from-slate-100 via-white to-slate-200">
+        <div className="mx-auto flex min-h-screen max-w-4xl flex-col items-center justify-center px-6 text-center">
+          <div className="rounded-3xl border border-white/60 bg-white/70 p-12 shadow-xl backdrop-blur">
+            <h1 className="mb-4 text-4xl font-black text-slate-800">🛒 Your Cart Is Empty</h1>
+            <p className="mb-8 text-lg text-slate-600">
+              Looks like you haven&apos;t added anything yet. Browse our services and come back when you&apos;re ready.
+            </p>
+            <Button asChild className="rounded-full px-8 py-3 text-base font-semibold">
+              <Link href="/services">Explore Services</Link>
+            </Button>
+          </div>
+        </div>
+      </section>
+    );
+  }
 
   return (
-    <div className="max-w-6xl mx-auto px-6 py-12">
-      <h1 className="text-center text-4xl font-extrabold text-gray-800 mb-10">
-        🛒 Your Shopping Cart
-      </h1>
+    <section className="min-h-screen bg-gradient-to-br from-slate-100 via-white to-slate-200">
+      <div className="mx-auto max-w-6xl px-6 py-14">
+        <header className="mb-10 text-center sm:text-left">
+          <p className="text-sm font-semibold uppercase tracking-[0.3em] text-violet-500">Shopping Cart</p>
+          <h1 className="mt-4 text-4xl font-black text-slate-900 sm:text-5xl">
+            Review &amp; confirm your selections
+          </h1>
+          <p className="mt-3 text-base text-slate-600 sm:max-w-xl">
+            Secure checkout, instant confirmations, and dedicated support for every appointment or service you book.
+          </p>
+        </header>
 
-      {cart.length === 0 ? (
-        <div className="bg-white shadow-md rounded-2xl p-10 text-center">
-          <p className="text-gray-500 text-lg">Your cart is empty</p>
-        </div>
-      ) : (
-        <div className="bg-white shadow-xl rounded-2xl overflow-hidden">
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm text-left">
-              <thead className="bg-gradient-to-r from-violet-600 to-purple-500 text-white">
-                <tr>
-                  <th className="px-6 py-4">Image</th>
-                  <th className="px-6 py-4">Name</th>
-                  <th className="px-6 py-4">Quantity</th>
-                  <th className="px-6 py-4">Price</th>
-                  <th className="px-6 py-4">Total</th>
-                  <th className="px-6 py-4">Action</th>
-                </tr>
-              </thead>
-              <tbody>
-                {cart.map((item) => (
-                  <tr key={item._id} className="border-b hover:bg-gray-50 transition">
-                    <td className="px-6 py-4">
-                      <Image
-                        src={item.image}
-                        alt={item.name}
-                        width={60}
-                        height={60}
-                        className="rounded-lg shadow-sm object-contain"
-                      />
-                    </td>
-                    <td className="px-6 py-4 font-medium text-gray-800">{item.name}</td>
-                    <td className="px-6 py-4">{item.quantity}</td>
-                    <td className="px-6 py-4 text-gray-700">${item.price.toFixed(2)}</td>
-                    <td className="px-6 py-4 font-semibold text-violet-600">
-                      ${(item.price * item.quantity).toFixed(2)}
-                    </td>
-                    <td className="px-6 py-4">
-                      <Button
-                        size="sm"
-                        variant="destructive"
-                        onClick={() => item._id && handleRemove(item._id)}
-                        className="rounded-full px-4 py-1"
-                      >
-                        Remove
-                      </Button>
-                    </td>
-                  </tr>
-                ))}
-                <tr>
-                  <td colSpan={4} className="px-6 py-4 text-right font-bold text-gray-800">
-                    Total:
-                  </td>
-                  <td className="px-6 py-4 font-extrabold text-green-600 text-lg">
-                    ${totalPrice.toFixed(2)}
-                  </td>
-                  <td />
-                </tr>
-              </tbody>
-            </table>
+        <div className="grid gap-8 lg:grid-cols-[minmax(0,1.7fr)_minmax(0,1fr)]">
+          <div className="space-y-4">
+            {cart.map((item) => (
+              <article
+                key={item._id}
+                className="group flex rounded-3xl border border-slate-200/70 bg-white p-4 shadow-sm transition hover:-translate-y-1 hover:border-violet-200 hover:shadow-xl"
+              >
+                <div className="relative h-24 w-24 flex-shrink-0 overflow-hidden rounded-2xl bg-slate-100 sm:h-28 sm:w-28">
+                  <Image
+                    src={item.image}
+                    alt={item.name}
+                    fill
+                    className="object-cover transition-transform group-hover:scale-105"
+                    sizes="(min-width: 640px) 7rem, 6rem"
+                  />
+                </div>
+
+                <div className="flex flex-1 flex-col justify-between gap-3 px-4">
+                  <div className="flex items-start justify-between gap-3">
+                    <div>
+                      <h2 className="text-lg font-semibold text-slate-900">{item.name}</h2>
+                      <p className="mt-1 text-sm text-slate-500">
+                        Quantity: <span className="font-semibold text-slate-900">{item.quantity}</span>
+                      </p>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-xs uppercase tracking-[0.25em] text-slate-400">Unit Price</p>
+                      <p className="text-lg font-semibold text-slate-900">
+                        ${item.price.toFixed(2)}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-xs uppercase tracking-[0.25em] text-slate-400">Total</p>
+                      <p className="text-xl font-semibold text-violet-600">
+                        ${(item.price * item.quantity).toFixed(2)}
+                      </p>
+                    </div>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => item._id && handleRemove(item._id)}
+                      className="rounded-full border-red-500 px-4 py-1 text-red-500 transition hover:bg-red-50 hover:text-red-600"
+                    >
+                      Remove
+                    </Button>
+                  </div>
+                </div>
+              </article>
+            ))}
           </div>
 
-          {/* Bottom Action Bar */}
-          <div className="flex justify-between items-center p-6 border-t bg-gray-50">
-            <Button
-              variant="outline"
-              onClick={handleClear}
-              className="rounded-full px-6 py-2 hover:bg-red-50 hover:text-red-600"
-            >
-              Clear Cart
-            </Button>
-            <Button
-              onClick={handleCreatePayment}
-              className="rounded-full px-6 py-2 bg-violet-600 hover:bg-violet-700 text-white font-semibold shadow-md"
-            >
-              Proceed to Checkout →
-            </Button>
-          </div>
+          <aside className="flex flex-col justify-between gap-6">
+            <div className="rounded-3xl bg-gradient-to-br from-violet-600 via-violet-500 to-purple-500 p-8 text-white shadow-2xl">
+              <h3 className="text-2xl font-semibold">Order Summary</h3>
+              <p className="mt-2 text-sm text-violet-100">
+                Secure payments powered by Stripe. Review your booking before continuing.
+              </p>
+
+              <dl className="mt-6 space-y-4 text-sm">
+                <div className="flex justify-between">
+                  <dt>Items</dt>
+                  <dd>{cart.length}</dd>
+                </div>
+                <div className="flex justify-between">
+                  <dt>Subtotal</dt>
+                  <dd>${totalPrice.toFixed(2)}</dd>
+                </div>
+                <div className="flex justify-between">
+                  <dt>Service fee</dt>
+                  <dd className="text-violet-200">Complimentary</dd>
+                </div>
+              </dl>
+
+              <div className="mt-6 border-t border-white/20 pt-6">
+                <div className="flex items-center justify-between">
+                  <p className="text-sm uppercase tracking-[0.3em] text-violet-200">Total due</p>
+                  <p className="text-3xl font-bold">${totalPrice.toFixed(2)}</p>
+                </div>
+              </div>
+            </div>
+
+            <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+              <p className="text-sm text-slate-500">
+                Need to make changes? You can remove items or clear the cart entirely before checkout.
+              </p>
+
+              <div className="mt-6 flex flex-col gap-3 sm:flex-row">
+                <Button
+                  variant="outline"
+                  onClick={handleClear}
+                  className="flex-1 rounded-full border-slate-200 px-6 py-2 text-slate-700 hover:border-red-500 hover:bg-red-50 hover:text-red-500"
+                >
+                  Clear Cart
+                </Button>
+                <Button
+                  onClick={handleCreatePayment}
+                  className="flex-1 rounded-full bg-violet-600 px-6 py-2 font-semibold shadow-md transition hover:bg-violet-700"
+                >
+                  Proceed to Checkout →
+                </Button>
+              </div>
+
+              <Button
+                asChild
+                variant="ghost"
+                className="mt-4 w-full rounded-full text-sm text-slate-500 underline-offset-4 hover:text-violet-600 hover:underline"
+              >
+                <Link href="/services">← Continue browsing services</Link>
+              </Button>
+            </div>
+          </aside>
         </div>
-      )}
-    </div>
+      </div>
+    </section>
   );
 }
