@@ -13,10 +13,40 @@ const appointmentApi = baseApi.injectEndpoints({
       query: (patientId: string) => `/appointments/patient/${patientId}`,
       providesTags: ["appointments"],
     }),
+    cancelAppointment: builder.mutation({
+      query: ({ appointmentId, patientId }: { appointmentId: string; patientId?: string }) => ({
+        url: `/appointments/${appointmentId}/cancel`,
+        method: "PATCH",
+        body: { patientId },
+      }),
+      invalidatesTags: ["appointments"],
+    }),
+    rescheduleAppointment: builder.mutation({
+      query: ({
+        appointmentId,
+        patientId,
+        appointmentDate,
+        appointmentTime,
+        reason,
+      }: {
+        appointmentId: string;
+        patientId?: string;
+        appointmentDate: string;
+        appointmentTime: string;
+        reason?: string;
+      }) => ({
+        url: `/appointments/${appointmentId}/reschedule`,
+        method: "PATCH",
+        body: { patientId, appointmentDate, appointmentTime, reason },
+      }),
+      invalidatesTags: ["appointments"],
+    }),
   }),
 });
 
 export const {
   useCreateAppointmentCheckoutMutation,
   useGetAppointmentsByPatientQuery,
+  useCancelAppointmentMutation,
+  useRescheduleAppointmentMutation,
 } = appointmentApi;
