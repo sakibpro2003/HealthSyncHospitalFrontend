@@ -6,6 +6,13 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { addToCart } from "@/utils/cart";
 
+const formatTaka = (value: number) =>
+  new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: "BDT",
+    minimumFractionDigits: 2,
+  }).format(value);
+
 export default function ProductDetails() {
   const { id } = useParams();
   const { data, isLoading, isError } = useGetSingleProductQuery(id);
@@ -19,6 +26,13 @@ export default function ProductDetails() {
     );
 
   const medicine = data?.data;
+
+  const basePrice = Number(medicine?.price ?? 0);
+  const discountPercentage = Number(medicine?.discount ?? 0);
+  const discountedPrice = Math.max(
+    basePrice - (basePrice * discountPercentage) / 100,
+    0,
+  );
 
   return (
     <div className="max-w-7xl mx-auto px-6 py-10">
@@ -50,15 +64,11 @@ export default function ProductDetails() {
           {/* Price */}
           <div className="flex items-center gap-4">
             <span className="text-3xl font-bold text-green-600">
-              $
-              {(
-                medicine.price -
-                (medicine.price * medicine.discount) / 100
-              ).toFixed(2)}
+              {formatTaka(discountedPrice)}
             </span>
-            {medicine.discount > 0 && (
+            {discountPercentage > 0 && (
               <span className="text-gray-400 line-through text-lg">
-                ${medicine.price.toFixed(2)}
+                {formatTaka(basePrice)}
               </span>
             )}
           </div>

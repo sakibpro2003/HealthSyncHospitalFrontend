@@ -4,9 +4,16 @@ import Image from "next/image";
 import Link from "next/link";
 import { loadStripe } from "@stripe/stripe-js";
 import { Button } from "@/components/ui/button";
-import { getCart, removeFromCart, clearCart } from "@/utils/cart";
+import { addToCart, getCart, removeFromCart, clearCart, decrementCartItem } from "@/utils/cart";
 import { TProduct } from "@/types/product";
 import { toast } from "sonner";
+
+const formatTaka = (value: number) =>
+  new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: "BDT",
+    minimumFractionDigits: 2,
+  }).format(value);
 
 export default function CartPage() {
   const [cart, setCart] = useState<TProduct[]>([]);
@@ -36,6 +43,26 @@ export default function CartPage() {
   );
 
   const handleRemove = (id: string) => setCart(removeFromCart(id));
+
+  const handleIncrement = (product: TProduct) => {
+    if (!product?._id) {
+      return;
+    }
+    setCart(addToCart(product));
+  };
+
+  const handleDecrement = (product: TProduct) => {
+    if (!product?._id) {
+      return;
+    }
+
+    if ((product.quantity ?? 0) <= 1) {
+      handleRemove(product._id);
+      return;
+    }
+
+    setCart(decrementCartItem(product._id));
+  };
 
   const handleClear = () => {
     clearCart();
@@ -137,14 +164,34 @@ export default function CartPage() {
                   <div className="flex items-start justify-between gap-3">
                     <div>
                       <h2 className="text-lg font-semibold text-slate-900">{item.name}</h2>
-                      <p className="mt-1 text-sm text-slate-500">
-                        Quantity: <span className="font-semibold text-slate-900">{item.quantity}</span>
-                      </p>
+                      <div className="mt-2 flex items-center gap-3">
+                        <Button
+                          aria-label="Decrease quantity"
+                          size="icon"
+                          variant="outline"
+                          className="rounded-full border-slate-200 text-slate-600 hover:border-slate-300 hover:bg-slate-100 hover:text-slate-900"
+                          onClick={() => handleDecrement(item)}
+                        >
+                          -
+                        </Button>
+                        <span className="min-w-[2.5rem] text-center text-base font-semibold text-slate-900">
+                          {item.quantity}
+                        </span>
+                        <Button
+                          aria-label="Increase quantity"
+                          size="icon"
+                          variant="outline"
+                          className="rounded-full border-slate-200 text-slate-600 hover:border-slate-300 hover:bg-slate-100 hover:text-slate-900"
+                          onClick={() => handleIncrement(item)}
+                        >
+                          +
+                        </Button>
+                      </div>
                     </div>
                     <div className="text-right">
                       <p className="text-xs uppercase tracking-[0.25em] text-slate-400">Unit Price</p>
                       <p className="text-lg font-semibold text-slate-900">
-                        ${item.price.toFixed(2)}
+                        {formatTaka(item.price)}
                       </p>
                     </div>
                   </div>
@@ -153,7 +200,7 @@ export default function CartPage() {
                     <div>
                       <p className="text-xs uppercase tracking-[0.25em] text-slate-400">Total</p>
                       <p className="text-xl font-semibold text-violet-600">
-                        ${(item.price * item.quantity).toFixed(2)}
+                        {formatTaka(item.price * item.quantity)}
                       </p>
                     </div>
                     <Button
@@ -184,7 +231,7 @@ export default function CartPage() {
                 </div>
                 <div className="flex justify-between">
                   <dt>Subtotal</dt>
-                  <dd>${totalPrice.toFixed(2)}</dd>
+                  <dd>{formatTaka(totalPrice)}</dd>
                 </div>
                 <div className="flex justify-between">
                   <dt>Service fee</dt>
@@ -195,7 +242,7 @@ export default function CartPage() {
               <div className="mt-6 border-t border-white/20 pt-6">
                 <div className="flex items-center justify-between">
                   <p className="text-sm uppercase tracking-[0.3em] text-violet-200">Total due</p>
-                  <p className="text-3xl font-bold">${totalPrice.toFixed(2)}</p>
+                  <p className="text-3xl font-bold">{formatTaka(totalPrice)}</p>
                 </div>
               </div>
             </div>

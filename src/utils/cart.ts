@@ -26,6 +26,26 @@ export const addToCart = (product: TProduct) => {
   return cart;
 };
 
+export const decrementCartItem = (id: string) => {
+  const cart = getCart();
+  const updatedCart = cart.reduce((acc: TProduct[], item: TProduct) => {
+    if (item._id !== id) {
+      acc.push(item);
+      return acc;
+    }
+
+    const currentQuantity = Number(item.quantity ?? 0);
+    if (currentQuantity > 1) {
+      acc.push({ ...item, quantity: currentQuantity - 1 });
+    }
+
+    return acc;
+  }, []);
+
+  saveCart(updatedCart);
+  return updatedCart;
+};
+
 export const removeFromCart = (id: string) => {
   let cart = getCart();
   cart = cart.filter((item: TProduct) => item._id !== id);

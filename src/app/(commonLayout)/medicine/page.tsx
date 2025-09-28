@@ -39,7 +39,7 @@ const ITEMS_PER_PAGE = 8;
 const formatPrice = (value: number) =>
   new Intl.NumberFormat("en-US", {
     style: "currency",
-    currency: "USD",
+    currency: "BDT",
     minimumFractionDigits: 2,
   }).format(value);
 
