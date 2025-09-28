@@ -14,6 +14,7 @@ import { loadStripe } from "@stripe/stripe-js";
 import { Button } from "@/components/ui/button";
 import { getCart, removeFromCart, clearCart } from "@/utils/cart";
 import { TProduct } from "@/types/product";
+import { toast } from "sonner";
 
 export default function CartPage() {
   const [cart, setCart] = useState<TProduct[]>([]);
@@ -85,13 +86,29 @@ export default function CartPage() {
       }
     );
 
+    if (!response.ok) {
+      const errorBody = await response.json().catch(() => ({}));
+      const message =
+        errorBody?.message || errorBody?.error || "Unable to create checkout session";
+      toast.error(message);
+      console.error("Unable to create checkout session", errorBody);
+      return;
+    }
+
     const data = await response.json();
+
+    if (!data?.data?.id) {
+      toast.error("Payment session could not be created. Please try again.");
+      console.error("Stripe session id missing in response", data);
+      return;
+    }
 
     const result = await stripe?.redirectToCheckout({
       sessionId: data.data.id, // use the id from backend
     });
 
     if (result?.error) {
+      toast.error(result.error.message ?? "Stripe redirect failed");
       console.error("Stripe redirect error:", result.error.message);
     }
   };

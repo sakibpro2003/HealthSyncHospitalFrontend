@@ -11,6 +11,7 @@ import {
   ClipboardList,
   Pill,
   HeartPulse,
+  Receipt,
 } from "lucide-react";
 
 import { NavMain } from "@/components/nav-main";
@@ -44,7 +45,7 @@ export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
   const [user, setUser] = useState<{
     email?: string;
     name?: string;
-    role?: "receptionist" | "admin" | "user";
+    role?: "receptionist" | "admin" | "user" | "patient";
   } | null>(null);
 
   const [navItems, setNavItems] = useState<NavItem[]>([]);
@@ -136,12 +137,28 @@ export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
                   { title: "My Subscription", url: "/patient/my-subscription" },
                 ],
               },
+              // {
+              //   title: "My Health Packages",
+              //   url: "/patient",
+              //   icon: Receipt,
+              //   items: [
+              //     { title: "Billing & Receipts", url: "/patient/billing" },
+              //   ],
+              // },
               {
                 title: "Appointments",
                 url: "/patient/appointments",
                 icon: ClipboardList,
+                 items: [
+                  { title: "Appointment", url: "/patient/appointments" },
+                ],
+              },
+              {
+                title: "Billing & Receipts",
+                url: "/patient/billing",
+                icon: Receipt,
                 items: [
-                  { title: "Appointments", url: "/patient/appointments" },
+                  { title: "Billing & Receipts", url: "/patient/billing" },
                 ],
               },
             ]);
