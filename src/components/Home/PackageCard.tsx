@@ -1,18 +1,25 @@
 "use client";
 import { useGetAllhealthPackageQuery } from "@/redux/features/healthPackage/healthPackageApi";
 import { loadStripe } from "@stripe/stripe-js";
-import React, { useEffect, useState } from "react";
+import { Button } from "@/components/ui/button";
+import React, { useEffect, useMemo, useState } from "react";
 
 const PackageCard = () => {
   const [user, setUser] = useState<{
-    _id?:string,
+    _id?: string;
     userId?: string,
     email?: string;
     name?: string;
     role?: string;
   } | null>(null);
   const { data } = useGetAllhealthPackageQuery(undefined);
-  console.log(data, "package data");
+
+  const formatTaka = (value: number) =>
+    new Intl.NumberFormat("en-US", {
+      style: "currency",
+      currency: "BDT",
+      minimumFractionDigits: 0,
+    }).format(value);
 
   const handleSubscription = async (
     packageId: string,
@@ -42,8 +49,6 @@ const PackageCard = () => {
         },
       ],
     };
-    console.log(payload, "package checkout payload");
-
     try {
       const res = await fetch(
         "http://localhost:5000/api/v1/payment/create-checkout-session",
@@ -64,7 +69,6 @@ const PackageCard = () => {
       if (result?.error) {
         console.error("Stripe redirect error:", result.error.message);
       }
-      console.log("Subscribed:", res);
     } catch (err) {
       console.error("Error subscribing:", err);
     }
@@ -85,63 +89,102 @@ const PackageCard = () => {
     };
     fetchUser();
   }, []);
-  console.log(user?.userId, "user data id ");
+
+  const packages = useMemo(() => data?.data?.result ?? [], [data]);
 
   return (
-    <div className="mt-10">
-      <h5 className="text-center font-bold text-3xl">
-        Health Checkup Packages
-      </h5>
-      <div className="grid grid-cols-4 w-11/12 mx-auto gap-12">
-        {data?.data?.result?.map((single) => (
-          <div
-            key={single._id}
-            className="w-full flex flex-col mt-auto h-max max-w-sm p-4 bg-white border border-gray-200 rounded-lg shadow-sm sm:p-8 dark:bg-gray-800 dark:border-gray-700"
-          >
-            <h5 className="mb-4 text-xl font-medium text-gray-500 dark:text-gray-400">
-              {single.title}
-            </h5>
-            <h5 className="mb-4 text-sm font-semibold text-gray-500 dark:text-gray-400">
-              {single.idealFor}
-            </h5>
-            <div className="flex items-baseline text-gray-900 dark:text-white">
-              <span className="text-3xl font-semibold">TK</span>
-              <span className="text-5xl font-extrabold tracking-tight">
-                {single.price}
-              </span>
-              <span className="ms-1 text-xl font-normal text-gray-500 dark:text-gray-400">
-                /month
-              </span>
-            </div>
-            <ul className="space-y-5 my-7">
-              {single.includes.map((e, index) => (
-                <li key={index} className="flex">
-                  <svg
-                    className="shrink-0 w-4 h-4 text-blue-700 dark:text-blue-500"
-                    fill="currentColor"
-                    viewBox="0 0 20 20"
-                  >
-                    <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5Zm3.707 8.207-4 4a1 1 0 0 1-1.414 0l-2-2a1 1 0 0 1 1.414-1.414L9 10.586l3.293-3.293a1 1 0 0 1 1.414 1.414Z" />
-                  </svg>
-                  <span className="text-base font-normal leading-tight text-gray-500 dark:text-gray-400 ms-3">
-                    {e}
+    <section className="relative mt-16 bg-gradient-to-b from-white via-violet-50/60 to-white py-16">
+      <div className="mx-auto flex max-w-6xl flex-col gap-6 px-4 text-center">
+        <div>
+          <p className="text-sm font-semibold uppercase tracking-[0.35em] text-violet-500">
+            Preventive Care
+          </p>
+          <h2 className="mt-3 text-3xl font-black text-slate-900 sm:text-4xl">
+            Health Checkup Packages
+          </h2>
+          <p className="mx-auto mt-4 max-w-2xl text-base text-slate-600">
+            Choose a plan that aligns with your lifestyle. Each package bundles
+            essential screenings, ongoing support, and exclusive member perks
+            so you can stay ahead of potential health risks.
+          </p>
+        </div>
+
+        <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-4">
+          {packages.map((single, index) => {
+            const isFeatured = index === 1;
+
+            return (
+              <article
+                key={single._id}
+                className={`group relative flex h-full flex-col rounded-3xl border p-6 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl ${
+                  isFeatured
+                    ? "border-violet-200 bg-white/90 backdrop-blur-xl"
+                    : "border-slate-200/80 bg-white/80 backdrop-blur"
+                }`}
+              >
+                {isFeatured && (
+                  <span className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-violet-600 px-4 py-1 text-xs font-semibold uppercase tracking-widest text-white shadow-md">
+                    Popular Choice
                   </span>
-                </li>
-              ))}
-            </ul>
-            <button
-              onClick={() =>
-                handleSubscription(single?._id, single?.title, single?.price)
-              }
-              type="button"
-              className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-200 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-900 font-medium rounded-lg text-sm px-5 py-2.5 inline-flex justify-center w-full text-center"
-            >
-              Choose plan
-            </button>
-          </div>
-        ))}
+                )}
+
+                <div className="flex flex-col gap-2 text-left">
+                  <h3 className="text-xl font-semibold text-slate-900">
+                    {single.title}
+                  </h3>
+                  {single.idealFor && (
+                    <span className="w-fit rounded-full bg-violet-100 px-3 py-1 text-xs font-medium text-violet-600">
+                      {single.idealFor}
+                    </span>
+                  )}
+                </div>
+
+                <div className="mt-6 flex items-end justify-start gap-2">
+                  <span className="text-4xl font-extrabold text-slate-900">
+                    {formatTaka(Number(single.price ?? 0))}
+                  </span>
+                  <span className="mb-1 text-sm font-medium uppercase tracking-[0.3em] text-slate-500">
+                    /month
+                  </span>
+                </div>
+
+                <ul className="mt-8 flex flex-1 flex-col gap-4 text-left">
+                  {single.includes?.map((feature: string, idx: number) => (
+                    <li key={`${single._id}-feature-${idx}`} className="flex gap-3">
+                      <span className="mt-0.5 flex size-6 items-center justify-center rounded-full bg-violet-100 text-violet-600">
+                        <svg
+                          className="size-3"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2.5"
+                          viewBox="0 0 24 24"
+                        >
+                          <path d="M5 13l4 4L19 7" strokeLinecap="round" strokeLinejoin="round" />
+                        </svg>
+                      </span>
+                      <span className="text-sm text-slate-600">{feature}</span>
+                    </li>
+                  ))}
+                </ul>
+
+                <Button
+                  onClick={() =>
+                    handleSubscription(single?._id, single?.title, single?.price)
+                  }
+                  className={`mt-8 w-full rounded-full py-3 text-sm font-semibold shadow-md transition ${
+                    isFeatured
+                      ? "bg-violet-600 text-white hover:bg-violet-700"
+                      : "bg-slate-900 text-white hover:bg-slate-800"
+                  }`}
+                >
+                  Choose Plan
+                </Button>
+              </article>
+            );
+          })}
+        </div>
       </div>
-    </div>
+    </section>
   );
 };
 
