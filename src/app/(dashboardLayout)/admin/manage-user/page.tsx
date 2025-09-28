@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import {
   useBlockUserMutation,
   useGetAllUserQuery,
+  useGetRoleMetricsQuery,
   useUnblockUserMutation,
   useUpdateUserRoleMutation,
 } from "@/redux/features/user/userApi";
@@ -17,6 +18,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import {
   SelectContent,
@@ -43,12 +45,38 @@ const ManageUser = () => {
     searchTerm: normalizedSearch || undefined,
   });
 
+  const { data: roleMetrics } = useGetRoleMetricsQuery();
+
   const [blockUser] = useBlockUserMutation();
   const [unblockUser] = useUnblockUserMutation();
   const [updateUserRole] = useUpdateUserRoleMutation();
 
   const users = usersData?.data ?? [];
   const meta = usersData?.meta;
+
+  const summary = roleMetrics?.summary ?? {
+    admin: { active: 0, blocked: 0 },
+    receptionist: { active: 0, blocked: 0 },
+    doctor: { active: 0, blocked: 0 },
+  };
+
+  const metrics = [
+    {
+      label: "Admins",
+      active: summary.admin?.active ?? 0,
+      blocked: summary.admin?.blocked ?? 0,
+    },
+    {
+      label: "Receptionists",
+      active: summary.receptionist?.active ?? 0,
+      blocked: summary.receptionist?.blocked ?? 0,
+    },
+    {
+      label: "Doctors",
+      active: summary.doctor?.active ?? 0,
+      blocked: summary.doctor?.blocked ?? 0,
+    },
+  ];
 
   const [blockingUserId, setBlockingUserId] = useState<string | null>(null);
   const [unblockingUserId, setUnBlockingUserId] = useState<string | null>(null);
@@ -100,6 +128,24 @@ const ManageUser = () => {
   return (
     <div className="p-6">
       <h1 className="text-2xl font-bold mb-4">Manage Users</h1>
+
+      <div className="grid gap-4 md:grid-cols-3 mb-6">
+        {metrics.map((metric) => (
+          <Card key={metric.label}>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm text-gray-500">{metric.label}</CardTitle>
+            </CardHeader>
+            <CardContent className="flex items-baseline justify-between">
+              <div>
+                <p className="text-2xl font-semibold text-gray-900">
+                  Active: {metric.active}
+                </p>
+                <p className="text-sm text-gray-500">Blocked: {metric.blocked}</p>
+              </div>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
 
       <div className="mb-4 flex items-center gap-2">
         <Input

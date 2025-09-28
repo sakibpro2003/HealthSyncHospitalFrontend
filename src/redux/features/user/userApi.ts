@@ -36,6 +36,12 @@ const userAPi = baseApi.injectEndpoints({
         body: { role },
       }),
     }),
+    getRoleMetrics: builder.query({
+      query: () => ({
+        url: `/user/role-metrics`,
+      }),
+      transformResponse: (response: { data?: any }) => response?.data,
+    }),
   }),
 });
 
@@ -43,5 +49,6 @@ export const {
   useGetAllUserQuery,
   useBlockUserMutation,
   useUnblockUserMutation,
-  useUpdateUserRoleMutation
+  useUpdateUserRoleMutation,
+  useGetRoleMetricsQuery
 } = userAPi;

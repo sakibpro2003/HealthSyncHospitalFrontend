@@ -12,6 +12,7 @@ import {
   Pill,
   HeartPulse,
   Receipt,
+  BarChart3,
 } from "lucide-react";
 
 import { NavMain } from "@/components/nav-main";
@@ -96,6 +97,11 @@ export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
             break;
           case "admin":
             setNavItems([
+              {
+                title: "Dashboard",
+                url: "/admin/dashboard",
+                icon: BarChart3,
+              },
               {
                 title: "Medicines",
                 url: "#",
