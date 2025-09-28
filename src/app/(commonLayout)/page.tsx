@@ -2,6 +2,7 @@ import AccordioSection from "@/components/Home/AccordioSection";
 import DiscountSection from "@/components/Home/DiscountSection";
 import MyGallery from "@/components/Home/GallerySection";
 import NewsletterSection from "@/components/Home/NewsletterSection";
+import NoticeBoard from "@/components/Home/NoticeBoard";
 import PackageCard from "@/components/Home/PackageCard";
 import VideoSection from "@/components/Home/VideoSection";
 import Banner from "@/components/shared/Banner";
@@ -27,14 +28,8 @@ const page = () => {
       <NewsletterSection></NewsletterSection>
       <AccordioSection></AccordioSection>
       <MyGallery />
+      <NoticeBoard />
       <Footer></Footer>
-      <p className="text-6xl text-yellow-400"> gallery images</p>
-      <p className="text-6xl text-yellow-400"> add animations</p>
-      <p className="text-6xl text-yellow-400"> notice board</p>
-      <p className="text-6xl text-yellow-400">
-        {" "}
-        department wise capcity /admit
-      </p>
     </div>
   );
 };
