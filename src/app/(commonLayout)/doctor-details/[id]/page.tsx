@@ -4,8 +4,22 @@ import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import Image from "next/image";
 import { toast } from "sonner";
+import { format } from "date-fns";
+import { loadStripe } from "@stripe/stripe-js";
+import {
+  Stethoscope,
+  GraduationCap,
+  Mail,
+  Phone,
+  Building,
+  CalendarClock,
+  Clock,
+  Quote,
+} from "lucide-react";
+
 import { useGetSingleDoctorQuery } from "@/redux/features/doctor/doctorApi";
 import { useCreateAppointmentCheckoutMutation } from "@/redux/features/appointment/appointmentApi";
+
 import { Button } from "@/components/ui/button";
 import {
   Sheet,
@@ -17,7 +31,6 @@ import {
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { loadStripe } from "@stripe/stripe-js";
 
 type AuthedUser = {
   userId?: string;
@@ -27,8 +40,8 @@ type AuthedUser = {
   role?: string;
 };
 
-const BOOKING_START_MINUTE = 8 * 60; // 08:00
-const BOOKING_END_MINUTE = 22 * 60; // 22:00
+const BOOKING_START_MINUTE = 8 * 60;
+const BOOKING_END_MINUTE = 22 * 60;
 
 const timeToMinutes = (time: string) => {
   const [hourStr, minuteStr] = time.split(":");
@@ -67,27 +80,33 @@ export default function DoctorDetailsPage() {
         if (!res.ok) throw new Error("Unauthorized");
         const data = await res.json();
         setUser(data.user);
-      } catch (error) {
-        console.error("Not logged in");
+      } catch {
+        setUser(null);
       }
     };
     fetchUser();
   }, []);
 
   const doctor = data?.data?.result;
-  //  const token = cookies().get("token")?.value;
-  // const user = token ? await verifyToken(token) : null;
+  const patientId = user?.userId ?? user?._id;
 
-  if (isLoading)
-    return <div className="w-11/12 mx-auto mt-10 text-center">Loading...</div>;
-  if (isError || !doctor)
+  if (isLoading) {
     return (
-      <div className="w-11/12 mx-auto mt-10 text-center text-red-500">
-        Doctor not found.
+      <div className="flex min-h-[60vh] items-center justify-center">
+        <p className="text-sm text-slate-500">Loading doctor profile…</p>
       </div>
     );
+  }
 
-  const patientId = user?.userId ?? user?._id;
+  if (isError || !doctor) {
+    return (
+      <div className="flex min-h-[60vh] items-center justify-center">
+        <p className="text-sm text-red-500">
+          We couldn’t find the doctor you were looking for.
+        </p>
+      </div>
+    );
+  }
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -118,14 +137,12 @@ export default function DoctorDetailsPage() {
 
     try {
       const publishableKey = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY;
-
       if (!publishableKey) {
         toast.error("Stripe publishable key is not configured");
         return;
       }
 
       const stripe = await loadStripe(publishableKey);
-
       if (!stripe) {
         toast.error("Stripe is not configured");
         return;
@@ -140,7 +157,7 @@ export default function DoctorDetailsPage() {
         reason: formState.reason,
       }).unwrap();
 
-      toast.success("Redirecting to payment...");
+      toast.success("Redirecting to payment…");
       const result = await stripe.redirectToCheckout({
         sessionId: response.data.id,
       });
@@ -148,6 +165,7 @@ export default function DoctorDetailsPage() {
       if (result.error) {
         toast.error(result.error.message ?? "Stripe redirect failed");
       }
+
       setFormState({ appointmentDate: "", appointmentTime: "", reason: "" });
       setSheetOpen(false);
     } catch (error: any) {
@@ -157,163 +175,229 @@ export default function DoctorDetailsPage() {
     }
   };
 
+  const education = Array.isArray(doctor.education)
+    ? doctor.education.join(", ")
+    : doctor.education;
+
+  const availabilityDays = doctor.availability?.days?.join(", ");
+  const availabilityWindow =
+    doctor.availability?.from && doctor.availability?.to
+      ? `${doctor.availability.from} – ${doctor.availability.to}`
+      : undefined;
+
   return (
-    <div>
-      <h2 className="text-3xl text-center mt-10">Doctor Detail</h2>
-      <div className="w-11/12 mx-auto my-10 p-6 bg-white shadow-lg rounded-xl grid grid-cols-1 md:grid-cols-3 gap-6">
-        {/* Doctor Image */}
-        <div className="md:col-span-1 flex justify-center">
-          <div className="relative w-64 h-80 rounded-lg overflow-hidden shadow-md">
+    <section className="bg-slate-50 py-12 dark:bg-slate-950">
+      <div className="mx-auto w-11/12 space-y-8">
+        <div className="grid gap-10 rounded-3xl border border-slate-200 bg-white p-8 shadow-sm md:grid-cols-[320px,1fr] dark:border-slate-800 dark:bg-slate-900">
+          <div className="relative mx-auto aspect-[3/4] w-full max-w-xs overflow-hidden rounded-2xl shadow-lg">
             <Image
-              src={doctor.image}
+              src={doctor.image || "/default-doctor.jpg"}
               alt={doctor.name}
               fill
               className="object-cover"
               priority
             />
           </div>
+
+          <div className="space-y-8">
+            <div>
+              <p className="text-xs uppercase tracking-[0.3em] text-blue-500">
+                HealthSync Specialist
+              </p>
+              <h1 className="mt-2 text-3xl font-semibold text-slate-900 dark:text-white">
+                {doctor.name}
+              </h1>
+              <p className="mt-2 flex flex-wrap items-center gap-3 text-sm text-slate-500 dark:text-slate-400">
+                <span className="inline-flex items-center gap-2 rounded-full bg-blue-500/10 px-3 py-1 text-blue-600 dark:bg-blue-500/20 dark:text-blue-300">
+                  <Stethoscope className="h-4 w-4" />
+                  {doctor.specialization}
+                </span>
+                <span className="inline-flex items-center gap-2 rounded-full bg-slate-100 px-3 py-1 text-slate-600 dark:bg-slate-800 dark:text-slate-300">
+                  <Building className="h-4 w-4" />
+                  {doctor.department}
+                </span>
+              </p>
+            </div>
+
+            <div className="grid gap-4 text-sm text-slate-600 sm:grid-cols-2 dark:text-slate-300">
+              <p className="flex items-center gap-2">
+                <Mail className="h-4 w-4 text-blue-500" />
+                {doctor.email}
+              </p>
+              <p className="flex items-center gap-2">
+                <Phone className="h-4 w-4 text-blue-500" />
+                {doctor.phone}
+              </p>
+              <p className="flex items-start gap-2">
+                <Quote className="h-4 w-4 text-blue-500" />
+                <span>
+                  Experience:{" "}
+                  {doctor.experience ? doctor.experience : "Information not available."}
+                </span>
+              </p>
+              <p className="flex items-start gap-2">
+                <CalendarClock className="h-4 w-4 text-blue-500" />
+                <span>
+                  Availability:{" "}
+                  {availabilityDays ? `${availabilityDays}` : "—"}
+                  {availabilityWindow ? ` | ${availabilityWindow}` : ""}
+                </span>
+              </p>
+            </div>
+
+            <div className="space-y-6">
+              <div>
+                <h2 className="text-lg font-semibold text-slate-900 dark:text-white">
+                  Education & Training
+                </h2>
+                {education ? (
+                  <p className="mt-1 flex items-start gap-2 text-sm text-slate-600 dark:text-slate-300">
+                    <GraduationCap className="mt-0.5 h-4 w-4 text-blue-500" />
+                    {education}
+                  </p>
+                ) : (
+                  <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
+                    No academic details provided.
+                  </p>
+                )}
+              </div>
+
+              <div>
+                <h2 className="text-lg font-semibold text-slate-900 dark:text-white">
+                  Biography
+                </h2>
+                <p className="mt-2 text-sm leading-relaxed text-slate-600 dark:text-slate-300">
+                  {doctor.bio || "This specialist has not added a biography just yet."}
+                </p>
+              </div>
+            </div>
+
+            <div className="flex flex-wrap items-center justify-between rounded-2xl bg-blue-50 px-5 py-4 dark:bg-blue-500/10">
+              <div>
+                <p className="text-xs uppercase tracking-wide text-blue-500">
+                  Consultation Fee
+                </p>
+                <p className="text-2xl font-semibold text-blue-700 dark:text-blue-300">
+                  ৳{doctor.consultationFee?.toLocaleString() ?? "—"}
+                </p>
+              </div>
+              <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
+                <SheetTrigger asChild>
+                  <Button className="rounded-full px-6 text-sm">
+                    Book Appointment
+                  </Button>
+                </SheetTrigger>
+                <SheetContent side="right" className="sm:max-w-md">
+                  <SheetHeader>
+                    <SheetTitle className="text-xl font-semibold text-slate-900 dark:text-white">
+                      Book a consultation
+                    </SheetTitle>
+                    <p className="text-sm text-slate-500 dark:text-slate-400">
+                      Select a date and time that suits you and follow the steps to confirm
+                      your visit with {doctor.name}.
+                    </p>
+                  </SheetHeader>
+
+                  <form className="mt-6 flex flex-col gap-4" onSubmit={handleSubmit}>
+                    <div className="grid gap-2">
+                      <Label>Consultation Fee</Label>
+                      <p className="rounded-md bg-blue-50 px-3 py-2 text-blue-600 dark:bg-blue-500/10 dark:text-blue-200">
+                        ৳{doctor.consultationFee?.toLocaleString() ?? "—"}
+                      </p>
+                    </div>
+
+                    <div className="grid gap-2">
+                      <Label htmlFor="appointmentDate">Preferred Date</Label>
+                      <Input
+                        id="appointmentDate"
+                        type="date"
+                        min={new Date().toISOString().split("T")[0]}
+                        value={formState.appointmentDate}
+                        onChange={(e) =>
+                          setFormState((prev) => ({
+                            ...prev,
+                            appointmentDate: e.target.value,
+                          }))
+                        }
+                        required
+                      />
+                    </div>
+
+                    <div className="grid gap-2">
+                      <Label htmlFor="appointmentTime">Preferred Time</Label>
+                      <Input
+                        id="appointmentTime"
+                        type="time"
+                        value={formState.appointmentTime}
+                        onChange={(e) =>
+                          setFormState((prev) => ({
+                            ...prev,
+                            appointmentTime: e.target.value,
+                          }))
+                        }
+                        required
+                      />
+                      <p className="text-xs text-slate-500 dark:text-slate-400">
+                        Available: {availabilityDays ? availabilityDays : "—"}{" "}
+                        {availabilityWindow ? `(${availabilityWindow})` : ""}
+                      </p>
+                    </div>
+
+                    <div className="grid gap-2">
+                      <Label htmlFor="reason">Visit reason (optional)</Label>
+                      <Textarea
+                        id="reason"
+                        rows={4}
+                        placeholder="Describe your symptoms or concerns"
+                        value={formState.reason}
+                        onChange={(e) =>
+                          setFormState((prev) => ({
+                            ...prev,
+                            reason: e.target.value,
+                          }))
+                        }
+                      />
+                    </div>
+
+                    <Button
+                      type="submit"
+                      disabled={isBooking || !patientId}
+                      className="w-full"
+                    >
+                      {isBooking ? "Preparing…" : "Proceed to payment"}
+                    </Button>
+                    {!patientId && (
+                      <p className="text-center text-xs text-red-500">
+                        Please log in as a patient to book an appointment.
+                      </p>
+                    )}
+                  </form>
+                </SheetContent>
+              </Sheet>
+            </div>
+          </div>
         </div>
 
-        {/* Doctor Info */}
-        <div className="md:col-span-2 space-y-4">
-          <h1 className="text-3xl font-bold text-gray-800">{doctor.name}</h1>
-          <p className="text-lg text-gray-600">
-            {doctor.specialization} - {doctor.department}
-          </p>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <p>
-              <span className="font-semibold">Email:</span> {doctor.email}
-            </p>
-            <p>
-              <span className="font-semibold">Phone:</span> {doctor.phone}
-            </p>
-            <p>
-              <span className="font-semibold">Experience:</span>{" "}
-              {doctor.experience || "Not Available"}
-            </p>
-            {doctor.availability ? (
-              <p>
-                <span className="font-semibold">Availability:</span>{" "}
-                {doctor.availability.days?.join(", ")}
-                <br />({doctor.availability.from} - {doctor.availability.to})
-              </p>
-            ) : (
-              <p>
-                <span className="font-semibold">Availability:</span> Not
-                Available
-              </p>
-            )}
-          </div>
-
-          <div>
-            <h2 className="text-xl font-semibold mt-4 mb-2">Education</h2>
-            {Array.isArray(doctor.education) && doctor.education.length > 0 ? (
-              <ul className="list-disc list-inside text-gray-700">
-                {doctor.education.map((degree: string[], index: number) => (
-                  <li key={index}>{degree}</li>
-                ))}
-              </ul>
-            ) : (
-              <p className="text-gray-600">Education details not available.</p>
-            )}
-          </div>
-
-          <div>
-            <h2 className="text-xl font-semibold mt-4 mb-2">Biography</h2>
-            <p className="text-gray-700">{doctor.bio || "No bio available."}</p>
-          </div>
+        <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+          <h2 className="text-lg font-semibold text-slate-900 dark:text-white">
+            Why patients trust {doctor.name}
+          </h2>
+          <ul className="mt-4 grid gap-3 text-sm text-slate-600 dark:text-slate-300 sm:grid-cols-2 lg:grid-cols-3">
+            <li className="flex items-start gap-2 rounded-xl bg-slate-50 px-4 py-3 dark:bg-slate-800/60">
+              <Stethoscope className="mt-0.5 h-4 w-4 text-blue-500" />
+              Comprehensive care tailored to your condition.
+            </li>
+            <li className="flex items-start gap-2 rounded-xl bg-slate-50 px-4 py-3 dark:bg-slate-800/60">
+              <GraduationCap className="mt-0.5 h-4 w-4 text-blue-500" />
+              International training & evidence-based practice.
+            </li>
+            <li className="flex items-start gap-2 rounded-xl bg-slate-50 px-4 py-3 dark:bg-slate-800/60">
+              <Clock className="mt-0.5 h-4 w-4 text-blue-500" />
+              Timely follow-ups and holistic advice.
+            </li>
+          </ul>
         </div>
-        <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
-          <SheetTrigger asChild>
-            <Button className="md:col-span-3 w-full md:w-auto md:justify-self-end">
-              Book Appointment
-            </Button>
-          </SheetTrigger>
-          <SheetContent side="right" className="sm:max-w-md">
-            <SheetHeader>
-              <SheetTitle className="text-xl font-semibold text-gray-800">
-                Book a Consultation
-              </SheetTitle>
-              <p className="text-sm text-gray-500">
-                Secure your slot with {doctor.name}. Fill in the details below.
-              </p>
-            </SheetHeader>
-            <form className="flex flex-col gap-4 p-4" onSubmit={handleSubmit}>
-              <div className="grid gap-2">
-                <Label>Consultation Fee</Label>
-                <p className="text-lg font-semibold text-blue-600">
-                  ৳{doctor.consultationFee}
-                </p>
-              </div>
-              <div className="grid gap-2">
-                <Label htmlFor="appointmentDate">Preferred Date</Label>
-                <Input
-                  id="appointmentDate"
-                  type="date"
-                  min={new Date().toISOString().split("T")[0]}
-                  value={formState.appointmentDate}
-                  onChange={(event) =>
-                    setFormState((prev) => ({
-                      ...prev,
-                      appointmentDate: event.target.value,
-                    }))
-                  }
-                  required
-                />
-              </div>
-              <div className="grid gap-2">
-                <Label htmlFor="appointmentTime">Preferred Time</Label>
-                <Input
-                  id="appointmentTime"
-                  type="time"
-                  value={formState.appointmentTime}
-                  onChange={(event) =>
-                    setFormState((prev) => ({
-                      ...prev,
-                      appointmentTime: event.target.value,
-                    }))
-                  }
-                  required
-                />
-                <p className="text-xs text-gray-500">
-                  Doctor availability: {doctor.availability?.from} - {" "}
-                  {doctor.availability?.to} on {" "}
-                  {doctor.availability?.days?.join(", ")}
-                </p>
-              </div>
-              <div className="grid gap-2">
-                <Label htmlFor="reason">Visit Reason (optional)</Label>
-                <Textarea
-                  id="reason"
-                  rows={4}
-                  placeholder="Describe your symptoms or concerns"
-                  value={formState.reason}
-                  onChange={(event) =>
-                    setFormState((prev) => ({
-                      ...prev,
-                      reason: event.target.value,
-                    }))
-                  }
-                />
-              </div>
-
-              <Button
-                type="submit"
-                disabled={isBooking || !patientId}
-                className="w-full"
-              >
-                {isBooking ? "Preparing..." : "Proceed to Payment"}
-              </Button>
-              {!patientId && (
-                <p className="text-xs text-red-500 text-center">
-                  Please log in as a patient to book an appointment.
-                </p>
-              )}
-            </form>
-          </SheetContent>
-        </Sheet>
       </div>
-    </div>
+    </section>
   );
 }
