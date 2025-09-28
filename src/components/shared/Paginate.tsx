@@ -9,22 +9,23 @@ import {
 import { useSearchParams } from "next/navigation";
 import React from "react";
 
-const Paginate = ({ totalPage }: { totalPage: number }) => {
+const Paginate = ({ totalPage, currentPage }: { totalPage: number; currentPage?: number }) => {
   const searchParams = useSearchParams();
-  const page = searchParams.get("page");
+  const pageFromQuery = searchParams.get("page");
+  const activePage = currentPage ?? (pageFromQuery ? Number(pageFromQuery) : 1);
 
   return (
     <Pagination>
       <PaginationContent>
         <PaginationItem>
-          <PaginationPrevious href="?page=1" />
+          <PaginationPrevious href={`?page=${Math.max(activePage - 1, 1)}`} />
         </PaginationItem>
 
-        {Array.from({ length: totalPage }).map((_, index) => (
+        {Array.from({ length: Math.max(totalPage, 1) }).map((_, index) => (
           <PaginationItem key={index}>
             <PaginationLink
               href={`?page=${index + 1}`}
-              isActive={index === Number(page) - 1}
+              isActive={index + 1 === activePage}
             >
               {index + 1}
             </PaginationLink>
@@ -34,7 +35,7 @@ const Paginate = ({ totalPage }: { totalPage: number }) => {
         <PaginationItem>{/* <PaginationEllipsis /> */}</PaginationItem>
 
         <PaginationItem>
-          <PaginationNext href={`?page=${totalPage}`} />
+          <PaginationNext href={`?page=${Math.min(activePage + 1, Math.max(totalPage, 1))}`} />
         </PaginationItem>
       </PaginationContent>
     </Pagination>

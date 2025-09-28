@@ -23,18 +23,42 @@ import { useForm } from "react-hook-form";
 
 const Patients = () => {
   const searchParams = useSearchParams();
-  const page = searchParams.get("page");
+  const pageParam = Number(searchParams.get("page"));
+  const currentPage = Number.isNaN(pageParam) || pageParam < 1 ? 1 : pageParam;
   const { register, watch } = useForm();
-  const searchTerm = watch("search","");
-  const { data, isLoading, error } = useGetAllPatientQuery({ page , searchTerm});
-  const patients = data?.data?.result?.result || [];
-  const meta = data?.data?.result?.meta;
-  const totalPage = Number(meta?.totalPage);
+  const searchValue = watch("search", "");
+  const searchTerm = searchValue.trim();
+  const { data, isLoading, error } = useGetAllPatientQuery({
+    page: currentPage,
+    limit: 10,
+    searchTerm: searchTerm || undefined,
+  });
+  const patients = data?.result ?? [];
+  const meta = data?.meta;
+  const totalPage = Number(meta?.totalPage ?? 0);
 
 
   if (isLoading) return <Loader></Loader>;
   if (error) return <p>Failed to load patients.</p>;
-  if (patients.length === 0) return <p>No patients found.</p>;
+  if (!patients.length) {
+    return (
+      <div className="p-6">
+        <h3 className="text-3xl text-center ">Registered Patients</h3>
+
+        <div className="w-1/3 mx-auto mt-10">
+          <Input
+            {...register("search")}
+            name="search"
+            type="text"
+            placeholder="Search by name or email"
+          />
+        </div>
+        <p className="text-center text-gray-500 mt-6">
+          No patients found for the current filters.
+        </p>
+      </div>
+    );
+  }
 
   return (
     <div>
@@ -76,7 +100,7 @@ const Patients = () => {
           ))}
         </TableBody>
       </Table>
-      <Paginate totalPage={totalPage}></Paginate>
+      <Paginate currentPage={currentPage} totalPage={totalPage}></Paginate>
     </div>
   );
 };

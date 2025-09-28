@@ -53,15 +53,39 @@ interface GetSinglePatientResponse {
 const patientApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
     getAllPatient: builder.query<
-      GetAllPatientResponse,
-      { page: number; searchTerm: string }
+      GetAllPatientResponse["data"] | undefined,
+      {
+        page?: number;
+        limit?: number;
+        searchTerm?: string;
+        gender?: string;
+        bloodGroup?: string;
+      }
     >({
-      query: ({ page = 1, searchTerm = "" }) =>
-        `/patient/all-patient?page=${page}&searchTerm=${searchTerm}`,
+      query: ({ page = 1, limit = 10, searchTerm = "", gender, bloodGroup }) => {
+        const params: Record<string, string | number> = { page, limit };
+        if (searchTerm) params.searchTerm = searchTerm;
+        if (gender) params.gender = gender;
+        if (bloodGroup) params.bloodGroup = bloodGroup;
+        return {
+          url: `/patient/all-patient`,
+          params,
+        };
+      },
+      transformResponse: (response: GetAllPatientResponse) => {
+        const payload = response?.data?.result;
+        const items = Array.isArray(payload?.result)
+          ? payload.result
+          : Array.isArray(payload)
+          ? payload
+          : [];
+        const meta = response?.meta ?? payload?.meta ?? { page: 1, limit: 0, total: 0, totalPage: 0 };
+        return { result: items, meta };
+      },
       providesTags: (result) =>
-        result?.data?.result
+        result?.result?.length
           ? [
-              ...result.data.result.map((patient) => ({
+              ...result.result.map((patient) => ({
                 type: "patient" as const,
                 id: patient._id,
               })),

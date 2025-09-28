@@ -137,14 +137,7 @@ export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
                   { title: "My Subscription", url: "/patient/my-subscription" },
                 ],
               },
-              // {
-              //   title: "My Health Packages",
-              //   url: "/patient",
-              //   icon: Receipt,
-              //   items: [
-              //     { title: "Billing & Receipts", url: "/patient/billing" },
-              //   ],
-              // },
+              
               {
                 title: "Appointments",
                 url: "/patient/appointments",
