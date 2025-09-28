@@ -12,25 +12,26 @@ import React from "react";
 
 const page = () => {
   return (
-    <div className="h-screen">
-      <Banner></Banner>
-      {/* TODO:              uninstall slider js */}
-      {/* <Slider></Slider> */}
-      {/* <DepartmentTabs></DepartmentTabs> */}
-      <DepartmentButtons></DepartmentButtons>
-      <PackageCard></PackageCard>
-      <DiscountSection></DiscountSection>
-      <VideoSection
-        title="Intro Video"
-        videoUrl="https://www.youtube.com/embed/FHeq7a_2AiE?si=ytMC-rc7mD5a9q1N"
-      ></VideoSection>
-      <h1 className="text-center text-2xl font-bold mb-6">Photo Gallery</h1>
-      <NewsletterSection></NewsletterSection>
-      <AccordioSection></AccordioSection>
-      <MyGallery />
-      <NoticeBoard />
-      <Footer></Footer>
-    </div>
+    <main className="flex min-h-screen flex-col bg-slate-50">
+      <Banner />
+      {/* TODO: uninstall slider js */}
+      {/* <Slider /> */}
+      {/* <DepartmentTabs /> */}
+      <div className="flex-1 pb-20">
+        <DepartmentButtons />
+        <PackageCard />
+        <DiscountSection />
+        <VideoSection
+          title="Intro Video"
+          videoUrl="https://www.youtube.com/embed/FHeq7a_2AiE?si=ytMC-rc7mD5a9q1N"
+        />
+        <NewsletterSection />
+        <AccordioSection />
+        <MyGallery />
+        <NoticeBoard />
+      </div>
+      <Footer />
+    </main>
   );
 };
 

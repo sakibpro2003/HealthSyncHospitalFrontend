@@ -22,40 +22,42 @@ const departments = [
 
 const DepartmentButtons = () => {
   return (
-    <section className="mt-12">
-      <div className="mx-auto flex w-11/12 flex-col items-center gap-3 text-center">
-        <p className="text-sm uppercase tracking-[0.3em] text-blue-500">
-          Our Specialists
+    <section className="relative mx-auto mt-16 w-11/12 max-w-7xl overflow-hidden rounded-[2.5rem] border border-white/15 bg-gradient-to-br from-white/95 via-white/80 to-violet-50/80 px-6 py-14 shadow-[0_35px_80px_-40px_rgba(79,70,229,0.35)] backdrop-blur sm:px-10">
+      <div className="absolute -left-24 top-0 h-40 w-40 rounded-full bg-violet-200/60 blur-3xl" aria-hidden />
+      <div className="absolute -right-24 bottom-0 h-48 w-48 rounded-full bg-sky-200/50 blur-3xl" aria-hidden />
+
+      <div className="relative mx-auto flex w-full flex-col items-center gap-3 px-2 text-center sm:px-6 lg:px-8">
+        <p className="text-xs font-semibold uppercase tracking-[0.4em] text-violet-500">
+          Our specialists
         </p>
-        <h2 className="text-3xl font-semibold text-slate-900 dark:text-slate-100">
-          Find the Right Doctor
+        <h2 className="text-3xl font-black text-slate-900 sm:text-4xl">
+          Find the right doctor
         </h2>
-        <p className="max-w-2xl text-sm text-slate-500 dark:text-slate-400">
-          Browse departments and connect with leading consultants across the
-          HealthSync Hospital network.
+        <p className="max-w-3xl text-sm text-slate-600 sm:text-base">
+          Search by department and connect with leading consultants across the HealthSync network. Every profile includes availability windows, digital records, and patient satisfaction insights.
         </p>
       </div>
 
-      <div className="mx-auto mt-8 grid w-11/12 gap-4 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4">
+      <div className="relative mx-auto mt-10 grid w-full gap-4 px-2 sm:grid-cols-2 md:grid-cols-3 lg:px-8 xl:grid-cols-4">
         {departments.map((dept) => (
           <Link
             key={dept.slug}
             href={`/departmentalDoctors/${dept.slug}`}
             className={cn(
               buttonVariants({ variant: "ghost" }),
-              "group relative h-auto justify-start rounded-xl border border-slate-200 p-5 text-left shadow-sm transition hover:-translate-y-0.5 hover:border-blue-400 hover:shadow-md dark:border-slate-700 dark:hover:border-blue-500"
+              "group relative h-auto justify-start rounded-2xl border border-white/50 bg-white/80 p-5 text-left shadow-lg transition hover:-translate-y-1 hover:border-violet-300 hover:shadow-xl"
             )}
           >
-            <span className="absolute inset-x-4 bottom-4 h-[3px] rounded-full bg-gradient-to-r from-blue-500/80 to-indigo-500/80 opacity-0 transition group-hover:opacity-100" />
+            <span className="absolute inset-x-5 bottom-5 h-[3px] rounded-full bg-gradient-to-r from-violet-500/80 to-indigo-500/80 opacity-0 transition group-hover:opacity-100" />
             <div className="flex items-center gap-3">
-              <span className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-500/10 text-blue-600 dark:bg-blue-500/20">
+              <span className="flex h-12 w-12 items-center justify-center rounded-xl bg-violet-100 text-violet-600">
                 <Stethoscope className="h-5 w-5" />
               </span>
               <div>
-                <p className="text-base font-semibold text-slate-900 dark:text-slate-100">
+                <p className="text-base font-semibold text-slate-900">
                   {dept.name}
                 </p>
-                <p className="text-xs text-slate-500 dark:text-slate-400">
+                <p className="text-xs text-slate-500">
                   Consult top specialists
                 </p>
               </div>

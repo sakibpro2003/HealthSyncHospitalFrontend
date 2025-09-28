@@ -1,25 +1,25 @@
+
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useParams } from "next/navigation";
 import Image from "next/image";
 import { toast } from "sonner";
-import { format } from "date-fns";
 import { loadStripe } from "@stripe/stripe-js";
 import {
-  Stethoscope,
-  GraduationCap,
-  Mail,
-  Phone,
-  Building,
   CalendarClock,
   Clock,
-  Quote,
+  GraduationCap,
+  Mail,
+  MapPin,
+  Phone,
+  Sparkles,
+  Stethoscope,
+  UserRound,
 } from "lucide-react";
 
 import { useGetSingleDoctorQuery } from "@/redux/features/doctor/doctorApi";
 import { useCreateAppointmentCheckoutMutation } from "@/redux/features/appointment/appointmentApi";
-
 import { Button } from "@/components/ui/button";
 import {
   Sheet,
@@ -78,8 +78,8 @@ export default function DoctorDetailsPage() {
       try {
         const res = await fetch("/api/me");
         if (!res.ok) throw new Error("Unauthorized");
-        const data = await res.json();
-        setUser(data.user);
+        const payload = await res.json();
+        setUser(payload.user);
       } catch {
         setUser(null);
       }
@@ -89,6 +89,19 @@ export default function DoctorDetailsPage() {
 
   const doctor = data?.data?.result;
   const patientId = user?.userId ?? user?._id;
+
+  const education = useMemo(
+    () => (Array.isArray(doctor?.education) ? doctor?.education.join(", ") : doctor?.education),
+    [doctor?.education],
+  );
+  const availabilityDays = useMemo(
+    () => doctor?.availability?.days?.join(", "),
+    [doctor?.availability?.days],
+  );
+  const availabilityWindow =
+    doctor?.availability?.from && doctor?.availability?.to
+      ? `${doctor.availability.from} – ${doctor.availability.to}`
+      : undefined;
 
   if (isLoading) {
     return (
@@ -101,9 +114,7 @@ export default function DoctorDetailsPage() {
   if (isError || !doctor) {
     return (
       <div className="flex min-h-[60vh] items-center justify-center">
-        <p className="text-sm text-red-500">
-          We couldn’t find the doctor you were looking for.
-        </p>
+        <p className="text-sm text-red-500">We couldn’t find the doctor you were looking for.</p>
       </div>
     );
   }
@@ -127,10 +138,7 @@ export default function DoctorDetailsPage() {
       return;
     }
 
-    if (
-      totalMinutes < BOOKING_START_MINUTE ||
-      totalMinutes > BOOKING_END_MINUTE
-    ) {
+    if (totalMinutes < BOOKING_START_MINUTE || totalMinutes > BOOKING_END_MINUTE) {
       toast.error("Appointments are available between 08:00 and 22:00");
       return;
     }
@@ -169,27 +177,19 @@ export default function DoctorDetailsPage() {
       setFormState({ appointmentDate: "", appointmentTime: "", reason: "" });
       setSheetOpen(false);
     } catch (error: any) {
-      const message =
-        error?.data?.message || "Failed to book appointment. Please try again.";
+      const message = error?.data?.message || "Failed to book appointment. Please try again.";
       toast.error(message);
     }
   };
 
-  const education = Array.isArray(doctor.education)
-    ? doctor.education.join(", ")
-    : doctor.education;
-
-  const availabilityDays = doctor.availability?.days?.join(", ");
-  const availabilityWindow =
-    doctor.availability?.from && doctor.availability?.to
-      ? `${doctor.availability.from} – ${doctor.availability.to}`
-      : undefined;
-
   return (
-    <section className="bg-slate-50 py-12 dark:bg-slate-950">
-      <div className="mx-auto w-11/12 space-y-8">
-        <div className="grid gap-10 rounded-3xl border border-slate-200 bg-white p-8 shadow-sm md:grid-cols-[320px,1fr] dark:border-slate-800 dark:bg-slate-900">
-          <div className="relative mx-auto aspect-[3/4] w-full max-w-xs overflow-hidden rounded-2xl shadow-lg">
+    <section className="relative bg-gradient-to-br from-white via-violet-50/60 to-white pb-20 pt-12">
+      <div className="absolute -top-20 left-0 h-48 w-48 rounded-full bg-violet-200/60 blur-3xl" aria-hidden />
+      <div className="absolute -bottom-24 right-6 h-56 w-56 rounded-full bg-sky-200/55 blur-3xl" aria-hidden />
+
+      <div className="relative mx-auto w-11/12 max-w-7xl space-y-12">
+        <div className="grid gap-10 rounded-[2.75rem] border border-white/20 bg-white/85 p-8 shadow-[0_30px_70px_-45px_rgba(91,33,182,0.35)] backdrop-blur lg:grid-cols-[320px,1fr] lg:p-12">
+          <div className="relative mx-auto aspect-[3/4] w-full max-w-xs overflow-hidden rounded-3xl border border-white/40 bg-violet-100 shadow-xl">
             <Image
               src={doctor.image || "/default-doctor.jpg"}
               alt={doctor.name}
@@ -200,123 +200,111 @@ export default function DoctorDetailsPage() {
           </div>
 
           <div className="space-y-8">
-            <div>
-              <p className="text-xs uppercase tracking-[0.3em] text-blue-500">
-                HealthSync Specialist
-              </p>
-              <h1 className="mt-2 text-3xl font-semibold text-slate-900 dark:text-white">
-                {doctor.name}
-              </h1>
-              <p className="mt-2 flex flex-wrap items-center gap-3 text-sm text-slate-500 dark:text-slate-400">
-                <span className="inline-flex items-center gap-2 rounded-full bg-blue-500/10 px-3 py-1 text-blue-600 dark:bg-blue-500/20 dark:text-blue-300">
-                  <Stethoscope className="h-4 w-4" />
-                  {doctor.specialization}
-                </span>
-                <span className="inline-flex items-center gap-2 rounded-full bg-slate-100 px-3 py-1 text-slate-600 dark:bg-slate-800 dark:text-slate-300">
-                  <Building className="h-4 w-4" />
-                  {doctor.department}
-                </span>
-              </p>
-            </div>
-
-            <div className="grid gap-4 text-sm text-slate-600 sm:grid-cols-2 dark:text-slate-300">
-              <p className="flex items-center gap-2">
-                <Mail className="h-4 w-4 text-blue-500" />
-                {doctor.email}
-              </p>
-              <p className="flex items-center gap-2">
-                <Phone className="h-4 w-4 text-blue-500" />
-                {doctor.phone}
-              </p>
-              <p className="flex items-start gap-2">
-                <Quote className="h-4 w-4 text-blue-500" />
-                <span>
-                  Experience:{" "}
-                  {doctor.experience ? doctor.experience : "Information not available."}
-                </span>
-              </p>
-              <p className="flex items-start gap-2">
-                <CalendarClock className="h-4 w-4 text-blue-500" />
-                <span>
-                  Availability:{" "}
-                  {availabilityDays ? `${availabilityDays}` : "—"}
-                  {availabilityWindow ? ` | ${availabilityWindow}` : ""}
-                </span>
-              </p>
-            </div>
-
-            <div className="space-y-6">
+            <div className="space-y-4">
+              <span className="inline-flex items-center gap-2 rounded-full bg-violet-100 px-4 py-1 text-xs font-semibold uppercase tracking-[0.35em] text-violet-600">
+                <Sparkles className="size-4" />
+                HealthSync specialist
+              </span>
               <div>
-                <h2 className="text-lg font-semibold text-slate-900 dark:text-white">
-                  Education & Training
-                </h2>
+                <h1 className="text-3xl font-black text-slate-900 sm:text-4xl">{doctor.name}</h1>
+                <div className="mt-3 flex flex-wrap items-center gap-3 text-sm text-slate-600">
+                  <span className="inline-flex items-center gap-2 rounded-full bg-violet-100 px-3 py-1 text-violet-600">
+                    <Stethoscope className="h-4 w-4" />
+                    {doctor.specialization}
+                  </span>
+                  <span className="inline-flex items-center gap-2 rounded-full bg-white px-3 py-1 text-slate-500 shadow">
+                    <UserRound className="h-4 w-4" />
+                    {doctor.department}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <div className="grid gap-4 text-sm text-slate-600 sm:grid-cols-2">
+              <p className="flex items-center gap-2">
+                <Mail className="h-4 w-4 text-violet-500" />
+                {doctor.email || "Not shared"}
+              </p>
+              <p className="flex items-center gap-2">
+                <Phone className="h-4 w-4 text-violet-500" />
+                {doctor.phone || "Not shared"}
+              </p>
+              <p className="flex items-start gap-2">
+                <CalendarClock className="h-4 w-4 text-violet-500" />
+                <span>
+                  {availabilityDays ?? "Availability to be confirmed"}
+                  {availabilityWindow ? ` · ${availabilityWindow}` : ""}
+                </span>
+              </p>
+              <p className="flex items-start gap-2">
+                <MapPin className="h-4 w-4 text-violet-500" />
+                <span>{doctor.availability?.location ?? "Location on request"}</span>
+              </p>
+            </div>
+
+            <div className="space-y-6 text-sm text-slate-600">
+              <div>
+                <h2 className="text-lg font-semibold text-slate-900">Education & training</h2>
                 {education ? (
-                  <p className="mt-1 flex items-start gap-2 text-sm text-slate-600 dark:text-slate-300">
-                    <GraduationCap className="mt-0.5 h-4 w-4 text-blue-500" />
-                    {education}
+                  <p className="mt-2 flex items-start gap-2">
+                    <GraduationCap className="mt-0.5 h-4 w-4 text-violet-500" />
+                    <span>{education}</span>
                   </p>
                 ) : (
-                  <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
-                    No academic details provided.
-                  </p>
+                  <p className="mt-2 text-slate-500">No academic details provided.</p>
                 )}
               </div>
 
               <div>
-                <h2 className="text-lg font-semibold text-slate-900 dark:text-white">
-                  Biography
-                </h2>
-                <p className="mt-2 text-sm leading-relaxed text-slate-600 dark:text-slate-300">
+                <h2 className="text-lg font-semibold text-slate-900">Biography</h2>
+                <p className="mt-2 leading-relaxed">
                   {doctor.bio || "This specialist has not added a biography just yet."}
                 </p>
               </div>
             </div>
 
-            <div className="flex flex-wrap items-center justify-between rounded-2xl bg-blue-50 px-5 py-4 dark:bg-blue-500/10">
+            <div className="flex flex-wrap items-center justify-between gap-4 rounded-3xl border border-violet-100 bg-violet-50/70 px-6 py-5">
               <div>
-                <p className="text-xs uppercase tracking-wide text-blue-500">
-                  Consultation Fee
-                </p>
-                <p className="text-2xl font-semibold text-blue-700 dark:text-blue-300">
+                <p className="text-xs uppercase tracking-[0.35em] text-violet-500">Consultation fee</p>
+                <p className="text-2xl font-semibold text-violet-700">
                   ৳{doctor.consultationFee?.toLocaleString() ?? "—"}
                 </p>
               </div>
               <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
                 <SheetTrigger asChild>
-                  <Button className="rounded-full px-6 text-sm">
-                    Book Appointment
+                  <Button className="rounded-full bg-violet-600 px-6 text-sm font-semibold text-white shadow-lg transition hover:bg-violet-700">
+                    Book appointment
                   </Button>
                 </SheetTrigger>
                 <SheetContent side="right" className="sm:max-w-md">
                   <SheetHeader>
-                    <SheetTitle className="text-xl font-semibold text-slate-900 dark:text-white">
+                    <SheetTitle className="text-xl font-semibold text-slate-900">
                       Book a consultation
                     </SheetTitle>
-                    <p className="text-sm text-slate-500 dark:text-slate-400">
-                      Select a date and time that suits you and follow the steps to confirm
-                      your visit with {doctor.name}.
+                    <p className="text-sm text-slate-500">
+                      Select a date and time that suits you and follow the steps to confirm your visit with {doctor.name}.
                     </p>
                   </SheetHeader>
 
                   <form className="mt-6 flex flex-col gap-4" onSubmit={handleSubmit}>
                     <div className="grid gap-2">
-                      <Label>Consultation Fee</Label>
-                      <p className="rounded-md bg-blue-50 px-3 py-2 text-blue-600 dark:bg-blue-500/10 dark:text-blue-200">
+                      <Label>Consultation fee</Label>
+                      <p className="rounded-xl bg-violet-100 px-3 py-2 text-violet-600">
                         ৳{doctor.consultationFee?.toLocaleString() ?? "—"}
                       </p>
                     </div>
 
                     <div className="grid gap-2">
-                      <Label htmlFor="appointmentDate">Preferred Date</Label>
+                      <Label htmlFor="appointmentDate">Preferred date</Label>
                       <Input
                         id="appointmentDate"
                         type="date"
                         min={new Date().toISOString().split("T")[0]}
                         value={formState.appointmentDate}
-                        onChange={(e) =>
+                        onChange={(event) =>
                           setFormState((prev) => ({
                             ...prev,
-                            appointmentDate: e.target.value,
+                            appointmentDate: event.target.value,
                           }))
                         }
                         required
@@ -324,22 +312,22 @@ export default function DoctorDetailsPage() {
                     </div>
 
                     <div className="grid gap-2">
-                      <Label htmlFor="appointmentTime">Preferred Time</Label>
+                      <Label htmlFor="appointmentTime">Preferred time</Label>
                       <Input
                         id="appointmentTime"
                         type="time"
                         value={formState.appointmentTime}
-                        onChange={(e) =>
+                        onChange={(event) =>
                           setFormState((prev) => ({
                             ...prev,
-                            appointmentTime: e.target.value,
+                            appointmentTime: event.target.value,
                           }))
                         }
                         required
                       />
-                      <p className="text-xs text-slate-500 dark:text-slate-400">
-                        Available: {availabilityDays ? availabilityDays : "—"}{" "}
-                        {availabilityWindow ? `(${availabilityWindow})` : ""}
+                      <p className="text-xs text-slate-500">
+                        Available: {availabilityDays ?? "—"}
+                        {availabilityWindow ? ` (${availabilityWindow})` : ""}
                       </p>
                     </div>
 
@@ -350,20 +338,16 @@ export default function DoctorDetailsPage() {
                         rows={4}
                         placeholder="Describe your symptoms or concerns"
                         value={formState.reason}
-                        onChange={(e) =>
+                        onChange={(event) =>
                           setFormState((prev) => ({
                             ...prev,
-                            reason: e.target.value,
+                            reason: event.target.value,
                           }))
                         }
                       />
                     </div>
 
-                    <Button
-                      type="submit"
-                      disabled={isBooking || !patientId}
-                      className="w-full"
-                    >
+                    <Button type="submit" disabled={isBooking || !patientId} className="w-full rounded-full">
                       {isBooking ? "Preparing…" : "Proceed to payment"}
                     </Button>
                     {!patientId && (
@@ -378,24 +362,22 @@ export default function DoctorDetailsPage() {
           </div>
         </div>
 
-        <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900">
-          <h2 className="text-lg font-semibold text-slate-900 dark:text-white">
-            Why patients trust {doctor.name}
-          </h2>
-          <ul className="mt-4 grid gap-3 text-sm text-slate-600 dark:text-slate-300 sm:grid-cols-2 lg:grid-cols-3">
-            <li className="flex items-start gap-2 rounded-xl bg-slate-50 px-4 py-3 dark:bg-slate-800/60">
-              <Stethoscope className="mt-0.5 h-4 w-4 text-blue-500" />
-              Comprehensive care tailored to your condition.
-            </li>
-            <li className="flex items-start gap-2 rounded-xl bg-slate-50 px-4 py-3 dark:bg-slate-800/60">
-              <GraduationCap className="mt-0.5 h-4 w-4 text-blue-500" />
-              International training & evidence-based practice.
-            </li>
-            <li className="flex items-start gap-2 rounded-xl bg-slate-50 px-4 py-3 dark:bg-slate-800/60">
-              <Clock className="mt-0.5 h-4 w-4 text-blue-500" />
-              Timely follow-ups and holistic advice.
-            </li>
-          </ul>
+        <div className="grid gap-6 rounded-[2.5rem] border border-white/15 bg-white/85 p-8 shadow-lg backdrop-blur sm:grid-cols-2 lg:grid-cols-3">
+          {[
+            "Comprehensive care tailored to your condition",
+            "International training & evidence-based practice",
+            "Timely follow-ups and holistic advice",
+            doctor.availability?.location
+              ? `Consultations at ${doctor.availability.location}`
+              : "Hybrid teleconsultation available",
+            doctor.experience || "Seasoned specialist trusted by patients",
+            availabilityWindow ? `Slots between ${availabilityWindow}` : "Flexible appointment windows",
+          ].map((item) => (
+            <div key={item} className="flex items-start gap-3 rounded-2xl bg-violet-50/60 px-4 py-3 text-sm text-slate-600">
+              <Sparkles className="mt-0.5 h-4 w-4 text-violet-500" />
+              <span>{item}</span>
+            </div>
+          ))}
         </div>
       </div>
     </section>
