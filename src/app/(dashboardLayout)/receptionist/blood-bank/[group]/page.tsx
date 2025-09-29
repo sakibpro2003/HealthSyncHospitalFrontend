@@ -1,175 +1,112 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
-import { Button } from "@/components/ui/button";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-// import { useRegisterMutation } from "@/redux/features/auth/authApi";
-import React from "react";
-import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
-import { toast } from "sonner";
-import { useHandleBloodDonateQueryMutation } from "@/redux/features/bloodBank/bloodBankApi";
-// import { useRegisterDonorMutation } from "@/redux/features/donor/donorApi";
 
-const RegisterForm = ({ params }: { params: string }) => {
-  const bloodGroupFromParams = decodeURIComponent(params?.group);
-  console.log(bloodGroupFromParams, "getbg");
-  const [register] = useHandleBloodDonateQueryMutation();
-  const form = useForm();
-  const onSubmit: SubmitHandler<FieldValues> = async (userData) => {
-    const {
-      emergencyContactName,
-      emergencyContactPhone,
-      relationship,
-      ...rest
-    } = userData;
-    const emergencyContact = {
-      emergencyContactName: emergencyContactName,
-      relationship: relationship,
-      emergencyContactPhone: emergencyContactPhone,
-    };
+import { useParams } from "next/navigation";
+import Link from "next/link";
+import { useMemo } from "react";
+import { ArrowLeft } from "lucide-react";
+import { useGetBloodInventoryHistoryQuery } from "@/redux/features/bloodBank/bloodBankApi";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 
-    const modifiedData = {
-      ...rest,
-      emergencyContact,
-    };
+const formatChange = (change: number) =>
+  `${change > 0 ? "+" : ""}${change} units`;
 
-    //! Caution!!
-    try {
-      const res = await register(modifiedData);
-
-      if ("data" in res && res.data?.success) {
-        toast.success("Registration successful");
-      } else if ("error" in res) {
-        const error = res.error;
-
-        // Check if it's a FetchBaseQueryError
-        if ("status" in error) {
-          const errData = error.data as any;
-
-          if (Array.isArray(errData?.errorSources)) {
-            errData.errorSources.forEach((e: any) => {
-              toast.error(`${e.path}: ${e.message}`);
-            });
-          } else {
-            toast.error(errData?.message || "Registration failed.");
-          }
-        } else {
-          // SerializedError fallback
-          toast.error("Unexpected error occurred.");
-          console.error(error);
-        }
-      }
-    } catch (err) {
-      toast.error("Something went wrong.");
-      console.error(err);
-    }
+const HistoryEntryCard = ({
+  entry,
+}: {
+  entry: {
+    change: number;
+    balanceAfter: number;
+    type: string;
+    note?: string;
+    actorName?: string;
+    actorRole?: string;
+    createdAt?: string;
   };
+}) => (
+  <div className="rounded-2xl border border-slate-200/60 bg-white/90 p-4 shadow-sm">
+    <div className="flex flex-wrap items-center justify-between gap-2">
+      <Badge variant={entry.change < 0 ? "destructive" : "secondary"}>
+        {entry.type.replace("-", " ")}
+      </Badge>
+      <span className="text-xs text-slate-500">
+        {entry.createdAt ? new Date(entry.createdAt).toLocaleString() : "--"}
+      </span>
+    </div>
+    <p className="mt-3 text-lg font-semibold text-slate-900">
+      {formatChange(entry.change)}
+    </p>
+    <p className="text-xs text-slate-500">
+      Balance after change: <strong>{entry.balanceAfter}</strong> units
+    </p>
+    {entry.note && (
+      <p className="mt-2 text-sm text-slate-600">{entry.note}</p>
+    )}
+    {(entry.actorName || entry.actorRole) && (
+      <p className="mt-2 text-xs text-slate-500">
+        {entry.actorName} {entry.actorRole ? `(${entry.actorRole})` : ""}
+      </p>
+    )}
+  </div>
+);
 
-  const fields = [
-    { name: "name", label: "Full Name" },
-    { name: "phone", label: "Phone *" },
-    { name: "email", label: "Email", type: "email" },
+const ReceptionistBloodGroupHistoryPage = () => {
+  const params = useParams<{ group: string }>();
+  const bloodGroup = useMemo(() => params.group?.toUpperCase() ?? "", [params]);
 
-    { name: "address", label: "Address" },
-    { name: "dateOfBirth", label: "Date of Birth", type: "date" },
-    {
-      name: "bloodGroup",
-      label: "Blood Group",
-      type: "select",
-      default: bloodGroupFromParams,
-      // options: ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"],
-      options: [`${bloodGroupFromParams}`],
-    },
+  const { data = [], isLoading, isError } = useGetBloodInventoryHistoryQuery(
+    bloodGroup,
+  );
 
-    { name: "emergencyContactName", label: "Emergency Contact Name" },
-    { name: "emergencyContactPhone", label: "Emergency Contact Phone" },
-
-    {
-      name: "currentMedications",
-      label: "Current Medications",
-      type: "textarea",
-    },
-  ];
+  const history = data.find((item) => item.bloodGroup === bloodGroup)?.history ?? [];
+  const currentBalance = data.find((item) => item.bloodGroup === bloodGroup)?.unitsAvailable ?? 0;
 
   return (
-    <div className="md:p-8">
-      <div className="mx-auto md:p-10">
-        <h2 className="text-2xl md:text-3xl font-semibold mb-6 text-center">
-          Patient Registration
-        </h2>
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)}>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              {fields.map(({ name, label, options, type = "text" }) => (
-                <FormField
-                  key={name}
-                  control={form.control}
-                  name={name}
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>{label}</FormLabel>
-                      <FormControl>
-                        {type === "textarea" ? (
-                          <Textarea
-                            {...field}
-                            placeholder=""
-                            value={field.value || ""}
-                          />
-                        ) : type === "select" ? (
-                          <Select onValueChange={field.onChange}>
-                            <SelectTrigger className="w-[180px]">
-                              <SelectValue
-                                placeholder={`${bloodGroupFromParams}`}
-                              />
-                            </SelectTrigger>
-                            <SelectContent>
-                              {options?.map((option) => (
-                                <SelectItem key={option} value={option}>
-                                  {option}
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                        ) : (
-                          <Input
-                            {...field}
-                            type={type}
-                            placeholder=""
-                            value={field.value || ""}
-                          />
-                        )}
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              ))}
+    <div className="space-y-8 p-6">
+      <Link
+        href="/receptionist/blood-bank"
+        className="inline-flex items-center gap-2 text-sm font-semibold text-violet-600 hover:underline"
+      >
+        <ArrowLeft className="h-4 w-4" /> Back to blood inventory
+      </Link>
+
+      <Card className="border border-slate-200/70 shadow-sm">
+        <CardHeader>
+          <CardTitle>
+            Blood group {bloodGroup || "Unknown"} &mdash; history & balance
+          </CardTitle>
+          <p className="text-sm text-slate-500">
+            Review every adjustment, donation, and fulfillment recorded for this
+            blood group. Use this to audit requests and plan upcoming campaigns.
+          </p>
+        </CardHeader>
+        <CardContent>
+          {isLoading ? (
+            <p className="text-sm text-slate-500">Loading history...</p>
+          ) : isError ? (
+            <p className="text-sm text-red-500">
+              Unable to load history. Please try again later.
+            </p>
+          ) : history.length === 0 ? (
+            <p className="text-sm text-slate-500">
+              No history records for this blood group yet. Current balance:
+              {" "}
+              <strong>{currentBalance}</strong> units.
+            </p>
+          ) : (
+            <div className="grid gap-4 lg:grid-cols-2">
+              {history
+                .slice()
+                .reverse()
+                .map((entry, index) => (
+                  <HistoryEntryCard key={`${entry.createdAt}-${index}`} entry={entry} />
+                ))}
             </div>
-            <div className="mt-8 text-center">
-              <Button type="submit" className="w-full md:w-1/3">
-                Submit
-              </Button>
-            </div>
-          </form>
-        </Form>
-      </div>
+          )}
+        </CardContent>
+      </Card>
     </div>
   );
 };
 
-export default RegisterForm;
+export default ReceptionistBloodGroupHistoryPage;

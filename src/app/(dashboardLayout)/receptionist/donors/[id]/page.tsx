@@ -1,241 +1,221 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
-import { Button } from "@/components/ui/button";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import React, { use, useEffect } from "react";
-import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
+
+import { useParams } from "next/navigation";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import {
-  // useGetSinglePatientQuery,
-  useUpdatePatientMutation,
-} from "@/redux/features/patient/patientApi";
-import Loader from "@/components/shared/Loader";
-import { useGetSingleDonorQuery, useUpdateDonorMutation } from "@/redux/features/donor/donorApi";
+  useGetSingleDonorQuery,
+  useUpdateDonorMutation,
+} from "@/redux/features/donor/donorApi";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
-interface IParams {
-  params: Promise<{ id: string }>;
-}
-const fields = [
-  { name: "name", label: "Full Name" },
-  { name: "phone", label: "Phone *" },
-  { name: "address", label: "Address *" },
-  { name: "email", label: "Email", type: "email" },
-  { name: "age", label: "Age", type: "number" },
-  {
-    name: "gender",
-    label: "Gender",
-    type: "select",
-    options: ["male", "female", "other"],
-  },
+const BLOOD_GROUPS = ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"];
+const GENDERS = ["male", "female", "other"];
 
-  {
-    name: "bloodGroup",
-    label: "Blood Group",
-    type: "select",
-    options: ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"],
-  },
-  { name: "quantity", label: "Quantity", type: "number" },
-  { name: "lastDonationDate", type: "date", label: "Last Donation Date" },
-];
-const PatientDetailsPage = ({ params }: IParams) => {
-  const { id } = use(params);
-  const { data, isLoading, error } = useGetSingleDonorQuery(id);
-  const donor = data?.data?.result;
-  console.log(donor, "donor");
-  const form = useForm();
-  const [updateDonor, { isLoading: isUpdating, error: updateError }] =
-    useUpdateDonorMutation();
+const ReceptionistDonorDetailPage = () => {
+  const params = useParams<{ id: string }>();
+  const donorId = params.id;
+  const { data, isLoading } = useGetSingleDonorQuery(donorId, { skip: !donorId });
+  const donor = data?.data?.result ?? data?.data ?? null;
 
-  // useEffect(() => {
-  //   if (donor) {
-  //     form.reset({
-  //       ...donor,
-  //       emergencyContactName:
-  //         donor.emergencyContact?.emergencyContactName || "",
-  //       bloodGroup: donor.bloodGroup || "",
-  //       emergencyContactPhone:
-  //         donor.emergencyContact?.emergencyContactPhone || "",
-  //       relationship: donor.emergencyContact?.relationship || "",
-  //       medicalHistory: Array.isArray(donor.medicalHistory)
-  //         ? donor.medicalHistory.join(", ")
-  //         : donor.medicalHistory || "",
-  //       allergies: Array.isArray(donor.allergies)
-  //         ? donor.allergies.join(", ")
-  //         : donor.allergies || "",
-  //       currentMedications: Array.isArray(donor.currentMedications)
-  //         ? donor.currentMedications.join(", ")
-  //         : donor.currentMedications || "",
-  //     });
-  //   }
-  // }, [donor, form]);
+  const [form, setForm] = useState({
+    name: "",
+    bloodGroup: "",
+    quantity: "1",
+    age: "",
+    gender: "",
+    phone: "",
+    email: "",
+    address: "",
+    lastDonationDate: "",
+    available: true,
+  });
 
   useEffect(() => {
-    if (donor) {
-      const resetData: Record<string, any> = {};
+    if (!donor) return;
+    setForm({
+      name: donor.name ?? "",
+      bloodGroup: donor.bloodGroup ?? "",
+      quantity: String(donor.quantity ?? "1"),
+      age: donor.age ? String(donor.age) : "",
+      gender: donor.gender ?? "",
+      phone: donor.phone ?? "",
+      email: donor.email ?? "",
+      address: donor.address ?? "",
+      lastDonationDate: donor.lastDonationDate
+        ? new Date(donor.lastDonationDate).toISOString().slice(0, 10)
+        : "",
+      available: donor.available ?? true,
+    });
+  }, [donor]);
 
-      fields.forEach(({ name }) => {
-        if (
-          name === "emergencyContactName" ||
-          name === "emergencyContactPhone" ||
-          name === "relationship"
-        ) {
-          // These come from donor.emergencyContact — skip here since you handle separately below
-          return;
-        }
+  const [updateDonor, { isLoading: isUpdating }] = useUpdateDonorMutation();
 
-        // For fields that might be arrays (medicalHistory, allergies, currentMedications), handle specially
-        if (name === "medicalHistory" && donor.medicalHistory) {
-          resetData.medicalHistory = Array.isArray(donor.medicalHistory)
-            ? donor.medicalHistory.join(", ")
-            : donor.medicalHistory;
-        } else if (name === "allergies" && donor.allergies) {
-          resetData.allergies = Array.isArray(donor.allergies)
-            ? donor.allergies.join(", ")
-            : donor.allergies;
-        } else if (name === "currentMedications" && donor.currentMedications) {
-          resetData.currentMedications = Array.isArray(donor.currentMedications)
-            ? donor.currentMedications.join(", ")
-            : donor.currentMedications;
-        } else {
-          // Default: copy from donor or empty string
-          resetData[name] = donor[name] ?? "";
-        }
-      });
+  const handleChange = (key: string, value: string | boolean) => {
+    setForm((prev) => ({ ...prev, [key]: value }));
+  };
 
-      // Add emergencyContact fields separately
-      resetData.emergencyContactName =
-        donor.emergencyContact?.emergencyContactName || "";
-      resetData.emergencyContactPhone =
-        donor.emergencyContact?.emergencyContactPhone || "";
-      resetData.relationship = donor.emergencyContact?.relationship || "";
-
-      // Add bloodGroup specifically if not already present
-      if (!resetData.bloodGroup) {
-        resetData.bloodGroup = donor.bloodGroup || "";
-      }
-
-      form.reset(resetData);
-    }
-  }, [donor, form, fields]);
-
-  const onSubmit: SubmitHandler<FieldValues> = async (userData) => {
-    const  {
-      
-      
-      ...rest
-    } = userData;
-    
-
-    const updatePayload = {
-      ...rest,
-     
-    };
-
-    //! Caution!!
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    if (!donorId) return;
     try {
-      const result2 = await updateDonor({
-        id,
-        updatePayload,
-      });
-      console.log(result2);
-      if (result2?.data?.success) {
-        toast.success("Patient updated successfully");
-      } else if (updateError) {
-        console.log(updateError, "pat update page");
-      }
-    } catch (err) {
-      console.log(err);
+      await updateDonor({
+        _id: donorId,
+        donorPayload: {
+          ...form,
+          quantity: Number(form.quantity),
+          age: form.age ? Number(form.age) : undefined,
+          lastDonationDate: form.lastDonationDate || undefined,
+        },
+      }).unwrap();
+      toast.success("Donor updated successfully");
+    } catch (error: any) {
+      toast.error(error?.data?.message ?? "Failed to update donor");
     }
   };
 
-  if (isLoading || isUpdating) {
-    return <Loader></Loader>;
-  }
-
   return (
-    <div className="p-4 md:p-8">
-      <div className="mx-auto rounded-lg">
-        <h2 className="text-2xl md:text-3xl font-semibold mb-6 text-center">
-          Patient Registration
-        </h2>
-
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)}>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              {fields.map(({ name, label, options, type = "text" }) => (
-                <FormField
-                  key={name}
-                  control={form.control}
-                  name={name}
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>{label}</FormLabel>
-                      <FormControl>
-                        {type === "textarea" ? (
-                          <Textarea
-                            {...field}
-                            placeholder=""
-                            value={field.value || ""}
-                          />
-                        ) : type === "select" ? (
-                          <Select
-                            onValueChange={(value) => {
-                              form.setValue(name, value);
-                            }}
-                            value={form.getValues(name) || ""}
-                          >
-                            <SelectTrigger className="w-full">
-                              <SelectValue placeholder={`${label}`} />
-                            </SelectTrigger>
-                            <SelectContent>
-                              {options?.map((option) => (
-                                <SelectItem key={option} value={option}>
-                                  {option}
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                        ) : (
-                          <Input
-                            {...field}
-                            type={type}
-                            placeholder=""
-                            value={field.value || ""}
-                          />
-                        )}
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
+    <div className="space-y-8 p-6">
+      <Card className="border border-slate-200/70 shadow-sm">
+        <CardHeader>
+          <CardTitle>Donor profile</CardTitle>
+          <p className="text-sm text-slate-500">
+            Update donor availability or correct their contact details.
+          </p>
+        </CardHeader>
+        <CardContent>
+          {isLoading ? (
+            <p className="text-sm text-slate-500">Loading profile...</p>
+          ) : !donor ? (
+            <p className="text-sm text-red-500">Donor not found.</p>
+          ) : (
+            <form className="grid gap-4 sm:grid-cols-2" onSubmit={handleSubmit}>
+              <div className="space-y-2">
+                <Label>Name</Label>
+                <Input
+                  value={form.name}
+                  onChange={(event) => handleChange("name", event.target.value)}
+                  required
                 />
-              ))}
-            </div>
-            <div className="mt-8 text-center">
-              <Button type="submit" className="w-full md:w-1/3">
-                Submit
-              </Button>
-            </div>
-          </form>
-        </Form>
-      </div>
+              </div>
+              <div className="space-y-2">
+                <Label>Blood group</Label>
+                <Select
+                  value={form.bloodGroup}
+                  onValueChange={(value) => handleChange("bloodGroup", value)}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select blood group" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {BLOOD_GROUPS.map((group) => (
+                      <SelectItem key={group} value={group}>
+                        {group}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2">
+                <Label>Units pledged</Label>
+                <Input
+                  type="number"
+                  min={1}
+                  value={form.quantity}
+                  onChange={(event) => handleChange("quantity", event.target.value)}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label>Age</Label>
+                <Input
+                  type="number"
+                  min={18}
+                  value={form.age}
+                  onChange={(event) => handleChange("age", event.target.value)}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label>Gender</Label>
+                <Select
+                  value={form.gender}
+                  onValueChange={(value) => handleChange("gender", value)}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select gender" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {GENDERS.map((gender) => (
+                      <SelectItem key={gender} value={gender}>
+                        {gender}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2">
+                <Label>Phone</Label>
+                <Input
+                  value={form.phone}
+                  onChange={(event) => handleChange("phone", event.target.value)}
+                  required
+                />
+              </div>
+              <div className="space-y-2">
+                <Label>Email</Label>
+                <Input
+                  type="email"
+                  value={form.email}
+                  onChange={(event) => handleChange("email", event.target.value)}
+                  required
+                />
+              </div>
+              <div className="space-y-2 sm:col-span-2">
+                <Label>Address</Label>
+                <Input
+                  value={form.address}
+                  onChange={(event) => handleChange("address", event.target.value)}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label>Last donation</Label>
+                <Input
+                  type="date"
+                  value={form.lastDonationDate}
+                  onChange={(event) =>
+                    handleChange("lastDonationDate", event.target.value)
+                  }
+                />
+              </div>
+              <div className="space-y-2">
+                <Label>Availability</Label>
+                <Select
+                  value={form.available ? "yes" : "no"}
+                  onValueChange={(value) => handleChange("available", value === "yes")}
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="yes">Available</SelectItem>
+                    <SelectItem value="no">Unavailable</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="sm:col-span-2 flex justify-end gap-2">
+                <Button type="submit" disabled={isUpdating}>
+                  Save changes
+                </Button>
+              </div>
+            </form>
+          )}
+        </CardContent>
+      </Card>
     </div>
   );
 };
 
-export default PatientDetailsPage;
+export default ReceptionistDonorDetailPage;

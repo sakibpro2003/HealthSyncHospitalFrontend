@@ -8,6 +8,7 @@ import VideoSection from "@/components/Home/VideoSection";
 import Banner from "@/components/shared/Banner";
 import DepartmentButtons from "@/components/shared/DepartmentButtons";
 import Footer from "@/components/shared/Footer";
+import BloodAvailability from "@/components/Home/BloodAvailability";
 import React from "react";
 
 const page = () => {
@@ -25,6 +26,7 @@ const page = () => {
           title="Intro Video"
           videoUrl="https://www.youtube.com/embed/FHeq7a_2AiE?si=ytMC-rc7mD5a9q1N"
         />
+        <BloodAvailability />
         <NewsletterSection />
         <AccordioSection />
         <MyGallery />

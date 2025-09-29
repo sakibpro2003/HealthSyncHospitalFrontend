@@ -45,6 +45,7 @@ const Navbar = () => {
         setUser(data.user);
       } catch (error) {
         setUser(null);
+        console.log(error);
       }
     };
     fetchUser();
@@ -128,8 +129,12 @@ const Navbar = () => {
           <Link href="/" className="flex items-center gap-3">
             <Logo />
             <div className="hidden flex-col text-left text-xs font-medium text-slate-500 sm:flex">
-              <span className="uppercase tracking-[0.4em] text-violet-500">HealthSync</span>
-              <span className="tracking-[0.05em] text-slate-400">Hospital & Research Network</span>
+              <span className="uppercase tracking-[0.4em] text-violet-500">
+                HealthSync
+              </span>
+              <span className="tracking-[0.05em] text-slate-400">
+                Hospital & Research Network
+              </span>
             </div>
           </Link>
         </div>
@@ -190,7 +195,10 @@ const Navbar = () => {
               </Button>
             </>
           ) : (
-            <Button asChild className="rounded-full bg-violet-600 px-5 text-sm font-semibold text-white shadow-lg transition hover:bg-violet-700">
+            <Button
+              asChild
+              className="rounded-full bg-violet-600 px-5 text-sm font-semibold text-white shadow-lg transition hover:bg-violet-700"
+            >
               <Link href="/login">Login</Link>
             </Button>
           )}

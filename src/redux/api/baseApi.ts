@@ -6,6 +6,13 @@ export const baseApi = createApi({
     baseUrl: "http://localhost:5000/api/v1",
     credentials: "include",
   }),
-  tagTypes: ["subscription", "appointments", "patient", "payments"],
+  tagTypes: [
+    "subscription",
+    "appointments",
+    "patient",
+    "payments",
+    "bloodInventory",
+    "bloodRequests",
+  ],
   endpoints: () => ({}),
 });

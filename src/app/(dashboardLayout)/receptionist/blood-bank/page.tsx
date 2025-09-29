@@ -1,6 +1,8 @@
 "use client";
-import Loader from "@/components/shared/Loader";
-import { Button } from "@/components/ui/button";
+
+import Link from "next/link";
+import { useGetBloodInventoriesQuery } from "@/redux/features/bloodBank/bloodBankApi";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Table,
   TableBody,
@@ -9,57 +11,84 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { useGetAllAvailableQuantityQuery } from "@/redux/features/bloodBank/bloodBankApi";
-import Link from "next/link";
-import React from "react";
+import { Badge } from "@/components/ui/badge";
 
-const BloodBank = () => {
-  const { data: bloodData = {}, isLoading, error } = useGetAllAvailableQuantityQuery();
-
-  const handleDonate = (bloodGroup)=>{
-    
-    console.log(bloodGroup,'click')
-  }
-
-  if (isLoading) return <Loader />;
-  if (error)
-    return (
-      <p className="text-red-500 text-center">
-        Failed to load blood stock data.
-      </p>
-    );
+const ReceptionistBloodBankPage = () => {
+  const { data: inventories = [], isLoading, isError } =
+    useGetBloodInventoriesQuery();
 
   return (
-    <div className="p-4">
-      <h3 className="text-3xl text-center font-semibold mb-6">Blood Bank</h3>
-
-      <Table className="mx-auto w-11/12 mt-4 border rounded">
-        <TableHeader>
-          <TableRow>
-            <TableHead>Blood Group</TableHead>
-            <TableHead>Quantity</TableHead>
-            <TableHead>Donate To Patient</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {bloodData &&
-            Object.entries(bloodData).map(([group, quantity]) => (
-              <TableRow key={group}>
-                <TableCell className="font-medium">{group}</TableCell>
-                <TableCell>{quantity}</TableCell>
-                <TableCell>
-                  <Link href={`/receptionist/blood-bank/${group}`}>
-                  <Button onClick={()=>handleDonate(group)}>Donate</Button>
-
-                  </Link>
-                </TableCell>
-
-              </TableRow>
-            ))}
-        </TableBody>
-      </Table>
+    <div className="space-y-8 p-6">
+      <Card className="border border-slate-200/70 shadow-sm">
+        <CardHeader>
+          <CardTitle>Blood Inventory Snapshot</CardTitle>
+          <p className="text-sm text-slate-500">
+            Track available units for each blood group and coordinate with the
+            admin before fulfilling patient requests.
+          </p>
+        </CardHeader>
+        <CardContent>
+          {isLoading ? (
+            <p className="text-sm text-slate-500">Loading inventory...</p>
+          ) : isError ? (
+            <p className="text-sm text-red-500">
+              Unable to load blood inventory. Please refresh.
+            </p>
+          ) : inventories.length === 0 ? (
+            <p className="text-sm text-slate-500">No inventory data available.</p>
+          ) : (
+            <div className="overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Blood Group</TableHead>
+                    <TableHead>Units Available</TableHead>
+                    <TableHead>Minimum Threshold</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead>Last Restock</TableHead>
+                    <TableHead>History</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {inventories.map((inventory) => {
+                    const isLow =
+                      (inventory.minimumThreshold ?? 0) >= inventory.unitsAvailable;
+                    return (
+                      <TableRow key={inventory._id}>
+                        <TableCell className="font-semibold text-slate-800">
+                          {inventory.bloodGroup}
+                        </TableCell>
+                        <TableCell>{inventory.unitsAvailable}</TableCell>
+                        <TableCell>{inventory.minimumThreshold ?? 0}</TableCell>
+                        <TableCell>
+                          <Badge variant={isLow ? "destructive" : "secondary"}>
+                            {isLow ? "Low" : "Healthy"}
+                          </Badge>
+                        </TableCell>
+                        <TableCell>
+                          {inventory.lastRestockedAt
+                            ? new Date(inventory.lastRestockedAt).toLocaleString()
+                            : "--"}
+                        </TableCell>
+                        <TableCell>
+                          <Link
+                            className="text-sm font-semibold text-violet-600 hover:underline"
+                            href={`/receptionist/blood-bank/${inventory.bloodGroup}`}
+                          >
+                            View history
+                          </Link>
+                        </TableCell>
+                      </TableRow>
+                    );
+                  })}
+                </TableBody>
+              </Table>
+            </div>
+          )}
+        </CardContent>
+      </Card>
     </div>
   );
 };
 
-export default BloodBank;
+export default ReceptionistBloodBankPage;

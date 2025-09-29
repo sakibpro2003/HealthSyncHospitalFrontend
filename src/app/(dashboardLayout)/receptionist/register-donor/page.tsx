@@ -1,166 +1,178 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
-import { Button } from "@/components/ui/button";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-// import { useRegisterMutation } from "@/redux/features/auth/authApi";
-import React from "react";
-import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
+
+import { useState } from "react";
 import { toast } from "sonner";
 import { useRegisterDonorMutation } from "@/redux/features/donor/donorApi";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
-const RegisterDonorForm = () => {
-  const [registerDonor] = useRegisterDonorMutation();
-  const form = useForm();
-  const onSubmit: SubmitHandler<FieldValues> = async (userData) => {
-    const {
-      emergencyContactName,
-      emergencyContactPhone,
-      relationship,
-      ...rest
-    } = userData;
-    const emergencyContact = {
-      emergencyContactName: emergencyContactName,
-      relationship: relationship,
-      emergencyContactPhone: emergencyContactPhone,
-    };
+const BLOOD_GROUPS = ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"];
+const GENDERS = ["male", "female", "other"];
 
-    const modifiedData = {
-      ...rest,
-      emergencyContact,
-    };
+const RegisterDonorPage = () => {
+  const [registerDonor, { isLoading }] = useRegisterDonorMutation();
+  const [form, setForm] = useState({
+    name: "",
+    bloodGroup: "",
+    quantity: "1",
+    age: "",
+    gender: "",
+    phone: "",
+    email: "",
+    address: "",
+    lastDonationDate: "",
+  });
 
-    //! Caution!!
+  const handleChange = (key: string, value: string) => {
+    setForm((prev) => ({ ...prev, [key]: value }));
+  };
+
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
     try {
-      const res = await registerDonor(modifiedData);
-
-      if ("data" in res && res.data?.success) {
-        toast.success("Registration successful");
-      } else if ("error" in res) {
-        const error = res.error;
-
-        // Check if it's a FetchBaseQueryError
-        if ("status" in error) {
-          const errData = error.data as any;
-
-          if (Array.isArray(errData?.errorSources)) {
-            errData.errorSources.forEach((e: any) => {
-              toast.error(`${e.path}: ${e.message}`);
-            });
-          } else {
-            toast.error(errData?.message || "Registration failed.");
-          }
-        } else {
-          // SerializedError fallback
-          toast.error("Unexpected error occurred.");
-          console.error(error);
-        }
-      }
-    } catch (err) {
-      toast.error("Something went wrong.");
-      console.error(err);
+      await registerDonor({
+        ...form,
+        quantity: Number(form.quantity),
+        age: form.age ? Number(form.age) : undefined,
+        lastDonationDate: form.lastDonationDate || undefined,
+      }).unwrap();
+      toast.success("Donor registered successfully");
+      setForm({
+        name: "",
+        bloodGroup: "",
+        quantity: "1",
+        age: "",
+        gender: "",
+        phone: "",
+        email: "",
+        address: "",
+        lastDonationDate: "",
+      });
+    } catch (error: any) {
+      toast.error(error?.data?.message ?? "Unable to register donor");
     }
   };
 
-  const fields = [
-    { name: "name", label: "Full Name" },
-    { name: "phone", label: "Phone *" },
-    { name: "address", label: "Address *" },
-    { name: "email", label: "Email", type: "email" },
-    { name: "age", label: "Age", type: "number" },
-    {
-      name: "gender",
-      label: "Gender",
-      type: "select",
-      options: ["male", "female", "other"],
-    },
-    {
-      name: "bloodGroup",
-      label: "Blood Group",
-      type: "select",
-      options: ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"],
-    },
-    { name: "quantity", label: "Quantity", type: "number" },
-    { name: "lastDonationDate", type: "date", label: "Last Donation Date" },
-  ];
-
   return (
-    <div className="md:p-8">
-      <div className="mx-auto md:p-10">
-        <h2 className="text-2xl md:text-3xl font-semibold mb-6 text-center">
-          Register Donor
-        </h2>
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)}>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              {fields.map(({ name, label, options, type = "text" }) => (
-                <FormField
-                  key={name}
-                  control={form.control}
-                  name={name}
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>{label}</FormLabel>
-                      <FormControl>
-                        {type === "textarea" ? (
-                          <Textarea
-                            {...field}
-                            placeholder=""
-                            value={field.value || ""}
-                          />
-                        ) : type === "select" ? (
-                          <Select onValueChange={field.onChange}>
-                            <SelectTrigger className="w-[180px]">
-                              <SelectValue placeholder={`${label}`} />
-                            </SelectTrigger>
-                            <SelectContent>
-                              {options?.map((option) => (
-                                <SelectItem key={option} value={option}>
-                                  {option}
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                        ) : (
-                          <Input
-                            {...field}
-                            type={type}
-                            placeholder=""
-                            value={field.value || ""}
-                          />
-                        )}
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              ))}
+    <div className="space-y-8 p-6">
+      <Card className="border border-slate-200/70 shadow-sm">
+        <CardHeader>
+          <CardTitle>Register donor</CardTitle>
+          <p className="text-sm text-slate-500">
+            Capture donor information so the admin can manage eligibility and inventory.
+          </p>
+        </CardHeader>
+        <CardContent>
+          <form className="grid gap-4 sm:grid-cols-2" onSubmit={handleSubmit}>
+            <div className="space-y-2">
+              <Label>Name</Label>
+              <Input
+                value={form.name}
+                onChange={(event) => handleChange("name", event.target.value)}
+                required
+              />
             </div>
-            <div className="mt-8 text-center">
-              <Button type="submit" className="w-full md:w-1/3">
-                Submit
+            <div className="space-y-2">
+              <Label>Blood group</Label>
+              <Select
+                value={form.bloodGroup}
+                onValueChange={(value) => handleChange("bloodGroup", value)}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select blood group" />
+                </SelectTrigger>
+                <SelectContent>
+                  {BLOOD_GROUPS.map((group) => (
+                    <SelectItem key={group} value={group}>
+                      {group}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <Label>Units pledged</Label>
+              <Input
+                type="number"
+                min={1}
+                value={form.quantity}
+                onChange={(event) => handleChange("quantity", event.target.value)}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label>Age</Label>
+              <Input
+                type="number"
+                min={18}
+                value={form.age}
+                onChange={(event) => handleChange("age", event.target.value)}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label>Gender</Label>
+              <Select
+                value={form.gender}
+                onValueChange={(value) => handleChange("gender", value)}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select gender" />
+                </SelectTrigger>
+                <SelectContent>
+                  {GENDERS.map((gender) => (
+                    <SelectItem key={gender} value={gender}>
+                      {gender}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <Label>Phone</Label>
+              <Input
+                value={form.phone}
+                onChange={(event) => handleChange("phone", event.target.value)}
+                required
+              />
+            </div>
+            <div className="space-y-2">
+              <Label>Email</Label>
+              <Input
+                type="email"
+                value={form.email}
+                onChange={(event) => handleChange("email", event.target.value)}
+                required
+              />
+            </div>
+            <div className="space-y-2 sm:col-span-2">
+              <Label>Address</Label>
+              <Input
+                value={form.address}
+                onChange={(event) => handleChange("address", event.target.value)}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label>Last donation date</Label>
+              <Input
+                type="date"
+                value={form.lastDonationDate}
+                onChange={(event) =>
+                  handleChange("lastDonationDate", event.target.value)
+                }
+              />
+            </div>
+            <div className="sm:col-span-2 flex justify-end">
+              <Button type="submit" disabled={isLoading}>
+                Register donor
               </Button>
             </div>
           </form>
-        </Form>
-      </div>
+        </CardContent>
+      </Card>
     </div>
   );
 };
 
-export default RegisterDonorForm;
+export default RegisterDonorPage;

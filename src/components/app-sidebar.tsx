@@ -1,9 +1,9 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import * as React from "react";
 import { useState, useEffect } from "react";
 import {
-  Bot,
   GalleryVerticalEnd,
   SquareTerminal,
   Users,
@@ -12,6 +12,7 @@ import {
   Pill,
   HeartPulse,
   Receipt,
+  Droplet,
   BarChart3,
 } from "lucide-react";
 
@@ -73,26 +74,26 @@ export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
                   { title: "Patients", url: "/receptionist/patients" },
                 ],
               },
-              {
-                title: "Blood Donor",
-                url: "#",
-                icon: Bot,
-                items: [
-                  {
-                    title: "Register Donor",
-                    url: "/receptionist/register-donor",
-                  },
-                  { title: "View Donor", url: "/receptionist/donors" },
-                ],
-              },
-              {
-                title: "Blood Bank",
-                url: "#",
-                icon: Bot,
-                items: [
-                  { title: "View Blood Bank", url: "/receptionist/blood-bank" },
-                ],
-              },
+              // {
+              //   title: "Blood Donor",
+              //   url: "#",
+              //   icon: Bot,
+              //   items: [
+              //     {
+              //       title: "Register Donor",
+              //       url: "/receptionist/register-donor",
+              //     },
+              //     { title: "View Donor", url: "/receptionist/donors" },
+              //   ],
+              // },
+              // {
+              //   title: "Blood Bank",
+              //   url: "#",
+              //   icon: Bot,
+              //   items: [
+              //     { title: "View Blood Bank", url: "/receptionist/blood-bank" },
+              //   ],
+              // },
             ]);
             break;
           case "admin":
@@ -112,6 +113,15 @@ export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
                     url: "/admin/create-new-medicine",
                   },
                   { title: "Manage Medicines", url: "/admin/manage-medicine" },
+                ],
+              },
+              {
+                title: "Blood Bank",
+                url: "#",
+                icon: Droplet,
+                items: [
+                  { title: "Inventory", url: "/admin/blood-bank" },
+                  { title: "Requests", url: "/admin/blood-requests" },
                 ],
               },
               {
@@ -143,14 +153,12 @@ export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
                   { title: "My Subscription", url: "/patient/my-subscription" },
                 ],
               },
-              
+
               {
                 title: "Appointments",
                 url: "/patient/appointments",
                 icon: ClipboardList,
-                 items: [
-                  { title: "Appointment", url: "/patient/appointments" },
-                ],
+                items: [{ title: "Appointment", url: "/patient/appointments" }],
               },
               {
                 title: "Billing & Receipts",
@@ -160,13 +168,24 @@ export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
                   { title: "Billing & Receipts", url: "/patient/billing" },
                 ],
               },
+              {
+                title: "Blood Requests",
+                url: "/patient/blood-requests",
+                icon: Droplet,
+                items: [
+                  {
+                    title: "Request Blood",
+                    url: "/patient/blood-requests",
+                  },
+                ],
+              },
             ]);
             break;
           default:
             setNavItems([]);
         }
       } catch (error) {
-        console.error("Not logged in");
+        console.error("Not logged in", error);
       }
     };
 
