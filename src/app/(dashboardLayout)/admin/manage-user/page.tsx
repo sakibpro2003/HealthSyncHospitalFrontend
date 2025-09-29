@@ -45,7 +45,7 @@ const ManageUser = () => {
     searchTerm: normalizedSearch || undefined,
   });
 
-  const { data: roleMetrics } = useGetRoleMetricsQuery();
+  const { data: roleMetrics } = useGetRoleMetricsQuery(undefined);
 
   const [blockUser] = useBlockUserMutation();
   const [unblockUser] = useUnblockUserMutation();

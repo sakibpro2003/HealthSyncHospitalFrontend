@@ -16,8 +16,12 @@ const formatTaka = (value: number) =>
   }).format(value);
 
 export default function ProductDetails() {
-  const { id } = useParams();
-  const { data, isLoading, isError } = useGetSingleProductQuery(id);
+  const params = useParams();
+  const rawId = params?.id;
+  const productId = Array.isArray(rawId) ? rawId[0] : (rawId ?? "");
+  const { data, isLoading, isError } = useGetSingleProductQuery(productId, {
+    skip: !productId,
+  });
   const { user, isLoading: isUserLoading } = useClientUser();
 
   if (isLoading)
@@ -33,12 +37,28 @@ export default function ProductDetails() {
 
   const medicine = data?.data;
 
-  const basePrice = Number(medicine?.price ?? 0);
-  const discountPercentage = Number(medicine?.discount ?? 0);
+  if (!medicine) {
+    return (
+      <div className="mx-auto w-full py-10 text-center">
+        Product details are unavailable right now.
+      </div>
+    );
+  }
+
+  const basePrice = Number(medicine.price ?? 0);
+  const discountPercentage = Number(medicine.discount ?? 0);
+  const hasDiscount = discountPercentage > 0;
   const discountedPrice = Math.max(
     basePrice - (basePrice * discountPercentage) / 100,
     0,
   );
+  const manufacturer =
+    typeof medicine.manufacturer === "object" && medicine.manufacturer !== null
+      ? medicine.manufacturer
+      : null;
+  const expiryDateLabel = medicine.expiryDate
+    ? new Date(medicine.expiryDate).toLocaleDateString()
+    : "Not specified";
 
   const handleAddToCart = () => {
     if (!medicine) {
@@ -72,9 +92,9 @@ export default function ProductDetails() {
             height={400}
             className="object-contain rounded-lg transition-transform duration-300 hover:scale-105"
           />
-          {medicine.discount > 0 && (
+          {hasDiscount && (
             <Badge className="absolute top-6 left-6 bg-red-500 text-white px-3 py-1 text-sm shadow-md">
-              -{medicine.discount}%
+              -{discountPercentage}%
             </Badge>
           )}
         </div>
@@ -102,23 +122,23 @@ export default function ProductDetails() {
           <div className="space-y-2 text-sm">
             <p>
               <span className="font-medium">Stock:</span>{" "}
-              {medicine.inStock ? (
-                <span className="text-green-600 font-semibold">
-                  {medicine.quantity} available
-                </span>
-              ) : (
-                <span className="text-red-600 font-semibold">Out of Stock</span>
-              )}
-            </p>
-            <p>
-              <span className="font-medium">Prescription Required:</span>{" "}
-              {medicine.requiredPrescription ? "Yes" : "No"}
-            </p>
-            <p>
-              <span className="font-medium">Expiry Date:</span>{" "}
-              {new Date(medicine.expiryDate).toLocaleDateString()}
-            </p>
-          </div>
+            {medicine.inStock ? (
+              <span className="text-green-600 font-semibold">
+                {medicine.quantity} available
+              </span>
+            ) : (
+              <span className="text-red-600 font-semibold">Out of Stock</span>
+            )}
+          </p>
+          <p>
+            <span className="font-medium">Prescription Required:</span>{" "}
+            {medicine.requiredPrescription ? "Yes" : "No"}
+          </p>
+          <p>
+            <span className="font-medium">Expiry Date:</span>{" "}
+            {expiryDateLabel}
+          </p>
+        </div>
 
           {/* Add to Cart */}
           <Button
@@ -163,9 +183,9 @@ export default function ProductDetails() {
             Manufacturer
           </h2>
           <div className="text-gray-700 text-sm space-y-1">
-            <p className="font-medium">{medicine.manufacturer.name}</p>
-            <p>{medicine.manufacturer.address}</p>
-            <p>{medicine.manufacturer.contact}</p>
+            <p className="font-medium">{manufacturer?.name ?? "Not provided"}</p>
+            <p>{manufacturer?.address ?? "—"}</p>
+            <p>{manufacturer?.contact ?? "—"}</p>
           </div>
         </div>
       </div>

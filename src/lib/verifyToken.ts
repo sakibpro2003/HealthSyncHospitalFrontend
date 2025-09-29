@@ -1,14 +1,14 @@
 // lib/verifyToken.ts
-import { jwtVerify } from "jose";
+import { jwtVerify, type JWTPayload } from "jose";
 
-export const verifyToken = async (token: string) => {
+export const verifyToken = async (token: string): Promise<JWTPayload | null> => {
   try {
     const { payload } = await jwtVerify(
       token,
       new TextEncoder().encode(process.env.JWT_ACCESS_SECRET!)
     );
     return payload;
-  } catch (error) {
+  } catch {
     return null;
   }
 };

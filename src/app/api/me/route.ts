@@ -4,7 +4,8 @@ import { cookies } from "next/headers";
 import { verifyToken } from "@/lib/verifyToken";
 
 export async function GET() {
-  const token = cookies().get("token")?.value;
+  const cookieStore = await cookies();
+  const token = cookieStore.get("token")?.value;
   if (!token) {
     return NextResponse.json({ user: null }, { status: 401 });
   }

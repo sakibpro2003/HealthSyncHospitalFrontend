@@ -28,7 +28,24 @@ import { Separator } from "@/components/ui/separator";
 import { useRegisterMutation } from "@/redux/features/auth/authApi";
 import { HeartPulse, Loader2, ShieldPlus } from "lucide-react";
 
-const personalFields = [
+type FieldType =
+  | "text"
+  | "email"
+  | "password"
+  | "select"
+  | "textarea"
+  | "date"
+  | "number";
+
+type FieldDefinition = {
+  name: string;
+  label: string;
+  type?: FieldType;
+  options?: readonly string[];
+  placeholder?: string;
+};
+
+const personalFields: FieldDefinition[] = [
   { name: "name", label: "Full name" },
   { name: "email", label: "Email", type: "email" },
   { name: "phone", label: "Phone" },
@@ -47,14 +64,14 @@ const personalFields = [
   },
   { name: "address", label: "Address" },
   { name: "occupation", label: "Occupation" },
-] as const;
+];
 
-const credentialFields = [
+const credentialFields: FieldDefinition[] = [
   { name: "password", label: "Password", type: "password" },
   { name: "confirm_password", label: "Confirm password", type: "password" },
-] as const;
+];
 
-const emergencyFields = [
+const emergencyFields: FieldDefinition[] = [
   { name: "emergencyContactName", label: "Emergency contact name" },
   { name: "relationship", label: "Relationship" },
   { name: "emergencyContactPhone", label: "Emergency contact phone" },
@@ -65,7 +82,7 @@ const emergencyFields = [
     placeholder: "Allergies, chronic conditions, recent surgeries...",
   },
   { name: "allergies", label: "Allergies", type: "textarea" },
-] as const;
+];
 
 const RegisterForm = () => {
   const [register] = useRegisterMutation();
@@ -116,18 +133,13 @@ const RegisterForm = () => {
       setIsSubmitting(false);
     }
   };
-  type FieldConfig =
-    | (typeof personalFields)[number]
-    | (typeof credentialFields)[number]
-    | (typeof emergencyFields)[number];
-
   const renderField = ({
     name,
     label,
     type = "text",
-    options,
+    options = [] as readonly string[],
     placeholder,
-  }: FieldConfig & { placeholder?: string }) => (
+  }: FieldDefinition) => (
     <FormField
       key={name}
       control={form.control}
@@ -151,7 +163,7 @@ const RegisterForm = () => {
                   <SelectValue placeholder={`Select ${label.toLowerCase()}`} />
                 </SelectTrigger>
                 <SelectContent>
-                  {options?.map((option) => (
+                  {options.map((option) => (
                     <SelectItem key={option} value={option}>
                       {option}
                     </SelectItem>

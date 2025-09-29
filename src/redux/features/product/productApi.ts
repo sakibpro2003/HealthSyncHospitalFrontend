@@ -53,10 +53,10 @@ import { TProduct } from "@/types/product";
 
 const productApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
-    getAllMedicine: builder.query({
+    getAllMedicine: builder.query<{ data: TProduct[] } | undefined, void>({
       query: () => `/products`,
     }),
-    getSingleProduct: builder.query({
+    getSingleProduct: builder.query<{ data: TProduct }, string | void>({
       query: (_id) => `/products/${_id}`,
     }),
 

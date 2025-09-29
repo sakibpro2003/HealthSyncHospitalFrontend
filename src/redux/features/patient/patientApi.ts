@@ -11,7 +11,7 @@ type TMeta = {
   total: number;
   totalPage: number;
 };
-export interface IPatient extends Document {
+export interface IPatient {
   _id: string;
   name: string;
   role: string;
@@ -31,7 +31,6 @@ export interface IPatient extends Document {
   createdBy: string;
   createdAt?: Date;
   updatedAt?: Date;
-  meta: TMeta;
 }
 
 interface GetAllPatientResponse {
@@ -73,13 +72,15 @@ const patientApi = baseApi.injectEndpoints({
         };
       },
       transformResponse: (response: GetAllPatientResponse) => {
-        const payload = response?.data?.result;
-        const items = Array.isArray(payload?.result)
-          ? payload.result
-          : Array.isArray(payload)
-          ? payload
+        const items = Array.isArray(response?.data?.result)
+          ? response.data.result
           : [];
-        const meta = response?.meta ?? payload?.meta ?? { page: 1, limit: 0, total: 0, totalPage: 0 };
+        const meta = response?.data?.meta ?? {
+          page: 1,
+          limit: 0,
+          total: 0,
+          totalPage: 0,
+        };
         return { result: items, meta };
       },
       providesTags: (result) =>

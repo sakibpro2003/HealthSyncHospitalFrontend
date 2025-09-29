@@ -53,11 +53,10 @@ const RegisterForm = () => {
     if ("data" in res && res.data?.success) {
       toast.success("Registration successful");
     } else if ("error" in res) {
-      const error = res.error;
+      const { error } = res;
 
-      // Check if it's a FetchBaseQueryError
-      if ("status" in error) {
-        const errData = error.data as any;
+      if (error && "status" in error) {
+        const errData = (error as { data?: unknown }).data as any;
 
         if (Array.isArray(errData?.errorSources)) {
           errData.errorSources.forEach((e: any) => {
@@ -66,8 +65,7 @@ const RegisterForm = () => {
         } else {
           toast.error(errData?.message || "Registration failed.");
         }
-      } else {
-        // SerializedError fallback
+      } else if (error) {
         toast.error("Unexpected error occurred.");
         console.error(error);
       }
@@ -78,7 +76,12 @@ const RegisterForm = () => {
   }
 };
 
-  const fields = [
+  const fields: {
+    name: string;
+    label: string;
+    type?: "text" | "email" | "password" | "select" | "textarea" | "date";
+    options?: readonly string[];
+  }[] = [
     { name: "name", label: "Full Name" },
     { name: "phone", label: "Phone *" },
     { name: "email", label: "Email", type: "email" },
@@ -149,7 +152,7 @@ const RegisterForm = () => {
                               <SelectValue placeholder={`${label}`} />
                             </SelectTrigger>
                             <SelectContent>
-                              {options?.map((option) => (
+                              {options?.map((option: string) => (
                                 <SelectItem key={option} value={option}>
                                   {option}
                                 </SelectItem>

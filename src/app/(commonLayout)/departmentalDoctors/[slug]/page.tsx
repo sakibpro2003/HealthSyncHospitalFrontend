@@ -10,10 +10,11 @@ import { Clock, GraduationCap, MapPin, Stethoscope } from "lucide-react";
 
 const DepartmentDoctorsPage = () => {
   const params = useParams();
-  const slug = (params?.slug as string) ?? "Department";
+  const rawSlug = params?.slug;
+  const slug = Array.isArray(rawSlug) ? rawSlug[0] : rawSlug ?? "Department";
 
   const { data, isLoading, error } = useGetAllDoctorQuery(slug);
-  const doctors = data?.data?.result?.result;
+  const doctors: IDoctor[] = data?.data?.result ?? [];
 
   if (isLoading) {
     return (
@@ -31,7 +32,7 @@ const DepartmentDoctorsPage = () => {
     );
   }
 
-  if (!Array.isArray(doctors) || doctors.length === 0) {
+  if (doctors.length === 0) {
     return (
       <div className="mx-auto flex min-h-[60vh] w-11/12 flex-col items-center justify-center gap-2 text-center">
         <Stethoscope className="h-10 w-10 text-slate-400" />
@@ -97,7 +98,7 @@ const DepartmentDoctorsPage = () => {
                       {availabilityDays && (
                         <p className="mt-2 flex items-center gap-1 text-xs text-slate-500">
                           <Clock className="h-3.5 w-3.5 text-violet-500" />
-                          {availabilityDays} · {doctor.availability.from} – {doctor.availability.to}
+                          {availabilityDays} · {doctor.availability?.from ?? "—"} – {doctor.availability?.to ?? "—"}
                         </p>
                       )}
                     </div>

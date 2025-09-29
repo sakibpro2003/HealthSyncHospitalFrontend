@@ -1,14 +1,19 @@
 // app/profile/page.tsx or pages/profile.tsx (based on your routing)
 import { cookies } from "next/headers";
-import { jwtVerify } from "jose";
+import { jwtVerify, type JWTPayload } from "jose";
 
 const JWT_ACCESS_SECRET = process.env.JWT_ACCESS_SECRET!;
 
+type AuthPayload = JWTPayload & {
+  role?: string;
+  id?: string;
+};
+
 export default async function ProfilePage() {
-  const cookieStore = cookies();
+  const cookieStore = await cookies();
   const token = cookieStore.get("token")?.value;
 
-  let user = null;
+  let user: AuthPayload | null = null;
 
   if (token) {
     try {
@@ -26,11 +31,15 @@ export default async function ProfilePage() {
     return <div className="text-red-500">You must be logged in.</div>;
   }
 
+  const email = typeof user.email === "string" ? user.email : "Unknown";
+  const role = user.role ?? "Unknown";
+  const id = user.id ?? (typeof user.sub === "string" ? user.sub : "Unknown");
+
   return (
     <div className="p-6">
-      <h1 className="text-2xl font-bold mb-2">👋 Welcome, {user.email}</h1>
-      <p>Your role: {user.role}</p>
-      <p>Your ID: {user.id}</p>
+      <h1 className="mb-2 text-2xl font-bold">👋 Welcome, {email}</h1>
+      <p>Your role: {role}</p>
+      <p>Your ID: {id}</p>
     </div>
   );
 }

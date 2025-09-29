@@ -2,7 +2,7 @@
 
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { useParams } from "next/navigation";
 import Image from "next/image";
 import { toast } from "sonner";
@@ -31,14 +31,7 @@ import {
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-
-type AuthedUser = {
-  userId?: string;
-  _id?: string;
-  email?: string;
-  name?: string;
-  role?: string;
-};
+import { useClientUser } from "@/hooks/useClientUser";
 
 const BOOKING_START_MINUTE = 8 * 60;
 const BOOKING_END_MINUTE = 22 * 60;
@@ -65,27 +58,13 @@ export default function DoctorDetailsPage() {
   const { data, isLoading, isError } = useGetSingleDoctorQuery(id as string);
   const [createAppointmentCheckout, { isLoading: isBooking }] =
     useCreateAppointmentCheckoutMutation();
-  const [user, setUser] = useState<AuthedUser | null>(null);
+  const { user } = useClientUser();
   const [sheetOpen, setSheetOpen] = useState(false);
   const [formState, setFormState] = useState({
     appointmentDate: "",
     appointmentTime: "",
     reason: "",
   });
-
-  useEffect(() => {
-    const fetchUser = async () => {
-      try {
-        const res = await fetch("/api/me");
-        if (!res.ok) throw new Error("Unauthorized");
-        const payload = await res.json();
-        setUser(payload.user);
-      } catch {
-        setUser(null);
-      }
-    };
-    fetchUser();
-  }, []);
 
   const doctor = data?.data?.result;
   const patientId = user?.userId ?? user?._id;

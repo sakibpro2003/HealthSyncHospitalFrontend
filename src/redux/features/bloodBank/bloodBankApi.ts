@@ -123,10 +123,16 @@ const bloodBankApi = baseApi.injectEndpoints({
       invalidatesTags: ["bloodRequests"],
     }),
     getBloodRequests: builder.query<BloodRequest[], Record<string, unknown> | void>({
-      query: (params) => ({
-        url: "/blood-bank/requests",
-        params,
-      }),
+      query: (params) => {
+        const queryParams =
+          params && typeof params === "object"
+            ? (params as Record<string, unknown>)
+            : undefined;
+        return {
+          url: "/blood-bank/requests",
+          params: queryParams as Record<string, any> | undefined,
+        };
+      },
       transformResponse: (response: { data?: { result?: BloodRequest[] } }) =>
         response?.data?.result ?? [],
       providesTags: ["bloodRequests"],

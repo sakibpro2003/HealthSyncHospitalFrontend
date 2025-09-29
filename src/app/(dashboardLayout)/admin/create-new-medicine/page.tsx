@@ -32,7 +32,10 @@ const ProductForm = () => {
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ) => {
-    const { name, value, type, checked } = e.target;
+    const target = e.target;
+    const { name, value } = target;
+    const isCheckbox =
+      target instanceof HTMLInputElement && target.type === "checkbox";
 
     if (name.includes("manufacturer.")) {
       const field = name.split(".")[1];
@@ -43,7 +46,7 @@ const ProductForm = () => {
     } else {
       setProduct((prev) => ({
         ...prev,
-        [name]: type === "checkbox" ? checked : value,
+        [name]: isCheckbox ? target.checked : value,
       }));
     }
   };

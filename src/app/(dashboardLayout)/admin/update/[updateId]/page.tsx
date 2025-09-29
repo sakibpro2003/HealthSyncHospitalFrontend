@@ -1,11 +1,12 @@
 "use client"
 import { useState, useEffect } from "react";
-import { useParams, useRouter } from "next/navigation";
+import { useParams } from "next/navigation";
 import { useGetSingleProductQuery, useUpdateProductMutation } from "@/redux/features/product/productApi";
+import type { TProduct } from "@/types/product";
 import { toast } from "sonner";
 
 type ProductType = {
-  _id: string;
+  _id?: string;
   name: string;
   image: string;
   description: string;
@@ -22,32 +23,45 @@ type ProductType = {
 };
 
 const UpdateProductPage = () => {
-  const router = useRouter();
-  const { updateId } = useParams();
+  const params = useParams();
+  const paramValue = params?.updateId;
+  const updateId = Array.isArray(paramValue) ? paramValue[0] : (paramValue ?? "");
 
-  const { data: productData, isLoading, error } = useGetSingleProductQuery(updateId as string, {
+  const { data: productData, isLoading, error } = useGetSingleProductQuery(updateId, {
     skip: !updateId,
   });
 
-  const [updateProduct] = useUpdateProductMutation(updateId);
+  const [updateProduct] = useUpdateProductMutation();
 
   // ✅ Use typed state
   const [product, setProduct] = useState<ProductType | null>(null);
 
   useEffect(() => {
     if (productData?.data) {
-      setProduct(productData.data);
+      const { manufacturer, ...rest } = productData.data as TProduct;
+      setProduct({
+        ...rest,
+        manufacturer:
+          typeof manufacturer === "object" && manufacturer !== null
+            ? {
+                name: manufacturer.name ?? "",
+                address: manufacturer.address ?? "",
+                contact: manufacturer.contact ?? "",
+              }
+            : { name: "", address: "", contact: "" },
+      } as ProductType);
     }
   }, [productData]);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value, type } = e.target;
-    const isCheckbox = type === "checkbox";
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    const target = e.target;
+    const { name, value } = target;
+    const isCheckbox = target instanceof HTMLInputElement && target.type === "checkbox";
 
     setProduct((prev) =>
-      prev
-        ? { ...prev, [name]: isCheckbox ? (e.target as HTMLInputElement).checked : value }
-        : prev
+      prev ? { ...prev, [name]: isCheckbox ? target.checked : value } : prev
     );
   };
 
@@ -62,10 +76,15 @@ const UpdateProductPage = () => {
   };
 
   const handleUpdate = async () => {
-    if (!product) return;
+    if (!updateId || !product) {
+      return;
+    }
 
     try {
-      const result = await updateProduct({ id: updateId, product }).unwrap();
+      const result = await updateProduct({
+        id: updateId,
+        updatePayload: product,
+      }).unwrap();
       // toast.success("Medicine updated successfully");
       console.log(result, "Update result");
       // router.push("/manage-medicines");

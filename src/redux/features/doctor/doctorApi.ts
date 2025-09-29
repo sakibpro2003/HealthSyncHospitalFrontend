@@ -4,18 +4,20 @@ export interface IDoctor {
   _id: string;
   name: string;
   email: string;
-  image:string,
+  image: string;
   phone: string;
   department: string;
   specialization: string;
-  education: string[]; // e.g., ["MBBS - Dhaka Medical College", "FCPS - BIRDEM"]
+  education: string[] | string;
   availability: {
-    days: string[]; // e.g., ["Sunday", "Tuesday", "Thursday"]
-    from: string; // e.g., "09:00 AM"
-    to: string; // e.g., "05:00 PM"
+    days?: string[];
+    from?: string;
+    to?: string;
+    location?: string;
   };
-  experience?: string; // e.g., "5 years in Internal Medicine"
-  bio?: string; // A short professional summary about the doctor
+  experience?: string;
+  consultationFee?: number;
+  bio?: string;
   createdAt?: string;
   updatedAt?: string;
 }
@@ -36,15 +38,22 @@ interface IGetAllDoctorResponse {
   success: string;
 }
 
+interface IGetSingleDoctorResponse {
+  data: {
+    result: IDoctor;
+  };
+  message: string;
+  success: string;
+}
+
 const doctorApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
     getAllDoctor: builder.query<IGetAllDoctorResponse, string | void>({
       query: (department = "") =>
         `/doctor/get-all-doctor?department=${department}`,
     }),
-    getSingleDoctor: builder.query<IDoctor, string | void>({
-      query: (_id) =>
-        `/doctor/get-doctor/${_id}`,
+    getSingleDoctor: builder.query<IGetSingleDoctorResponse, string | void>({
+      query: (_id) => `/doctor/get-doctor/${_id}`,
     }),
   }),
 });

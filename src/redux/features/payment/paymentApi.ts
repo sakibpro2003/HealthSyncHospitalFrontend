@@ -18,6 +18,7 @@ export type PaymentRecord = {
   paidAt?: string;
   createdAt?: string;
   stripePaymentIntentId?: string;
+  reference?: string;
   items: PaymentItem[];
 };
 
