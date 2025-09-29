@@ -33,6 +33,7 @@ import {
 import { useGetAllMedicineQuery } from "@/redux/features/product/productApi";
 import { addToCart } from "@/utils/cart";
 import { toast } from "sonner";
+import { useClientUser } from "@/hooks/useClientUser";
 
 const ITEMS_PER_PAGE = 8;
 
@@ -52,6 +53,7 @@ const calculateSalePrice = (medicine: TProduct) => {
 
 export default function MedicinePage() {
   const { data, isLoading, isError } = useGetAllMedicineQuery(undefined);
+  const { user, isLoading: isUserLoading } = useClientUser();
 
   const medicines = useMemo<TProduct[]>(() => {
     return Array.isArray(data?.data) ? (data.data as TProduct[]) : [];
@@ -201,6 +203,16 @@ export default function MedicinePage() {
     priceRange[1] !== priceBounds[1];
 
   const handleAddToCart = (medicine: TProduct) => {
+    if (isUserLoading) {
+      toast.info("Checking your login status. Please try again in a moment.");
+      return;
+    }
+
+    if (!user) {
+      toast.error("Please log in to add items to your cart.");
+      return;
+    }
+
     addToCart(medicine);
     toast.success(`${medicine?.name ?? "Medicine"} added to cart`);
   };

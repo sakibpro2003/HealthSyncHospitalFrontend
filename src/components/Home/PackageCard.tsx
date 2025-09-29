@@ -2,17 +2,13 @@
 import { useGetAllhealthPackageQuery } from "@/redux/features/healthPackage/healthPackageApi";
 import { loadStripe } from "@stripe/stripe-js";
 import { Button } from "@/components/ui/button";
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useMemo } from "react";
+import { useClientUser } from "@/hooks/useClientUser";
+import { toast } from "sonner";
 
 const PackageCard = () => {
-  const [user, setUser] = useState<{
-    _id?: string;
-    userId?: string,
-    email?: string;
-    name?: string;
-    role?: string;
-  } | null>(null);
   const { data } = useGetAllhealthPackageQuery(undefined);
+  const { user, isLoading: isUserLoading } = useClientUser();
   type HealthPackage = {
   _id: string;
   title: string;
@@ -33,9 +29,14 @@ const PackageCard = () => {
     title: string,
     price: number
   ) => {
+    if (isUserLoading) {
+      toast.info("Checking your login status. Please try again in a moment.");
+      return;
+    }
+
     const resolvedUserId = user?.userId ?? user?._id;
     if (!resolvedUserId) {
-      console.error("User must be logged in to subscribe");
+      toast.error("Please log in to subscribe to a package.");
       return;
     }
 
@@ -67,35 +68,27 @@ const PackageCard = () => {
           body: JSON.stringify(payload),
         }
       );
-      const data = await res.json();
+
+      if (!res.ok) {
+        const errorBody = await res.json().catch(() => ({}));
+        toast.error(errorBody?.message ?? "Unable to start checkout.");
+        return;
+      }
+
+      const session = await res.json();
 
       const result = await stripe?.redirectToCheckout({
-        sessionId: data.data.id, // use the id from backend
+        sessionId: session?.data?.id,
       });
 
       if (result?.error) {
-        console.error("Stripe redirect error:", result.error.message);
+        toast.error(result.error.message ?? "Stripe redirect failed.");
       }
     } catch (err) {
       console.error("Error subscribing:", err);
+      toast.error("Something went wrong while processing your request.");
     }
   };
-
-  useEffect(() => {
-    const fetchUser = async () => {
-      try {
-        const res = await fetch("/api/me");
-        if (!res.ok) throw new Error("Unauthorized");
-
-        const data = await res.json();
-        // console.log(data?.user?.userId,"user data")
-        setUser(data.user);
-      } catch (error) {
-        console.error("Not logged in",error);
-      }
-    };
-    fetchUser();
-  }, []);
 
   const packages = useMemo(() => data?.data?.result ?? [], [data]);
 

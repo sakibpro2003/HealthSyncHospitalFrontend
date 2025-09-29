@@ -10,6 +10,7 @@ import b3 from "../../assets/b3.png";
 import b4 from "../../assets/b4.png";
 import b5 from "../../assets/b5.png";
 import b6 from "../../assets/b6.png";
+import b7 from "../../assets/b7.png";
 
 const slides = [
   {
@@ -75,6 +76,18 @@ const slides = [
   {
     id: 6,
     image: b6,
+    eyebrow: "Trusted Partner",
+    title: "Your digital transformation, guided end to end",
+    description:
+      "From onboarding to optimisation, our specialists deliver white-glove support so you can focus on what matters most—patient care.",
+    highlight: "Dedicated success manager for every client",
+    ctaLabel: "Speak to an expert",
+    secondaryLabel: "Implementation roadmap",
+    features: ["Hands-on onboarding", "Training academy", "24/7 priority support"],
+  },
+  {
+    id: 7,
+    image: b7,
     eyebrow: "Trusted Partner",
     title: "Your digital transformation, guided end to end",
     description:
@@ -154,13 +167,13 @@ const Banner = () => {
           </div>
 
           <div className="relative z-10 flex-1">
-            <div className="relative mx-auto aspect-[4/3] w-full max-w-md overflow-hidden rounded-3xl shadow-xl">
+            <div className="relative mx-auto aspect-[4/3] w-full max-w-[18rem] sm:max-w-sm lg:max-w-md overflow-hidden rounded-3xl shadow-xl">
               <Image
                 src={activeSlide.image}
                 alt={activeSlide.title}
                 fill
                 priority
-                sizes="(min-width: 1024px) 400px, 80vw"
+                sizes="(min-width: 1280px) 420px, (min-width: 768px) 320px, 70vw"
                 className="object-cover"
               />
               <div className="absolute inset-0 bg-gradient-to-tr from-slate-900/20 via-transparent to-white/10" />

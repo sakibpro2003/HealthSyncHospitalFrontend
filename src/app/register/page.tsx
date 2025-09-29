@@ -1,13 +1,12 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
+
+import { useState } from "react";
+import Link from "next/link";
+import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
+import { toast } from "sonner";
+
 import { Button } from "@/components/ui/button";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import {
   Form,
   FormControl,
@@ -17,16 +16,62 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
+import { Separator } from "@/components/ui/separator";
 import { useRegisterMutation } from "@/redux/features/auth/authApi";
-import React from "react";
-import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
-import { toast } from "sonner";
-import Link from "next/link";
+import { HeartPulse, Loader2, ShieldPlus } from "lucide-react";
+
+const personalFields = [
+  { name: "name", label: "Full name" },
+  { name: "email", label: "Email", type: "email" },
+  { name: "phone", label: "Phone" },
+  {
+    name: "gender",
+    label: "Gender",
+    type: "select",
+    options: ["male", "female", "other"],
+  },
+  { name: "dateOfBirth", label: "Date of birth", type: "date" },
+  {
+    name: "bloodGroup",
+    label: "Blood group",
+    type: "select",
+    options: ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"],
+  },
+  { name: "address", label: "Address" },
+  { name: "occupation", label: "Occupation" },
+] as const;
+
+const credentialFields = [
+  { name: "password", label: "Password", type: "password" },
+  { name: "confirm_password", label: "Confirm password", type: "password" },
+] as const;
+
+const emergencyFields = [
+  { name: "emergencyContactName", label: "Emergency contact name" },
+  { name: "relationship", label: "Relationship" },
+  { name: "emergencyContactPhone", label: "Emergency contact phone" },
+  {
+    name: "medicalHistory",
+    label: "Medical history",
+    type: "textarea",
+    placeholder: "Allergies, chronic conditions, recent surgeries...",
+  },
+  { name: "allergies", label: "Allergies", type: "textarea" },
+] as const;
 
 const RegisterForm = () => {
   const [register] = useRegisterMutation();
   const form = useForm();
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
   const onSubmit: SubmitHandler<FieldValues> = async (userData) => {
     const {
       emergencyContactName,
@@ -34,160 +79,216 @@ const RegisterForm = () => {
       relationship,
       ...rest
     } = userData;
-    const emergencyContact = {
-      emergencyContactName: emergencyContactName,
-      relationship: relationship,
-      emergencyContactPhone: emergencyContactPhone,
-    };
-
-    const modifiedData = {
+    const payload = {
       ...rest,
-      emergencyContact,
+      emergencyContact: {
+        emergencyContactName,
+        emergencyContactPhone,
+        relationship,
+      },
     };
 
-    //! Caution!!
     try {
-      const res = await register(modifiedData);
-
+      setIsSubmitting(true);
+      const res = await register(payload);
       if ("data" in res && res.data?.success) {
         toast.success("Registration successful");
+        form.reset();
       } else if ("error" in res) {
-        const error = res.error;
-
-        // Check if it's a FetchBaseQueryError
+        const error = res.error as any;
         if ("status" in error) {
           const errData = error.data as any;
-
           if (Array.isArray(errData?.errorSources)) {
-            errData.errorSources.forEach((e: any) => {
-              toast.error(`${e.path}: ${e.message}`);
-            });
+            errData.errorSources.forEach((e: any) =>
+              toast.error(`${e.path}: ${e.message}`)
+            );
           } else {
             toast.error(errData?.message || "Registration failed.");
           }
         } else {
-          // SerializedError fallback
           toast.error("Unexpected error occurred.");
-          console.error(error);
         }
       }
     } catch (err) {
       toast.error("Something went wrong.");
       console.error(err);
+    } finally {
+      setIsSubmitting(false);
     }
   };
+  type FieldConfig =
+    | (typeof personalFields)[number]
+    | (typeof credentialFields)[number]
+    | (typeof emergencyFields)[number];
 
-  const fields = [
-    { name: "name", label: "Full Name" },
-    { name: "phone", label: "Phone *" },
-    { name: "email", label: "Email", type: "email" },
-    {
-      name: "gender",
-      label: "Gender",
-      type: "select",
-      options: ["male", "female", "other"],
-    },
-    { name: "address", label: "Address" },
-    { name: "dateOfBirth", label: "Date of Birth", type: "date" },
-    {
-      name: "bloodGroup",
-      label: "Blood Group",
-      type: "select",
-      options: ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"],
-    },
-    { name: "password", label: "Password", type: "password" },
-    { name: "confirm_password", label: "Confirm Password", type: "password" },
-    // {
-    //   name: "maritalStatus",
-    //   label: "Marital Status",
-    //   type: "select",
-    //   options: ["single", "married", "divorced", "widowed"],
-    // },
-    // { name: "emergencyContactName", label: "Emergency Contact Name" },
-    // { name: "emergencyContactPhone", label: "Emergency Contact Phone" },
+  const renderField = ({
+    name,
+    label,
+    type = "text",
+    options,
+    placeholder,
+  }: FieldConfig & { placeholder?: string }) => (
+    <FormField
+      key={name}
+      control={form.control}
+      name={name}
+      render={({ field }) => (
+        <FormItem>
+          <FormLabel className="text-sm font-medium text-slate-600">
+            {label}
+          </FormLabel>
+          <FormControl>
+            {type === "textarea" ? (
+              <Textarea
+                {...field}
+                value={field.value || ""}
+                placeholder={placeholder || ""}
+                className="min-h-[120px] rounded-2xl border-slate-200 bg-white/85 px-4 py-3 text-slate-900 shadow-sm focus-visible:border-violet-400 focus-visible:ring-violet-200"
+              />
+            ) : type === "select" ? (
+              <Select value={field.value ?? ""} onValueChange={field.onChange}>
+                <SelectTrigger className="h-12 rounded-2xl border-slate-200 bg-white/85 px-4 text-left text-slate-900 shadow-sm focus-visible:border-violet-400 focus-visible:ring-violet-200">
+                  <SelectValue placeholder={`Select ${label.toLowerCase()}`} />
+                </SelectTrigger>
+                <SelectContent>
+                  {options?.map((option) => (
+                    <SelectItem key={option} value={option}>
+                      {option}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            ) : (
+              <Input
+                {...field}
+                type={type}
+                value={field.value || ""}
+                className="h-12 rounded-2xl border-slate-200 bg-white/85 px-4 text-slate-900 shadow-sm focus-visible:border-violet-400 focus-visible:ring-violet-200"
+              />
+            )}
+          </FormControl>
+          <FormMessage />
+        </FormItem>
+      )}
+    />
+  );
 
-    // {
-    //   name: "relationship",
-    //   label: "Emergency Contact Relationship",
-    // },
-    // { name: "occupation", label: "Occupation" },
-    // { name: "medicalHistory", label: "Medical History", type: "textarea" },
-    // { name: "allergies", label: "Allergies" },
-    // {
-    //   name: "currentMedications",
-    //   label: "Current Medications",
-    //   type: "textarea",
-    // },
-  ];
-  // className='flex justify-center items-center content-center w-screen h-screen'
   return (
-    <div className="flex justify-center items-center content-center w-screen h-screen">
-      <div className="mx-auto md:p-10">
-        <h2 className="text-2xl md:text-3xl font-semibold mb-6 text-center">
-          SignUp
-        </h2>
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)}>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              {fields.map(({ name, label, options, type = "text" }) => (
-                <FormField
-                  key={name}
-                  control={form.control}
-                  name={name}
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>{label}</FormLabel>
-                      <FormControl>
-                        {type === "textarea" ? (
-                          <Textarea
-                            {...field}
-                            placeholder=""
-                            value={field.value || ""}
-                          />
-                        ) : type === "select" ? (
-                          <Select onValueChange={field.onChange}>
-                            <SelectTrigger className="w-[180px]">
-                              <SelectValue placeholder={`${label}`} />
-                            </SelectTrigger>
-                            <SelectContent>
-                              {options?.map((option) => (
-                                <SelectItem key={option} value={option}>
-                                  {option}
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                        ) : (
-                          <Input
-                            {...field}
-                            type={type}
-                            placeholder=""
-                            value={field.value || ""}
-                          />
-                        )}
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              ))}
+    <section className="relative flex items-center justify-center overflow-hidden bg-gradient-to-br from-white via-violet-50/70 to-violet-100/30 px-4 py-12">
+      <div
+        className="absolute -left-24  w-72 rounded-full bg-violet-200/40 blur-3xl"
+        aria-hidden
+      />
+      <div
+        className="absolute -right-32 bottom-0 h-80 w-80 rounded-full bg-sky-200/50 blur-3xl"
+        aria-hidden
+      />
+
+      <Form {...form}>
+        <form
+          onSubmit={form.handleSubmit(onSubmit)}
+          className="relative z-10 w-full"
+        >
+          <div className="mx-auto grid w-full max-w-7xl gap-10 overflow-hidden rounded-[2.5rem] border border-white/50 bg-white/95 p-10 shadow-[0_40px_100px_-60px_rgba(76,29,149,0.45)] backdrop-blur-xl xl:grid-cols-[1fr_1.05fr_1.05fr]">
+            <div className="space-y-6 text-slate-700">
+              <span className="inline-flex items-center gap-2 rounded-full bg-violet-100 px-4 py-1 text-xs font-semibold uppercase tracking-[0.35em] text-violet-600">
+                <ShieldPlus className="h-4 w-4" /> Join HealthSync
+              </span>
+              <h1 className="text-3xl font-black text-slate-900 sm:text-4xl">
+                Create your unified care profile
+              </h1>
+              <p className="text-base text-slate-600">
+                Register once to synchronise appointments, diagnostics,
+                prescriptions, and emergency contacts across the HealthSync
+                Hospital network.
+              </p>
+              <div className="grid gap-3 text-sm">
+                <div className="flex items-center gap-3 rounded-2xl bg-violet-50/70 p-4 text-violet-700">
+                  <HeartPulse className="h-5 w-5" /> Track appointments, lab
+                  results, and bills in real time.
+                </div>
+                <div className="flex items-center gap-3 rounded-2xl bg-slate-900/90 p-4 text-white">
+                  <ShieldPlus className="h-5 w-5" /> Share secure access with
+                  family and emergency responders.
+                </div>
+              </div>
+              <p className="text-sm text-slate-500">
+                Already onboard?{" "}
+                <Link
+                  href="/login"
+                  className="font-semibold text-violet-600 hover:underline"
+                >
+                  Log in here
+                </Link>
+                .
+              </p>
             </div>
-            <p className="mt-4">
-              Already registered? Go to{" "}
-              <Link className="text-blue-600 underline" href={"/login"}>
-                Login
-              </Link>{" "}
-              page.
-            </p>
-            <div className="mt-8 text-center">
-              <Button type="submit" className="w-full md:w-1/3">
-                SignUp
+
+            <div className="flex flex-col gap-6">
+              <div>
+                <h2 className="text-lg font-semibold text-slate-900">
+                  Personal information
+                </h2>
+                <p className="text-sm text-slate-500">
+                  Tell us a little about yourself to tailor your care
+                  experience.
+                </p>
+              </div>
+              <div className="grid gap-5">
+                {personalFields.map((field) => renderField(field))}
+              </div>
+            </div>
+
+            <div className="flex flex-col gap-8">
+              <div className="space-y-6">
+                <div>
+                  <h2 className="text-lg font-semibold text-slate-900">
+                    Security credentials
+                  </h2>
+                  <p className="text-sm text-slate-500">
+                    Set a strong password to keep your health data safe.
+                  </p>
+                </div>
+                <div className="grid gap-5">
+                  {credentialFields.map((field) => renderField(field))}
+                </div>
+              </div>
+
+              <Separator className="bg-slate-200" />
+
+              <div className="space-y-6">
+                <div>
+                  <h2 className="text-lg font-semibold text-slate-900">
+                    Emergency details
+                  </h2>
+                  <p className="text-sm text-slate-500">
+                    Help our clinicians act quickly when every second counts.
+                  </p>
+                </div>
+                <div className="grid gap-5">
+                  {emergencyFields.map((field) => renderField(field))}
+                </div>
+              </div>
+
+              <Button
+                type="submit"
+                disabled={isSubmitting}
+                className="mt-auto h-12 w-full rounded-full bg-violet-600 text-sm font-semibold text-white shadow-lg transition hover:bg-violet-700 disabled:cursor-not-allowed disabled:opacity-70"
+              >
+                {isSubmitting ? (
+                  <span className="flex items-center justify-center gap-2">
+                    <Loader2 className="h-4 w-4 animate-spin" /> Creating
+                    account…
+                  </span>
+                ) : (
+                  "Create account"
+                )}
               </Button>
             </div>
-          </form>
-        </Form>
-      </div>
-    </div>
+          </div>
+        </form>
+      </Form>
+    </section>
   );
 };
 

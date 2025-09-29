@@ -1,54 +1,28 @@
 "use client";
 
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter, usePathname } from "next/navigation";
-import { Menu, X, LogOut, User as UserIcon } from "lucide-react";
+import { Menu, X, LogOut } from "lucide-react";
 import Logo from "../ui/Logo";
 import { Button } from "../ui/button";
-import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "../ui/dropdown-menu";
 import { useAppDispatch } from "@/redux/hooks";
 import { logOut } from "@/redux/features/auth/authSlice";
 import { useLogoutUserMutation } from "@/redux/features/auth/authApi";
-
-type TUser = {
-  email?: string;
-  name?: string;
-  role?: "user" | "receptionist" | "admin";
-} | null;
+import { useClientUser } from "@/hooks/useClientUser";
 
 const Navbar = () => {
   const [mounted, setMounted] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
-  const [user, setUser] = useState<TUser>(null);
+  const { user } = useClientUser();
 
   const dispatch = useAppDispatch();
   const router = useRouter();
   const pathname = usePathname();
   const [logoutUser] = useLogoutUserMutation();
 
-  useEffect(() => {
+  React.useEffect(() => {
     setMounted(true);
-    const fetchUser = async () => {
-      try {
-        const res = await fetch("/api/me");
-        if (!res.ok) throw new Error("Unauthorized");
-        const data = await res.json();
-        setUser(data.user);
-      } catch (error) {
-        setUser(null);
-        console.log(error);
-      }
-    };
-    fetchUser();
   }, []);
 
   const handleLogout = async () => {
@@ -128,14 +102,7 @@ const Navbar = () => {
           </button>
           <Link href="/" className="flex items-center gap-3">
             <Logo />
-            <div className="hidden flex-col text-left text-xs font-medium text-slate-500 sm:flex">
-              <span className="uppercase tracking-[0.4em] text-violet-500">
-                HealthSync
-              </span>
-              <span className="tracking-[0.05em] text-slate-400">
-                Hospital & Research Network
-              </span>
-            </div>
+           
           </Link>
         </div>
 

@@ -2,12 +2,21 @@ import { NextRequest, NextResponse } from "next/server";
 import { jwtVerify } from "jose";
 
 // Routes that don't require authentication
-const publicRoutes = [
+const publicRoutes = new Set([
+  "/",
   "/login",
   "/register",
   "/unauthorized",
   "/success-payment",
-];
+  "/failed-payment",
+  "/about",
+  "/services",
+  "/contact",
+  "/medicine",
+  "/departmentalDoctors",
+  "/api/me",
+]);
+const publicRoutePatterns: RegExp[] = [/^\/doctor-details\//];
 const authRoutes = ["/login", "/register"];
 
 // Role-based access map
@@ -59,7 +68,11 @@ export async function middleware(request: NextRequest) {
     }
   } else {
     // User is not authenticated
-    if (!publicRoutes.includes(pathname)) {
+    const isPublicRoute =
+      publicRoutes.has(pathname) ||
+      publicRoutePatterns.some((pattern) => pattern.test(pathname));
+
+    if (!isPublicRoute) {
       return NextResponse.redirect(new URL("/login", request.url));
     }
   }

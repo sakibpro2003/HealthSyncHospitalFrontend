@@ -5,6 +5,8 @@ import { useGetSingleProductQuery } from "@/redux/features/product/productApi";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { addToCart } from "@/utils/cart";
+import { useClientUser } from "@/hooks/useClientUser";
+import { toast } from "sonner";
 
 const formatTaka = (value: number) =>
   new Intl.NumberFormat("en-US", {
@@ -16,6 +18,7 @@ const formatTaka = (value: number) =>
 export default function ProductDetails() {
   const { id } = useParams();
   const { data, isLoading, isError } = useGetSingleProductQuery(id);
+  const { user, isLoading: isUserLoading } = useClientUser();
 
   if (isLoading)
     return (
@@ -36,6 +39,25 @@ export default function ProductDetails() {
     basePrice - (basePrice * discountPercentage) / 100,
     0,
   );
+
+  const handleAddToCart = () => {
+    if (!medicine) {
+      return;
+    }
+
+    if (isUserLoading) {
+      toast.info("Checking your login status. Please try again in a moment.");
+      return;
+    }
+
+    if (!user) {
+      toast.error("Please log in to add items to your cart.");
+      return;
+    }
+
+    addToCart(medicine);
+    toast.success(`${medicine.name ?? "Medicine"} added to cart`);
+  };
 
   return (
     <div className="mx-auto w-full px-6 py-10">
@@ -100,7 +122,7 @@ export default function ProductDetails() {
 
           {/* Add to Cart */}
           <Button
-            onClick={() => addToCart(medicine)}
+            onClick={handleAddToCart}
             className="w-full md:w-2/3 rounded-xl py-6 text-lg font-semibold bg-gradient-to-r from-green-500 to-emerald-600 text-white shadow-md hover:from-green-600 hover:to-emerald-700"
             disabled={!medicine.inStock}
           >

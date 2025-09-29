@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { addToCart, getCart, removeFromCart, clearCart, decrementCartItem } from "@/utils/cart";
 import { TProduct } from "@/types/product";
 import { toast } from "sonner";
+import { useClientUser } from "@/hooks/useClientUser";
 
 const formatTaka = (value: number) =>
   new Intl.NumberFormat("en-US", {
@@ -17,24 +18,10 @@ const formatTaka = (value: number) =>
 
 export default function CartPage() {
   const [cart, setCart] = useState<TProduct[]>([]);
-  const [user, setUser] = useState<{ userId?: string; _id?: string; email?: string } | null>(null);
+  const { user, isLoading: isUserLoading } = useClientUser();
 
   useEffect(() => {
     setCart(getCart());
-  }, []);
-
-  useEffect(() => {
-    const fetchUser = async () => {
-      try {
-        const res = await fetch("/api/me");
-        if (!res.ok) throw new Error("Unauthenticated");
-        const data = await res.json();
-        setUser(data.user);
-      } catch (error) {
-        console.error("Unable to fetch user info", error);
-      }
-    };
-    fetchUser();
   }, []);
 
   const totalPrice = useMemo(
@@ -46,6 +33,16 @@ export default function CartPage() {
 
   const handleIncrement = (product: TProduct) => {
     if (!product?._id) {
+      return;
+    }
+
+    if (isUserLoading) {
+      toast.info("Checking your login status. Please try again in a moment.");
+      return;
+    }
+
+    if (!user) {
+      toast.error("Please log in to update your cart.");
       return;
     }
     setCart(addToCart(product));
@@ -70,6 +67,11 @@ export default function CartPage() {
   };
 
   const handleCreatePayment = async () => {
+    if (isUserLoading) {
+      toast.info("Checking your login status. Please try again in a moment.");
+      return;
+    }
+
     const resolvedUserId = user?.userId ?? user?._id;
     if (!resolvedUserId) {
       toast.error("Please log in before checkout");
