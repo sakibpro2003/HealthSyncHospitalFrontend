@@ -7,7 +7,7 @@ import Logo from "../ui/Logo";
 export default function Footer() {
   return (
     <footer className="bg-gray-100 text-gray-700 py-10 mt-16 border-t">
-      <div className="mx-auto grid w-11/12 max-w-7xl grid-cols-1 gap-8 px-4 sm:px-6 lg:px-8 md:grid-cols-3">
+      <div className="mx-auto grid w-full grid-cols-1 gap-8 px-4 sm:px-6 lg:px-8 md:grid-cols-3">
         {/* Logo and short description */}
         <div>
           <h1 className="text-xl font-bold text-primary mb-2">

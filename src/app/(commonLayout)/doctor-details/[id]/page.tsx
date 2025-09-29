@@ -187,7 +187,7 @@ export default function DoctorDetailsPage() {
       <div className="absolute -top-20 left-0 h-48 w-48 rounded-full bg-violet-200/60 blur-3xl" aria-hidden />
       <div className="absolute -bottom-24 right-6 h-56 w-56 rounded-full bg-sky-200/55 blur-3xl" aria-hidden />
 
-      <div className="relative mx-auto w-11/12 max-w-7xl space-y-12">
+      <div className="relative mx-auto w-full space-y-12">
         <div className="grid gap-10 rounded-[2.75rem] border border-white/20 bg-white/85 p-8 shadow-[0_30px_70px_-45px_rgba(91,33,182,0.35)] backdrop-blur lg:grid-cols-[320px,1fr] lg:p-12">
           <div className="relative mx-auto aspect-[3/4] w-full max-w-xs overflow-hidden rounded-3xl border border-white/40 bg-violet-100 shadow-xl">
             <Image

@@ -17,10 +17,13 @@ export default function ProductDetails() {
   const { id } = useParams();
   const { data, isLoading, isError } = useGetSingleProductQuery(id);
 
-  if (isLoading) return <div className="text-center py-10">Loading...</div>;
+  if (isLoading)
+    return (
+      <div className="mx-auto w-full py-10 text-center">Loading...</div>
+    );
   if (isError)
     return (
-      <div className="text-center py-10 text-red-500">
+      <div className="mx-auto w-full py-10 text-center text-red-500">
         Error loading product
       </div>
     );
@@ -35,7 +38,7 @@ export default function ProductDetails() {
   );
 
   return (
-    <div className="max-w-7xl mx-auto px-6 py-10">
+    <div className="mx-auto w-full px-6 py-10">
       {/* Top Section */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-start">
         {/* Image Section */}

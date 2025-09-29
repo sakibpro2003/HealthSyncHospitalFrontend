@@ -13,7 +13,7 @@ const VideoSection: React.FC<VideoSectionProps> = ({
   videoUrl,
 }) => {
   return (
-    <section className="relative isolate mx-auto w-11/12 max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
+    <section className="relative isolate mx-auto w-full px-4 py-20 sm:px-6 lg:px-8">
       <div className="mx-auto flex w-full flex-col overflow-hidden rounded-[2.25rem] bg-gradient-to-br from-white via-violet-50/70 to-white/60 shadow-2xl ring-1 ring-slate-200/60">
         <div className="relative flex flex-col gap-10 px-6 py-10 md:flex-row md:items-center md:px-12 md:py-14">
           <div className="absolute -left-16 top-12 hidden h-36 w-36 rounded-full bg-violet-200/60 blur-3xl md:block" aria-hidden />

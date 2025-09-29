@@ -4,7 +4,7 @@ import discountImage from "../../../public/discount.png";
 
 const DiscountSection = () => {
   return (
-    <section className="mx-auto mt-10 w-11/12 max-w-7xl px-4 sm:px-6 lg:px-8">
+    <section className="mx-auto mt-10 w-full px-4 sm:px-6 lg:px-8">
       <div className="relative w-full md:h-96 rounded-2xl overflow-hidden shadow-lg">
         {/* Background Image */}
         <Image

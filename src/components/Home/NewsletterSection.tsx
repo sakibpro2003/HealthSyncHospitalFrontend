@@ -42,7 +42,7 @@ const NewsletterSection = () => {
   };
 
   return (
-    <section className="relative isolate mx-auto w-11/12 max-w-7xl px-4 py-24 sm:px-6 lg:px-8">
+    <section className="relative isolate mx-auto w-full px-4 py-24 sm:px-6 lg:px-8">
       <div className="absolute inset-0 -z-10 bg-gradient-to-br from-violet-200 via-violet-100 to-white" aria-hidden />
       <div className="mx-auto max-w-5xl overflow-hidden rounded-[2.5rem] border border-white/10 bg-gradient-to-br from-white/95 via-white/80 to-violet-50/80 px-6 py-10 shadow-[0_40px_80px_-40px_rgba(30,41,59,0.55)] backdrop-blur md:px-16 md:py-16">
         <div className="relative">

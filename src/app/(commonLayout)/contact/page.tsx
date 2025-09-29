@@ -35,7 +35,7 @@ const contactChannels = [
 
 export default function ContactPage() {
   return (
-    <main className="relative mx-auto w-11/12 max-w-7xl space-y-16 py-16">
+    <main className="relative mx-auto w-full space-y-16 py-16">
       <section className="relative overflow-hidden rounded-[2.5rem] bg-gradient-to-br from-white via-violet-50/70 to-white px-8 py-16 shadow-[0_40px_80px_-50px_rgba(79,70,229,0.35)] sm:px-12 md:px-16">
         <div className="absolute -left-24 top-0 h-48 w-48 rounded-full bg-violet-200/60 blur-3xl" aria-hidden />
         <div className="absolute -right-28 bottom-0 h-64 w-64 rounded-full bg-sky-200/50 blur-3xl" aria-hidden />

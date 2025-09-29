@@ -48,7 +48,7 @@ const DepartmentDoctorsPage = () => {
       <div className="absolute -top-16 left-0 h-48 w-48 rounded-full bg-violet-200/60 blur-3xl" aria-hidden />
       <div className="absolute -bottom-20 right-6 h-56 w-56 rounded-full bg-sky-200/50 blur-3xl" aria-hidden />
 
-      <div className="relative mx-auto w-11/12 max-w-7xl">
+      <div className="relative mx-auto w-full">
         <div className="mb-12 text-center">
           <p className="text-xs font-semibold uppercase tracking-[0.4em] text-violet-500">
             Specialists directory

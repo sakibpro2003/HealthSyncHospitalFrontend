@@ -237,7 +237,7 @@ export default function MedicinePage() {
   if (isLoading) {
     return (
       <section className="min-h-screen bg-gradient-to-br from-slate-100 via-white to-slate-200">
-        <div className="mx-auto flex min-h-screen max-w-5xl items-center justify-center px-6">
+        <div className="mx-auto flex min-h-screen w-11/12 max-w-5xl items-center justify-center px-6">
           <div className="flex flex-col items-center gap-4 text-center text-slate-500">
             <span className="h-12 w-12 animate-spin rounded-full border-4 border-violet-200 border-t-transparent" />
             <p className="text-lg font-medium">Loading medicines...</p>
@@ -250,7 +250,7 @@ export default function MedicinePage() {
   if (isError) {
     return (
       <section className="min-h-screen bg-gradient-to-br from-red-50 via-white to-rose-100">
-        <div className="mx-auto flex min-h-screen max-w-3xl items-center justify-center px-6">
+        <div className="mx-auto flex min-h-screen w-11/12 max-w-3xl items-center justify-center px-6">
           <div className="rounded-3xl border border-red-200 bg-white/80 p-8 text-center shadow-xl backdrop-blur">
             <h1 className="text-2xl font-semibold text-red-600">
               We couldn&apos;t load the medicine catalog
@@ -266,7 +266,7 @@ export default function MedicinePage() {
 
   return (
     <section className="min-h-screen bg-gradient-to-br from-slate-100 via-white to-slate-200">
-      <div className="mx-auto max-w-7xl px-6 py-14">
+      <div className="mx-auto w-full px-6 py-14">
         <header className="mx-auto max-w-3xl text-center lg:max-w-none lg:text-left">
           <p className="text-xs font-semibold uppercase tracking-[0.35em] text-violet-500">
             Medicine Catalog
@@ -526,7 +526,7 @@ export default function MedicinePage() {
                 </Button>
               </div>
             ) : (
-              <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
+              <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4">
                 {paginatedMedicines.map((medicine) => {
                   const salePrice = calculateSalePrice(medicine);
                   const manufacturer =
@@ -537,15 +537,15 @@ export default function MedicinePage() {
                   return (
                     <Card
                       key={medicine?._id}
-                      className="group flex h-full flex-col overflow-hidden rounded-3xl border border-slate-200/70 bg-white/90 shadow-md transition hover:-translate-y-1 hover:border-violet-200 hover:shadow-xl"
+                      className="group flex h-full flex-col overflow-hidden rounded-2xl border border-slate-200/70 bg-white/90 shadow-md transition hover:-translate-y-1 hover:border-violet-200 hover:shadow-xl"
                     >
-                      <div className="relative flex items-center justify-center bg-gradient-to-br from-slate-100 via-white to-slate-200 px-6 pt-8">
+                      <div className="relative flex items-center justify-center bg-gradient-to-br from-slate-100 via-white to-slate-200 px-4 pt-5">
                         {medicine?.discount ? (
                           <Badge className="absolute right-4 top-4 rounded-full bg-gradient-to-r from-rose-500 to-pink-500 px-3 py-1 text-[11px] font-semibold uppercase tracking-wide text-white shadow-lg">
                             -{medicine.discount}%
                           </Badge>
                         ) : null}
-                        <div className="relative h-40 w-40">
+                        <div className="relative h-28 w-28">
                           <Image
                             src={medicine?.image || "/placeholder.jpg"}
                             alt={medicine?.name ?? "Medicine"}
@@ -556,47 +556,47 @@ export default function MedicinePage() {
                         </div>
                       </div>
 
-                      <CardHeader className="space-y-2 px-6 pt-5">
+                      <CardHeader className="space-y-1.5 px-4 pt-3">
                         <CardTitle className="text-lg font-semibold text-slate-900 line-clamp-1">
                           {medicine?.name}
                         </CardTitle>
                         <p className="text-xs uppercase tracking-[0.3em] text-violet-500">
                           {medicine?.category ?? "General"}
                         </p>
-                        <p className="line-clamp-2 text-sm text-slate-500">
+                        <p className="line-clamp-2 text-xs text-slate-500 sm:text-sm">
                           {medicine?.description ?? "No description available."}
                         </p>
                       </CardHeader>
 
-                      <CardContent className="flex flex-1 flex-col gap-3 px-6 text-sm">
-                        <div className="flex items-center justify-between text-slate-600">
+                      <CardContent className="flex flex-1 flex-col gap-2 px-4 text-xs text-slate-600 sm:text-sm">
+                        <div className="flex items-center justify-between">
                           <span>Form</span>
-                          <span className="font-medium text-slate-800">
+                          <span className="font-medium text-slate-800 text-sm">
                             {medicine?.form ?? "—"}
                           </span>
                         </div>
-                        <div className="flex items-center justify-between text-slate-600">
+                        <div className="flex items-center justify-between">
                           <span>Pack size</span>
-                          <span className="font-medium text-slate-800">
+                          <span className="font-medium text-slate-800 text-sm">
                             {medicine?.packSize ?? "—"}
                           </span>
                         </div>
-                        <div className="flex items-center justify-between text-slate-600">
+                        <div className="flex items-center justify-between">
                           <span>Manufacturer</span>
-                          <span className="font-medium text-slate-800 line-clamp-1">
+                          <span className="font-medium text-slate-800 line-clamp-1 text-sm">
                             {manufacturer ?? "Unknown"}
                           </span>
                         </div>
-                        <div className="flex items-center justify-between text-slate-600">
+                        <div className="flex items-center justify-between">
                           <span>Rating</span>
-                          <span className="font-semibold text-amber-500">
-                            ⭐ {Number(medicine?.rating ?? 0).toFixed(1)} / 5
+                          <span className="font-semibold text-amber-500 text-sm">
+                            ⭐ {Number(medicine?.rating ?? 0).toFixed(1)}
                           </span>
                         </div>
-                        <div className="flex flex-col gap-1">
+                        <div className="flex flex-col gap-0.5">
                           <div className="flex items-center justify-between">
                             <span className="text-slate-600">Price</span>
-                            <span className="text-lg font-bold text-violet-600">
+                            <span className="text-base font-bold text-violet-600 sm:text-lg">
                               {formatPrice(salePrice)}
                             </span>
                           </div>
@@ -606,39 +606,39 @@ export default function MedicinePage() {
                             </span>
                           ) : null}
                         </div>
-                        <div className="flex items-center justify-between text-slate-600">
+                        <div className="flex items-center justify-between">
                           <span>Availability</span>
                           {medicine?.inStock ? (
-                            <Badge className="rounded-full bg-emerald-500/90 px-3 text-[11px] font-semibold">
+                            <Badge className="rounded-full bg-emerald-500/90 px-2.5 text-[10px] font-semibold">
                               {medicine?.quantity ?? 0} in stock
                             </Badge>
                           ) : (
-                            <Badge variant="outline" className="rounded-full border-red-300 bg-red-50 px-3 text-[11px] font-semibold text-red-500">
+                            <Badge variant="outline" className="rounded-full border-red-300 bg-red-50 px-2.5 text-[10px] font-semibold text-red-500">
                               Out of stock
                             </Badge>
                           )}
                         </div>
                         {medicine?.requiredPrescription ? (
-                          <div className="flex items-center justify-between text-slate-600">
+                          <div className="flex items-center justify-between">
                             <span>Prescription</span>
-                            <Badge variant="outline" className="rounded-full border-violet-300 bg-violet-50 px-3 text-[11px] font-semibold text-violet-600">
+                            <Badge variant="outline" className="rounded-full border-violet-300 bg-violet-50 px-2.5 text-[10px] font-semibold text-violet-600">
                               Required
                             </Badge>
                           </div>
                         ) : null}
                       </CardContent>
 
-                      <CardFooter className="flex flex-col gap-3 px-6 pb-6">
+                      <CardFooter className="flex flex-col gap-2 px-4 pb-4">
                         <Button
                           onClick={() => handleAddToCart(medicine)}
                           disabled={!medicine?.inStock}
-                          className="flex w-full items-center justify-center gap-2 rounded-full bg-violet-600 py-2 text-sm font-semibold text-white shadow-lg transition hover:bg-violet-700 disabled:cursor-not-allowed disabled:bg-slate-200"
+                          className="flex w-full items-center justify-center gap-2 rounded-full bg-violet-600 py-1.5 text-sm font-semibold text-white shadow-lg transition hover:bg-violet-700 disabled:cursor-not-allowed disabled:bg-slate-200"
                         >
                           {medicine?.inStock ? "Add to cart" : "Out of stock"}
                         </Button>
                         <Button
                           variant="outline"
-                          className="w-full rounded-full border-slate-200 py-2 text-sm font-semibold text-slate-700 hover:border-violet-300 hover:text-violet-600"
+                          className="w-full rounded-full border-slate-200 py-1.5 text-sm font-semibold text-slate-700 hover:border-violet-300 hover:text-violet-600"
                           asChild
                         >
                           <Link href={`/medicine/${medicine?._id}`}>

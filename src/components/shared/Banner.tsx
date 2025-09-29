@@ -106,7 +106,7 @@ const Banner = () => {
   const activeSlide = useMemo(() => slides[current], [current]);
 
   return (
-    <section className="relative isolate mx-auto mt-12 w-11/12 max-w-7xl px-4 sm:px-6 lg:px-8">
+    <section className="relative isolate mx-auto mt-12 w-full px-4 sm:px-6 lg:px-8">
       <div className="relative overflow-hidden rounded-[2.25rem] bg-gradient-to-br from-white/95 via-white/85 to-violet-50/80 shadow-2xl">
         <div className="relative flex flex-col gap-10 px-6 py-10 backdrop-blur md:flex-row md:items-center md:px-12 md:py-14">
           <div className="absolute -left-20 top-10 h-36 w-36 rounded-full bg-violet-200/70 blur-3xl" aria-hidden />

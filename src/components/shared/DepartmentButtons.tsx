@@ -22,7 +22,7 @@ const departments = [
 
 const DepartmentButtons = () => {
   return (
-    <section className="relative mx-auto mt-16 w-11/12 max-w-7xl overflow-hidden rounded-[2.5rem] border border-white/15 bg-gradient-to-br from-white/95 via-white/80 to-violet-50/80 px-6 py-14 shadow-[0_35px_80px_-40px_rgba(79,70,229,0.35)] backdrop-blur sm:px-10">
+    <section className="relative mx-auto mt-16 w-full overflow-hidden rounded-[2.5rem] border border-white/15 bg-gradient-to-br from-white/95 via-white/80 to-violet-50/80 px-6 py-14 shadow-[0_35px_80px_-40px_rgba(79,70,229,0.35)] backdrop-blur sm:px-10">
       <div className="absolute -left-24 top-0 h-40 w-40 rounded-full bg-violet-200/60 blur-3xl" aria-hidden />
       <div className="absolute -right-24 bottom-0 h-48 w-48 rounded-full bg-sky-200/50 blur-3xl" aria-hidden />
 

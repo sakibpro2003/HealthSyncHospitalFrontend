@@ -107,7 +107,7 @@ const Navbar = () => {
   if (!mounted) {
     return (
       <header className="border-b border-white/30 bg-gradient-to-br from-white/95 via-white/85 to-violet-50/80 backdrop-blur">
-        <div className="mx-auto flex h-16 w-11/12 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
+        <div className="mx-auto flex h-16 w-full items-center justify-between px-4 sm:px-6 lg:px-8">
           <Logo />
         </div>
       </header>
@@ -116,7 +116,7 @@ const Navbar = () => {
 
   return (
     <header className="sticky top-0 z-50 border-b border-white/30 bg-gradient-to-br from-white/95 via-white/85 to-violet-50/80 shadow-[0_10px_30px_-20px_rgba(79,70,229,0.45)] backdrop-blur">
-      <div className="mx-auto flex h-20 w-11/12 max-w-7xl items-center justify-between gap-4 px-4 sm:px-6 lg:px-8">
+      <div className="mx-auto flex h-20 w-full items-center justify-between gap-4 px-4 sm:px-6 lg:px-8">
         <div className="flex items-center gap-3">
           <button
             onClick={() => setIsOpen((prev) => !prev)}

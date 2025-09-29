@@ -115,7 +115,7 @@ export default function CartPage() {
   if (!cart.length) {
     return (
       <section className="min-h-screen bg-gradient-to-br from-slate-100 via-white to-slate-200">
-        <div className="mx-auto flex min-h-screen max-w-4xl flex-col items-center justify-center px-6 text-center">
+        <div className="mx-auto flex min-h-screen w-11/12 max-w-4xl flex-col items-center justify-center px-6 text-center">
           <div className="rounded-3xl border border-white/60 bg-white/70 p-12 shadow-xl backdrop-blur">
             <h1 className="mb-4 text-4xl font-black text-slate-800">🛒 Your Cart Is Empty</h1>
             <p className="mb-8 text-lg text-slate-600">
@@ -132,7 +132,7 @@ export default function CartPage() {
 
   return (
     <section className="min-h-screen bg-gradient-to-br from-slate-100 via-white to-slate-200">
-      <div className="mx-auto max-w-6xl px-6 py-14">
+      <div className="mx-auto w-11/12 max-w-6xl px-6 py-14">
         <header className="mb-10 text-center sm:text-left">
           <p className="text-sm font-semibold uppercase tracking-[0.3em] text-violet-500">Shopping Cart</p>
           <h1 className="mt-4 text-4xl font-black text-slate-900 sm:text-5xl">
