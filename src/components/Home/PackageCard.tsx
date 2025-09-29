@@ -13,6 +13,13 @@ const PackageCard = () => {
     role?: string;
   } | null>(null);
   const { data } = useGetAllhealthPackageQuery(undefined);
+  type HealthPackage = {
+  _id: string;
+  title: string;
+  price: number;
+  idealFor?: string;
+  includes?: string[];
+};
 
   const formatTaka = (value: number) =>
     new Intl.NumberFormat("en-US", {
@@ -84,7 +91,7 @@ const PackageCard = () => {
         // console.log(data?.user?.userId,"user data")
         setUser(data.user);
       } catch (error) {
-        console.error("Not logged in");
+        console.error("Not logged in",error);
       }
     };
     fetchUser();
@@ -93,7 +100,7 @@ const PackageCard = () => {
   const packages = useMemo(() => data?.data?.result ?? [], [data]);
 
   return (
-    <section className="relative mx-auto mt-16 w-full bg-gradient-to-b from-white via-violet-50/60 to-white py-16">
+    <section className="relative mx-auto mt-16 w-7xl bg-gradient-to-b from-white via-violet-50/60 to-white py-16">
       <div className="mx-auto flex w-full flex-col gap-6 px-4 text-center sm:px-6 lg:px-8">
         <div>
           <p className="text-sm font-semibold uppercase tracking-[0.35em] text-violet-500">
@@ -110,7 +117,7 @@ const PackageCard = () => {
         </div>
 
         <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-4">
-          {packages.map((single, index) => {
+          {packages.map((single:HealthPackage, index:number) => {
             const isFeatured = index === 1;
 
             return (

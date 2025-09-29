@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 
 "use client";
 
@@ -8,7 +9,6 @@ import { toast } from "sonner";
 import { loadStripe } from "@stripe/stripe-js";
 import {
   CalendarClock,
-  Clock,
   GraduationCap,
   Mail,
   MapPin,
@@ -91,12 +91,15 @@ export default function DoctorDetailsPage() {
   const patientId = user?.userId ?? user?._id;
 
   const education = useMemo(
-    () => (Array.isArray(doctor?.education) ? doctor?.education.join(", ") : doctor?.education),
-    [doctor?.education],
+    () =>
+      Array.isArray(doctor?.education)
+        ? doctor?.education.join(", ")
+        : doctor?.education,
+    [doctor?.education]
   );
   const availabilityDays = useMemo(
     () => doctor?.availability?.days?.join(", "),
-    [doctor?.availability?.days],
+    [doctor?.availability?.days]
   );
   const availabilityWindow =
     doctor?.availability?.from && doctor?.availability?.to
@@ -114,7 +117,9 @@ export default function DoctorDetailsPage() {
   if (isError || !doctor) {
     return (
       <div className="flex min-h-[60vh] items-center justify-center">
-        <p className="text-sm text-red-500">We couldn’t find the doctor you were looking for.</p>
+        <p className="text-sm text-red-500">
+          We couldn’t find the doctor you were looking for.
+        </p>
       </div>
     );
   }
@@ -138,7 +143,10 @@ export default function DoctorDetailsPage() {
       return;
     }
 
-    if (totalMinutes < BOOKING_START_MINUTE || totalMinutes > BOOKING_END_MINUTE) {
+    if (
+      totalMinutes < BOOKING_START_MINUTE ||
+      totalMinutes > BOOKING_END_MINUTE
+    ) {
       toast.error("Appointments are available between 08:00 and 22:00");
       return;
     }
@@ -177,17 +185,24 @@ export default function DoctorDetailsPage() {
       setFormState({ appointmentDate: "", appointmentTime: "", reason: "" });
       setSheetOpen(false);
     } catch (error: any) {
-      const message = error?.data?.message || "Failed to book appointment. Please try again.";
+      const message =
+        error?.data?.message || "Failed to book appointment. Please try again.";
       toast.error(message);
     }
   };
 
   return (
-    <section className="relative bg-gradient-to-br from-white via-violet-50/60 to-white pb-20 pt-12">
-      <div className="absolute -top-20 left-0 h-48 w-48 rounded-full bg-violet-200/60 blur-3xl" aria-hidden />
-      <div className="absolute -bottom-24 right-6 h-56 w-56 rounded-full bg-sky-200/55 blur-3xl" aria-hidden />
+    <section className="relative bg-gradient-to-br from-white via-violet-50/60 to-white py-12">
+      <div
+        className="absolute -top-20 left-0 w-48 rounded-full bg-violet-200/60 blur-3xl"
+        aria-hidden
+      />
+      <div
+        className="absolute -bottom-24 right-6 w-56 rounded-full bg-sky-200/55 blur-3xl"
+        aria-hidden
+      />
 
-      <div className="relative mx-auto w-full space-y-12">
+      <div className="relative mx-auto flex w-full justify-center gap-12">
         <div className="grid gap-10 rounded-[2.75rem] border border-white/20 bg-white/85 p-8 shadow-[0_30px_70px_-45px_rgba(91,33,182,0.35)] backdrop-blur lg:grid-cols-[320px,1fr] lg:p-12">
           <div className="relative mx-auto aspect-[3/4] w-full max-w-xs overflow-hidden rounded-3xl border border-white/40 bg-violet-100 shadow-xl">
             <Image
@@ -206,7 +221,9 @@ export default function DoctorDetailsPage() {
                 HealthSync specialist
               </span>
               <div>
-                <h1 className="text-3xl font-black text-slate-900 sm:text-4xl">{doctor.name}</h1>
+                <h1 className="text-3xl font-black text-slate-900 sm:text-4xl">
+                  {doctor.name}
+                </h1>
                 <div className="mt-3 flex flex-wrap items-center gap-3 text-sm text-slate-600">
                   <span className="inline-flex items-center gap-2 rounded-full bg-violet-100 px-3 py-1 text-violet-600">
                     <Stethoscope className="h-4 w-4" />
@@ -238,34 +255,45 @@ export default function DoctorDetailsPage() {
               </p>
               <p className="flex items-start gap-2">
                 <MapPin className="h-4 w-4 text-violet-500" />
-                <span>{doctor.availability?.location ?? "Location on request"}</span>
+                <span>
+                  {doctor.availability?.location ?? "Location on request"}
+                </span>
               </p>
             </div>
 
             <div className="space-y-6 text-sm text-slate-600">
               <div>
-                <h2 className="text-lg font-semibold text-slate-900">Education & training</h2>
+                <h2 className="text-lg font-semibold text-slate-900">
+                  Education & training
+                </h2>
                 {education ? (
                   <p className="mt-2 flex items-start gap-2">
                     <GraduationCap className="mt-0.5 h-4 w-4 text-violet-500" />
                     <span>{education}</span>
                   </p>
                 ) : (
-                  <p className="mt-2 text-slate-500">No academic details provided.</p>
+                  <p className="mt-2 text-slate-500">
+                    No academic details provided.
+                  </p>
                 )}
               </div>
 
               <div>
-                <h2 className="text-lg font-semibold text-slate-900">Biography</h2>
+                <h2 className="text-lg font-semibold text-slate-900">
+                  Biography
+                </h2>
                 <p className="mt-2 leading-relaxed">
-                  {doctor.bio || "This specialist has not added a biography just yet."}
+                  {doctor.bio ||
+                    "This specialist has not added a biography just yet."}
                 </p>
               </div>
             </div>
 
             <div className="flex flex-wrap items-center justify-between gap-4 rounded-3xl border border-violet-100 bg-violet-50/70 px-6 py-5">
               <div>
-                <p className="text-xs uppercase tracking-[0.35em] text-violet-500">Consultation fee</p>
+                <p className="text-xs uppercase tracking-[0.35em] text-violet-500">
+                  Consultation fee
+                </p>
                 <p className="text-2xl font-semibold text-violet-700">
                   ৳{doctor.consultationFee?.toLocaleString() ?? "—"}
                 </p>
@@ -282,11 +310,15 @@ export default function DoctorDetailsPage() {
                       Book a consultation
                     </SheetTitle>
                     <p className="text-sm text-slate-500">
-                      Select a date and time that suits you and follow the steps to confirm your visit with {doctor.name}.
+                      Select a date and time that suits you and follow the steps
+                      to confirm your visit with {doctor.name}.
                     </p>
                   </SheetHeader>
 
-                  <form className="mt-6 flex flex-col gap-4" onSubmit={handleSubmit}>
+                  <form
+                    className="mt-6 flex flex-col gap-4"
+                    onSubmit={handleSubmit}
+                  >
                     <div className="grid gap-2">
                       <Label>Consultation fee</Label>
                       <p className="rounded-xl bg-violet-100 px-3 py-2 text-violet-600">
@@ -347,7 +379,11 @@ export default function DoctorDetailsPage() {
                       />
                     </div>
 
-                    <Button type="submit" disabled={isBooking || !patientId} className="w-full rounded-full">
+                    <Button
+                      type="submit"
+                      disabled={isBooking || !patientId}
+                      className="w-full rounded-full"
+                    >
                       {isBooking ? "Preparing…" : "Proceed to payment"}
                     </Button>
                     {!patientId && (
@@ -371,9 +407,14 @@ export default function DoctorDetailsPage() {
               ? `Consultations at ${doctor.availability.location}`
               : "Hybrid teleconsultation available",
             doctor.experience || "Seasoned specialist trusted by patients",
-            availabilityWindow ? `Slots between ${availabilityWindow}` : "Flexible appointment windows",
+            availabilityWindow
+              ? `Slots between ${availabilityWindow}`
+              : "Flexible appointment windows",
           ].map((item) => (
-            <div key={item} className="flex items-start gap-3 rounded-2xl bg-violet-50/60 px-4 py-3 text-sm text-slate-600">
+            <div
+              key={item}
+              className="flex items-start gap-3 rounded-2xl bg-violet-50/60 px-4 py-3 text-sm text-slate-600"
+            >
               <Sparkles className="mt-0.5 h-4 w-4 text-violet-500" />
               <span>{item}</span>
             </div>

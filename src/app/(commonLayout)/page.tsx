@@ -7,7 +7,6 @@ import PackageCard from "@/components/Home/PackageCard";
 import VideoSection from "@/components/Home/VideoSection";
 import Banner from "@/components/shared/Banner";
 import DepartmentButtons from "@/components/shared/DepartmentButtons";
-import Footer from "@/components/shared/Footer";
 import BloodAvailability from "@/components/Home/BloodAvailability";
 import React from "react";
 
@@ -32,7 +31,6 @@ const page = () => {
         <MyGallery />
         <NoticeBoard />
       </div>
-      <Footer />
     </main>
   );
 };
