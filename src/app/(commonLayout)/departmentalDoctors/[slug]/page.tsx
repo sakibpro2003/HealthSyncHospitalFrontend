@@ -8,13 +8,33 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Clock, GraduationCap, MapPin, Stethoscope } from "lucide-react";
 
+
+interface IDoctorResponse {
+  meta: {
+    limit: number;
+    page: number;
+    total: number;
+    totalPage: number;
+  };
+  result: IDoctor[];
+}
 const DepartmentDoctorsPage = () => {
   const params = useParams();
   const rawSlug = params?.slug;
   const slug = Array.isArray(rawSlug) ? rawSlug[0] : rawSlug ?? "Department";
 
   const { data, isLoading, error } = useGetAllDoctorQuery(slug);
-  const doctors: IDoctor[] = data?.data?.result ?? [];
+  // const doctors: IDoctor[] = data?.data?.result ?? [];
+  // const doctors: IDoctor[] = Array.isArray(data?.data?.result)
+
+  // ? data.data.result
+  // : Array.isArray(data?.data?.result?.result)
+  //   ? data.data.result.result
+  //   : [];
+  // const doctors: IDoctor[] = data?.data?.result?.result ?? [];
+  const doctors: IDoctor[] = data?.data?.result?.result ?? [];
+
+  console.log(doctors,"doctore")
 
   if (isLoading) {
     return (
@@ -63,7 +83,7 @@ const DepartmentDoctorsPage = () => {
         </div>
 
         <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
-          {doctors.map((doctor: IDoctor) => {
+          {doctors?.map((doctor: IDoctor) => {
             const education = Array.isArray(doctor.education)
               ? doctor.education.join(", ")
               : doctor.education;
