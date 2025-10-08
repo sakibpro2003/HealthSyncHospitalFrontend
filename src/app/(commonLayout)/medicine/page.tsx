@@ -292,7 +292,7 @@ export default function MedicinePage() {
         </header>
 
         <div className="mt-12 grid gap-8 lg:grid-cols-[320px_minmax(0,1fr)]">
-          <aside className="space-y-8 rounded-3xl border border-slate-200/70 bg-white/80 p-6 shadow-xl backdrop-blur">
+          <aside className="space-y-8  rounded-3xl border border-slate-200/70 bg-white/80 p-6 shadow-xl backdrop-blur">
             <div className="space-y-3">
               <Label htmlFor="medicine-search" className="text-xs uppercase tracking-[0.3em] text-slate-500">
                 Search
