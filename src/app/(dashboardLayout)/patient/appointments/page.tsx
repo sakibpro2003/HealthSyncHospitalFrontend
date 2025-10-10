@@ -393,11 +393,7 @@ const AppointmentsPage = () => {
               <Button asChild className="rounded-full bg-sky-600 px-6 text-sm font-semibold text-white hover:bg-sky-700">
                 <Link href="/departmentalDoctors">Find a specialist</Link>
               </Button>
-              <Button
-                variant="outline"
-                onClick={() => refetch()}
-                className="rounded-full border-sky-200 text-sky-600 hover:border-sky-300"
-              >
+              <Button variant="outline" onClick={() => refetch()} className="rounded-full border-sky-200 text-sky-600 hover:border-sky-300">
                 Refresh
               </Button>
             </div>
@@ -552,6 +548,9 @@ const AppointmentsPage = () => {
                         </p>
                       )}
                     </div>
+                    <Button size="sm" variant="outline" onClick={() => downloadICS(appointment)}>
+                      <CalendarPlus className="mr-2 h-4 w-4" /> Add to calendar
+                    </Button>
                   </article>
                 );
               })}

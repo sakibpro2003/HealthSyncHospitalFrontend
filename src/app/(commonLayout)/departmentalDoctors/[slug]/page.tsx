@@ -2,7 +2,7 @@
 "use client";
 
 import { useParams } from "next/navigation";
-import { useGetAllDoctorQuery, type IDoctor } from "@/redux/features/doctor/doctorApi";
+import { normaliseDoctorResult, useGetAllDoctorQuery, type IDoctor } from "@/redux/features/doctor/doctorApi";
 import Image from "next/image";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -23,18 +23,11 @@ const DepartmentDoctorsPage = () => {
   const rawSlug = params?.slug;
   const slug = Array.isArray(rawSlug) ? rawSlug[0] : rawSlug ?? "Department";
 
-  const { data, isLoading, error } = useGetAllDoctorQuery(slug);
-  // const doctors: IDoctor[] = data?.data?.result ?? [];
-  // const doctors: IDoctor[] = Array.isArray(data?.data?.result)
-
-  // ? data.data.result
-  // : Array.isArray(data?.data?.result?.result)
-  //   ? data.data.result.result
-  //   : [];
-  // const doctors: IDoctor[] = data?.data?.result?.result ?? [];
-  const doctors: IDoctor[] = data?.data?.result?.result ?? [];
-
-  console.log(doctors,"doctore")
+  const { data, isLoading, error } = useGetAllDoctorQuery({
+    department: slug,
+    limit: 100,
+  });
+  const doctors: IDoctor[] = normaliseDoctorResult(data?.data?.result);
 
   if (isLoading) {
     return (

@@ -9,6 +9,7 @@ export const baseApi = createApi({
   tagTypes: [
     "subscription",
     "appointments",
+    "doctor",
     "patient",
     "payments",
     "bloodInventory",

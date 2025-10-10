@@ -27,6 +27,7 @@ import {
   X,
 } from "lucide-react";
 import { format, formatDistanceToNow } from "date-fns";
+import { useClientUser } from "@/hooks/useClientUser";
 
 type NoticeFormState = {
   title: string;
@@ -50,27 +51,11 @@ const NoticeBoard = () => {
   const [editingNotice, setEditingNotice] = useState<TNotice | null>(null);
   const [form, setForm] = useState<NoticeFormState>(defaultForm);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [user, setUser] = useState<{ role?: string; name?: string } | null>(null);
-
+  const { user } = useClientUser();
   const isAdmin = user?.role === "admin";
 
   useEffect(() => {
     setNotices(getNotices());
-  }, []);
-
-  useEffect(() => {
-    const fetchUser = async () => {
-      try {
-        const response = await fetch("/api/me");
-        if (!response.ok) return;
-        const payload = await response.json();
-        setUser(payload?.user ?? null);
-      } catch (error) {
-        console.error("Unable to fetch current user", error);
-      }
-    };
-
-    fetchUser();
   }, []);
 
   const sortedNotices = useMemo(() => {

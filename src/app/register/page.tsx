@@ -211,7 +211,7 @@ const RegisterForm = () => {
               </h1>
               <p className="text-base text-slate-600">
                 Register once to synchronise appointments, diagnostics,
-                prescriptions, and emergency contacts across the HealthSync
+                reports, and emergency contacts across the HealthSync
                 Hospital network.
               </p>
               <div className="grid gap-3 text-sm">

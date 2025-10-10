@@ -45,7 +45,7 @@ const MyGallery = () => {
         src: "https://img.freepik.com/free-photo/interior-pharmacy-store_23-2149512243.jpg",
         title: "Integrated Pharmacy",
         description:
-          "Digitally connected pharmacy ensures quick dispensing, medication counselling, and remote prescription fulfilment.",
+          "Digitally connected pharmacy ensures quick dispensing, medication counselling, and doorstep delivery coordination.",
         category: "Pharmacy",
       },
       {

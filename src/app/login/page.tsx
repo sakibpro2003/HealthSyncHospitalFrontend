@@ -59,6 +59,9 @@ const LoginForm = () => {
           case "user":
             router.push("/");
             break;
+          case "doctor":
+            router.push("/");
+            break;
           case "receptionist":
             router.push("/receptionist");
             break;

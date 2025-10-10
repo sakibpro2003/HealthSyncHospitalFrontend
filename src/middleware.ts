@@ -30,6 +30,12 @@ const roleBasedAccess: Record<string, RegExp[]> = {
     /^\//,
     /^\/additems/,/^\/success-payment/,/^\/failed-payment/
   ],
+  doctor: [
+    /^\//,
+    /^\/departmentalDoctors/,
+    /^\/success-payment/,
+    /^\/failed-payment/,
+  ],
 };
 
 // Secret for JWT verification
@@ -48,23 +54,23 @@ export async function middleware(request: NextRequest) {
 
       console.log("✅ Token is valid:", payload);
 
-      // Redirect logged-in users away from login/register
-      if (authRoutes.includes(pathname)) {
-        return NextResponse.redirect(new URL("/", request.url));
-      }
-
       // 🔐 Role-based route checking
       const allowedRoutes = roleBasedAccess[userRole] || [];
 
       const isAllowed = allowedRoutes.some((pattern) => pattern.test(pathname));
 
-      if (!isAllowed && pathname !== "/") {
+      if (!isAllowed && pathname !== "/" && pathname !== "/unauthorized") {
         console.warn(`🚫 ${userRole} cannot access ${pathname}`);
         return NextResponse.redirect(new URL("/unauthorized", request.url));
       }
     } catch (err) {
       console.error("❌ Invalid or expired token:", err);
-      return NextResponse.redirect(new URL("/login", request.url));
+      const response = NextResponse.redirect(new URL("/login", request.url));
+      response.cookies.set("token", "", {
+        path: "/",
+        maxAge: 0,
+      });
+      return response;
     }
   } else {
     // User is not authenticated

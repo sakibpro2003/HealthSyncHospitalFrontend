@@ -59,7 +59,7 @@ const slides = [
     highlight: "98% patient satisfaction score",
     ctaLabel: "Chat with us",
     secondaryLabel: "Patient resources",
-    features: ["Digital prescriptions", "Family updates", "Seamless billing"],
+    features: ["Personalised reminders", "Family updates", "Seamless billing"],
   },
   {
     id: 5,

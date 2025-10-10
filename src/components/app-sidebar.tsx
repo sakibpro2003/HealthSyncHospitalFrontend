@@ -14,6 +14,7 @@ import {
   Receipt,
   Droplet,
   BarChart3,
+  Stethoscope,
 } from "lucide-react";
 
 import { NavMain } from "@/components/nav-main";
@@ -47,7 +48,7 @@ export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
   const [user, setUser] = useState<{
     email?: string;
     name?: string;
-    role?: "receptionist" | "admin" | "user" | "patient";
+    role?: "receptionist" | "admin" | "user" | "patient" | "doctor";
   } | null>(null);
 
   const [navItems, setNavItems] = useState<NavItem[]>([]);
@@ -113,6 +114,17 @@ export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
                     url: "/admin/create-new-medicine",
                   },
                   { title: "Manage Medicines", url: "/admin/manage-medicine" },
+                ],
+              },
+              {
+                title: "Doctors",
+                url: "/admin/doctors",
+                icon: Stethoscope,
+                items: [
+                  {
+                    title: "Manage doctors",
+                    url: "/admin/doctors",
+                  },
                 ],
               },
               {

@@ -26,8 +26,8 @@ const DEFAULT_NOTICES: TNotice[] = [
   {
     id: "notice-portal-update",
     title: "Patient portal release 4.2",
-    summary: "New telehealth booking flow now live with instant payment confirmation and prescription tracking.",
-    body: "Patients can now view their medication history, reorder prescriptions, and receive SMS reminders within the portal. Reception teams have been briefed—reach out if you need refresher material for your department.",
+    summary: "New telehealth booking flow now live with instant payment confirmation and visit summaries.",
+    body: "Patients can now view their appointment history, download visit notes, and receive SMS reminders within the portal. Reception teams have been briefed—reach out if you need refresher material for your department.",
     priority: "low",
     audience: "patients",
     publishedAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 5).toISOString(),

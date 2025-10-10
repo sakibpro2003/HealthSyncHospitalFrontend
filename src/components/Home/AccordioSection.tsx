@@ -39,7 +39,7 @@ const AccordioSection = () => {
         id: "records",
         question: "How do I access my medical records and lab results?",
         answer:
-          "Log in to the HealthSync patient portal to download reports, view prescriptions, and share records securely with other providers whenever needed.",
+          "Log in to the HealthSync patient portal to download reports, review visit summaries, and share records securely with other providers whenever needed.",
       },
       {
         id: "support",
