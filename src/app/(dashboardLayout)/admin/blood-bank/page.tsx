@@ -70,6 +70,23 @@ const initialAdjustForm: AdjustFormState = {
   note: "",
 };
 
+const extractErrorMessage = (error: unknown, fallback: string) => {
+  if (
+    typeof error === "object" &&
+    error !== null &&
+    "data" in error &&
+    typeof (error as { data?: { message?: unknown } }).data?.message === "string"
+  ) {
+    return (error as { data: { message: string } }).data.message;
+  }
+
+  if (error instanceof Error && error.message) {
+    return error.message;
+  }
+
+  return fallback;
+};
+
 const formatDateTime = (value?: string) => {
   if (!value) return "--";
   try {
@@ -80,7 +97,7 @@ const formatDateTime = (value?: string) => {
       hour: "2-digit",
       minute: "2-digit",
     }).format(new Date(value));
-  } catch (error) {
+  } catch {
     return "--";
   }
 };
@@ -177,8 +194,8 @@ const AdminBloodBankPage = () => {
       setInventoryForm(initialInventoryForm);
       setSelectedInventoryId(null);
       await refetch();
-    } catch (error: any) {
-      toast.error(error?.data?.message ?? "Failed to save inventory");
+    } catch (error: unknown) {
+      toast.error(extractErrorMessage(error, "Failed to save inventory"));
     }
   };
 
@@ -216,8 +233,8 @@ const AdminBloodBankPage = () => {
       toast.success("Inventory adjusted");
       setAdjustForm(initialAdjustForm);
       await refetch();
-    } catch (error: any) {
-      toast.error(error?.data?.message ?? "Failed to adjust inventory");
+    } catch (error: unknown) {
+      toast.error(extractErrorMessage(error, "Failed to adjust inventory"));
     }
   };
 
@@ -226,8 +243,8 @@ const AdminBloodBankPage = () => {
       await deleteInventory(id).unwrap();
       toast.success("Inventory deleted");
       await refetch();
-    } catch (error: any) {
-      toast.error(error?.data?.message ?? "Failed to delete inventory");
+    } catch (error: unknown) {
+      toast.error(extractErrorMessage(error, "Failed to delete inventory"));
     }
   };
 

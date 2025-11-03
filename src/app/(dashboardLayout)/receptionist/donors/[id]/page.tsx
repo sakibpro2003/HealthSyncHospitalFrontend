@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import {
   useGetSingleDonorQuery,
   useUpdateDonorMutation,
+  type DonorRecord,
 } from "@/redux/features/donor/donorApi";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -16,24 +17,58 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 const BLOOD_GROUPS = ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"];
 const GENDERS = ["male", "female", "other"];
 
+type DonorFormState = {
+  name: string;
+  bloodGroup: string;
+  quantity: string;
+  age: string;
+  gender: string;
+  phone: string;
+  email: string;
+  address: string;
+  lastDonationDate: string;
+  available: boolean;
+};
+
+const initialFormState: DonorFormState = {
+  name: "",
+  bloodGroup: "",
+  quantity: "1",
+  age: "",
+  gender: "",
+  phone: "",
+  email: "",
+  address: "",
+  lastDonationDate: "",
+  available: true,
+};
+
+const extractErrorMessage = (error: unknown, fallback: string) => {
+  if (
+    typeof error === "object" &&
+    error !== null &&
+    "data" in error &&
+    typeof (error as { data?: { message?: unknown } }).data?.message === "string"
+  ) {
+    return (error as { data: { message: string } }).data.message;
+  }
+
+  if (error instanceof Error && error.message) {
+    return error.message;
+  }
+
+  return fallback;
+};
+
 const ReceptionistDonorDetailPage = () => {
   const params = useParams<{ id: string }>();
   const donorId = params.id;
-  const { data, isLoading } = useGetSingleDonorQuery(donorId, { skip: !donorId });
-  const donor = data?.data?.result ?? data?.data ?? null;
-
-  const [form, setForm] = useState({
-    name: "",
-    bloodGroup: "",
-    quantity: "1",
-    age: "",
-    gender: "",
-    phone: "",
-    email: "",
-    address: "",
-    lastDonationDate: "",
-    available: true,
+  const { data: donorData, isLoading } = useGetSingleDonorQuery(donorId ?? "", {
+    skip: !donorId,
   });
+  const donor: DonorRecord | null = donorData ?? null;
+
+  const [form, setForm] = useState<DonorFormState>(initialFormState);
 
   useEffect(() => {
     if (!donor) return;
@@ -55,7 +90,10 @@ const ReceptionistDonorDetailPage = () => {
 
   const [updateDonor, { isLoading: isUpdating }] = useUpdateDonorMutation();
 
-  const handleChange = (key: string, value: string | boolean) => {
+  const handleChange = <Key extends keyof DonorFormState>(
+    key: Key,
+    value: DonorFormState[Key],
+  ) => {
     setForm((prev) => ({ ...prev, [key]: value }));
   };
 
@@ -73,8 +111,8 @@ const ReceptionistDonorDetailPage = () => {
         },
       }).unwrap();
       toast.success("Donor updated successfully");
-    } catch (error: any) {
-      toast.error(error?.data?.message ?? "Failed to update donor");
+    } catch (error: unknown) {
+      toast.error(extractErrorMessage(error, "Failed to update donor"));
     }
   };
 

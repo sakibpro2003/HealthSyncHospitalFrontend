@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { addToCart } from "@/utils/cart";
 import { useClientUser } from "@/hooks/useClientUser";
 import { toast } from "sonner";
+import { resolveImageSrc } from "@/utils/resolveImageSrc";
 
 const formatTaka = (value: number) =>
   new Intl.NumberFormat("en-US", {
@@ -86,7 +87,7 @@ export default function ProductDetails() {
         {/* Image Section */}
         <div className="relative flex justify-center bg-gray-50 p-6 rounded-2xl shadow-md">
           <Image
-            src={medicine.image}
+            src={resolveImageSrc(medicine.image)}
             alt={medicine.name}
             width={400}
             height={400}

@@ -15,6 +15,7 @@ import {
   Droplet,
   BarChart3,
   Stethoscope,
+  FileText,
 } from "lucide-react";
 
 import { NavMain } from "@/components/nav-main";
@@ -27,6 +28,7 @@ import {
   SidebarHeader,
   SidebarRail,
 } from "@/components/ui/sidebar";
+import { useClientUser } from "@/hooks/useClientUser";
 
 type NavItem = {
   title: string;
@@ -45,164 +47,151 @@ const teams = [
 ];
 
 export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
-  const [user, setUser] = useState<{
-    email?: string;
-    name?: string;
-    role?: "receptionist" | "admin" | "user" | "patient" | "doctor";
-  } | null>(null);
-
+  const { user } = useClientUser();
   const [navItems, setNavItems] = useState<NavItem[]>([]);
 
   useEffect(() => {
-    const fetchUser = async () => {
-      try {
-        const res = await fetch("/api/me");
-        if (!res.ok) throw new Error("Unauthorized");
-        const data = await res.json();
-        setUser(data.user);
+    if (!user) {
+      setNavItems([]);
+      return;
+    }
 
-        // Load sidebar menu based on role
-        const role = data.user.role;
-        switch (role) {
-          case "receptionist":
-            setNavItems([
+    switch (user.role) {
+      case "receptionist":
+        setNavItems([
+          {
+            title: "Patient",
+            url: "#",
+            icon: SquareTerminal,
+            items: [
+              { title: "Register", url: "/receptionist/patient-register" },
+              { title: "Patients", url: "/receptionist/patients" },
+            ],
+          },
+        ]);
+        break;
+      case "admin":
+        setNavItems([
+          {
+            title: "Dashboard",
+            url: "/admin/dashboard",
+            icon: BarChart3,
+          },
+          {
+            title: "Medicines",
+            url: "#",
+            icon: Pill,
+            items: [
               {
-                title: "Patient",
-                url: "#",
-                icon: SquareTerminal,
-                items: [
-                  { title: "Register", url: "/receptionist/patient-register" },
-                  { title: "Patients", url: "/receptionist/patients" },
-                ],
+                title: "Add Medicine",
+                url: "/admin/create-new-medicine",
               },
-              // {
-              //   title: "Blood Donor",
-              //   url: "#",
-              //   icon: Bot,
-              //   items: [
-              //     {
-              //       title: "Register Donor",
-              //       url: "/receptionist/register-donor",
-              //     },
-              //     { title: "View Donor", url: "/receptionist/donors" },
-              //   ],
-              // },
-              // {
-              //   title: "Blood Bank",
-              //   url: "#",
-              //   icon: Bot,
-              //   items: [
-              //     { title: "View Blood Bank", url: "/receptionist/blood-bank" },
-              //   ],
-              // },
-            ]);
-            break;
-          case "admin":
-            setNavItems([
+              { title: "Manage Medicines", url: "/admin/manage-medicine" },
+            ],
+          },
+          {
+            title: "Doctors",
+            url: "/admin/doctors",
+            icon: Stethoscope,
+            items: [
               {
-                title: "Dashboard",
-                url: "/admin/dashboard",
-                icon: BarChart3,
-              },
-              {
-                title: "Medicines",
-                url: "#",
-                icon: Pill,
-                items: [
-                  {
-                    title: "Add Medicine",
-                    url: "/admin/create-new-medicine",
-                  },
-                  { title: "Manage Medicines", url: "/admin/manage-medicine" },
-                ],
-              },
-              {
-                title: "Doctors",
+                title: "Manage doctors",
                 url: "/admin/doctors",
-                icon: Stethoscope,
-                items: [
-                  {
-                    title: "Manage doctors",
-                    url: "/admin/doctors",
-                  },
-                ],
               },
+            ],
+          },
+          {
+            title: "Blood Bank",
+            url: "#",
+            icon: Droplet,
+            items: [
+              { title: "Inventory", url: "/admin/blood-bank" },
+              { title: "Requests", url: "/admin/blood-requests" },
+            ],
+          },
+          {
+            title: "Users",
+            url: "/admin/manage-user",
+            icon: Users,
+            items: [
               {
-                title: "Blood Bank",
-                url: "#",
-                icon: Droplet,
-                items: [
-                  { title: "Inventory", url: "/admin/blood-bank" },
-                  { title: "Requests", url: "/admin/blood-requests" },
-                ],
-              },
-              {
-                title: "Users",
+                title: "Manage Users",
                 url: "/admin/manage-user",
-                icon: Users,
-                items: [
-                  {
-                    title: "Manage Users",
-                    url: "/admin/manage-user",
-                  },
-                ],
               },
+            ],
+          },
+          {
+            title: "Settings",
+            url: "/admin/settings",
+            icon: Settings,
+          },
+        ]);
+        break;
+      case "doctor":
+        setNavItems([
+          {
+            title: "Appointments",
+            url: "/doctor/appointments",
+            icon: ClipboardList,
+            items: [
               {
-                title: "Settings",
-                url: "/admin/settings",
-                icon: Settings,
+                title: "Schedule overview",
+                url: "/doctor/appointments",
               },
-            ]);
-            break;
-          case "user":
-          case "patient":
-            setNavItems([
+            ],
+          },
+        ]);
+        break;
+      case "user":
+      case "patient":
+        setNavItems([
+          {
+            title: "My Health Packages",
+            url: "/patient",
+            icon: HeartPulse,
+            items: [
+              { title: "My Subscription", url: "/patient/my-subscription" },
+            ],
+          },
+          {
+            title: "Appointments",
+            url: "/patient/appointments",
+            icon: ClipboardList,
+            items: [{ title: "Appointment", url: "/patient/appointments" }],
+          },
+          {
+            title: "Billing & Receipts",
+            url: "/patient/billing",
+            icon: Receipt,
+            items: [
+              { title: "Billing & Receipts", url: "/patient/billing" },
+            ],
+          },
+          {
+            title: "Prescriptions",
+            url: "/patient/prescriptions",
+            icon: FileText,
+            items: [
+              { title: "Prescriptions", url: "/patient/prescriptions" },
+            ],
+          },
+          {
+            title: "Blood Requests",
+            url: "/patient/blood-requests",
+            icon: Droplet,
+            items: [
               {
-                title: "My Health Packages",
-                url: "/patient",
-                icon: HeartPulse,
-                items: [
-                  { title: "My Subscription", url: "/patient/my-subscription" },
-                ],
-              },
-
-              {
-                title: "Appointments",
-                url: "/patient/appointments",
-                icon: ClipboardList,
-                items: [{ title: "Appointment", url: "/patient/appointments" }],
-              },
-              {
-                title: "Billing & Receipts",
-                url: "/patient/billing",
-                icon: Receipt,
-                items: [
-                  { title: "Billing & Receipts", url: "/patient/billing" },
-                ],
-              },
-              {
-                title: "Blood Requests",
+                title: "Request Blood",
                 url: "/patient/blood-requests",
-                icon: Droplet,
-                items: [
-                  {
-                    title: "Request Blood",
-                    url: "/patient/blood-requests",
-                  },
-                ],
               },
-            ]);
-            break;
-          default:
-            setNavItems([]);
-        }
-      } catch (error) {
-        console.error("Not logged in", error);
-      }
-    };
-
-    fetchUser();
-  }, []);
+            ],
+          },
+        ]);
+        break;
+      default:
+        setNavItems([]);
+    }
+  }, [user]);
 
   return (
     <Sidebar collapsible="icon" {...props}>

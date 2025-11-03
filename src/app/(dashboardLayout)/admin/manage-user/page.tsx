@@ -28,6 +28,24 @@ import {
 } from "@/components/ui/select";
 import { Select } from "@/components/ui/select";
 import { toast } from "sonner";
+import type { UserSummary } from "@/redux/features/user/userApi";
+
+const extractErrorMessage = (error: unknown, fallback: string) => {
+  if (
+    typeof error === "object" &&
+    error !== null &&
+    "data" in error &&
+    typeof (error as { data?: { message?: unknown } }).data?.message === "string"
+  ) {
+    return (error as { data: { message: string } }).data.message;
+  }
+
+  if (error instanceof Error && error.message) {
+    return error.message;
+  }
+
+  return fallback;
+};
 
 const ManageUser = () => {
   const [page, setPage] = useState(1);
@@ -84,35 +102,38 @@ const ManageUser = () => {
   const handleBlock = async (userId: string) => {
     try {
       setBlockingUserId(userId);
-      const res = await blockUser(userId).unwrap();
-
-      refetch();
+      await blockUser(userId).unwrap();
+      toast.success("User blocked successfully");
+      await refetch();
     } catch (error) {
-      console.error("Failed to block user:", error);
+      toast.error(extractErrorMessage(error, "Failed to block user"));
     } finally {
       setBlockingUserId(null);
     }
   };
 
   const handleRoleChange = async (userId: string, role: string) => {
-    console.log(role, "new role");
     try {
-      const res = await updateUserRole({ userId, role }).unwrap();
-      toast.success(res?.message + ` to ${role}`);
-      refetch();
+      const response = await updateUserRole({ userId, role }).unwrap();
+      const message =
+        response.message ?? `User role updated to ${role.toLowerCase()}`;
+      toast.success(message);
+      await refetch();
     } catch (error) {
-      toast.error("Failed to change user role:");
+      toast.error(
+        extractErrorMessage(error, "Failed to change user role")
+      );
     }
   };
 
   const handleUnBlock = async (userId: string) => {
     try {
       setUnBlockingUserId(userId);
-      const res = await unblockUser(userId).unwrap();
-      console.log(res, "unblock");
-      refetch();
+      await unblockUser(userId).unwrap();
+      toast.success("User unblocked successfully");
+      await refetch();
     } catch (error) {
-      console.error("Failed to block user:", error);
+      toast.error(extractErrorMessage(error, "Failed to unblock user"));
     } finally {
       setUnBlockingUserId(null);
     }
@@ -177,7 +198,7 @@ const ManageUser = () => {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {users.map((user: any) => (
+          {users.map((user: UserSummary) => (
             <TableRow key={user._id}>
               <TableCell className="font-medium">{user.name}</TableCell>
               <TableCell>{user.email}</TableCell>

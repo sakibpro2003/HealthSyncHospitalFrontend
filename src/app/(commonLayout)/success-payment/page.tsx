@@ -1,13 +1,13 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { Suspense, useEffect, useState } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { clearCart } from "@/utils/cart";
 
 type PaymentState = "loading" | "success" | "error";
 
-const SuccessPaymentPage = () => {
+const SuccessPaymentContent = () => {
   const searchParams = useSearchParams();
   const sessionId = searchParams.get("session_id");
   const [state, setState] = useState<PaymentState>("loading");
@@ -109,5 +109,24 @@ const SuccessPaymentPage = () => {
     </div>
   );
 };
+
+const SuccessPaymentPage = () => (
+  <Suspense
+    fallback={
+      <div className="min-h-screen flex items-center justify-center bg-green-50 p-4">
+        <div className="bg-white rounded-2xl shadow-lg p-10 max-w-md text-center">
+          <h1 className="text-3xl font-bold mb-4 text-green-700">
+            Finalizing Payment...
+          </h1>
+          <p className="text-gray-600">
+            Please wait while we confirm your transaction.
+          </p>
+        </div>
+      </div>
+    }
+  >
+    <SuccessPaymentContent />
+  </Suspense>
+);
 
 export default SuccessPaymentPage;

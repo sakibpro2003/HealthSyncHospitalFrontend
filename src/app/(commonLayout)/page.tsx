@@ -1,14 +1,46 @@
-import AccordioSection from "@/components/Home/AccordioSection";
-import DiscountSection from "@/components/Home/DiscountSection";
-import MyGallery from "@/components/Home/GallerySection";
-import NewsletterSection from "@/components/Home/NewsletterSection";
-import NoticeBoard from "@/components/Home/NoticeBoard";
-import PackageCard from "@/components/Home/PackageCard";
-import VideoSection from "@/components/Home/VideoSection";
 import Banner from "@/components/shared/Banner";
 import DepartmentButtons from "@/components/shared/DepartmentButtons";
-import BloodAvailability from "@/components/Home/BloodAvailability";
+import dynamic from "next/dynamic";
 import React from "react";
+
+const SectionPlaceholder = ({ className = "h-64" }: { className?: string }) => (
+  <div
+    className={`mx-auto mt-16 w-full max-w-6xl animate-pulse rounded-3xl bg-slate-200/60 ${className}`}
+    aria-hidden
+  />
+);
+
+const PackageCard = dynamic(() => import("@/components/Home/PackageCard"), {
+  loading: () => <SectionPlaceholder className="h-[28rem]" />,
+});
+
+const DiscountSection = dynamic(() => import("@/components/Home/DiscountSection"), {
+  loading: () => <SectionPlaceholder className="h-48" />,
+});
+
+const VideoSection = dynamic(() => import("@/components/Home/VideoSection"), {
+  loading: () => <SectionPlaceholder className="h-[26rem]" />,
+});
+
+const BloodAvailability = dynamic(() => import("@/components/Home/BloodAvailability"), {
+  loading: () => <SectionPlaceholder className="h-72" />,
+});
+
+const NewsletterSection = dynamic(() => import("@/components/Home/NewsletterSection"), {
+  loading: () => <SectionPlaceholder className="h-64" />,
+});
+
+const AccordioSection = dynamic(() => import("@/components/Home/AccordioSection"), {
+  loading: () => <SectionPlaceholder className="h-60" />,
+});
+
+const MyGallery = dynamic(() => import("@/components/Home/GallerySection"), {
+  loading: () => <SectionPlaceholder className="h-[22rem]" />,
+});
+
+const NoticeBoard = dynamic(() => import("@/components/Home/NoticeBoard"), {
+  loading: () => <SectionPlaceholder className="h-60" />,
+});
 
 const page = () => {
   return (

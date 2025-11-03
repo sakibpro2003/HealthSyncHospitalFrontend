@@ -1,21 +1,11 @@
 "use client";
-import Image from "next/image";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight, Sparkles } from "lucide-react";
-
-import b1 from "../../assets/b1.png";
-import b2 from "../../assets/b2.png";
-import b3 from "../../assets/b3.png";
-import b4 from "../../assets/b4.png";
-import b5 from "../../assets/b5.png";
-import b6 from "../../assets/b6.png";
-import b7 from "../../assets/b7.png";
 
 const slides = [
   {
     id: 1,
-    image: b1,
     eyebrow: "Digital-first Healthcare",
     title: "Seamless hospital care for every patient journey",
     description:
@@ -24,10 +14,14 @@ const slides = [
     ctaLabel: "Book a consultation",
     secondaryLabel: "Explore departments",
     features: ["Smart scheduling", "AI-assisted triage", "Real-time dashboards"],
+    visual: {
+      label: "Operations control",
+      caption: "Smart coordination across clinics",
+      gradient: "from-violet-600/70 via-indigo-500/65 to-sky-500/70",
+    },
   },
   {
     id: 2,
-    image: b2,
     eyebrow: "Empowered Care Teams",
     title: "Give your staff the tools they deserve",
     description:
@@ -36,10 +30,14 @@ const slides = [
     ctaLabel: "See how it works",
     secondaryLabel: "Meet our doctors",
     features: ["Unified patient history", "Role-based access", "Secure messaging"],
+    visual: {
+      label: "Care collaboration",
+      caption: "Clinicians stay in sync",
+      gradient: "from-emerald-500/70 via-blue-500/65 to-violet-600/60",
+    },
   },
   {
     id: 3,
-    image: b3,
     eyebrow: "Future-ready Platform",
     title: "Scale securely without compromising care",
     description:
@@ -48,10 +46,14 @@ const slides = [
     ctaLabel: "Start a free trial",
     secondaryLabel: "View success stories",
     features: ["Cloud or on-premise", "24/7 monitoring", "Advanced analytics"],
+    visual: {
+      label: "Platform security",
+      caption: "Compliance baked into every workflow",
+      gradient: "from-sky-600/70 via-indigo-500/70 to-slate-900/70",
+    },
   },
   {
     id: 4,
-    image: b4,
     eyebrow: "Patient-first Experiences",
     title: "Delight patients with proactive communication",
     description:
@@ -60,10 +62,14 @@ const slides = [
     ctaLabel: "Chat with us",
     secondaryLabel: "Patient resources",
     features: ["Personalised reminders", "Family updates", "Seamless billing"],
+    visual: {
+      label: "Experience design",
+      caption: "Patient updates in real time",
+      gradient: "from-rose-500/70 via-orange-500/65 to-amber-400/70",
+    },
   },
   {
     id: 5,
-    image: b5,
     eyebrow: "Insights at your fingertips",
     title: "Turn hospital data into decisive action",
     description:
@@ -72,30 +78,43 @@ const slides = [
     ctaLabel: "View analytics",
     secondaryLabel: "Download brochure",
     features: ["Custom dashboards", "Predictive alerts", "KPI tracking"],
+    visual: {
+      label: "Intelligence hub",
+      caption: "Predictive analytics, ready to go",
+      gradient: "from-blue-600/70 via-cyan-500/60 to-teal-500/70",
+    },
   },
   {
     id: 6,
-    image: b6,
     eyebrow: "Trusted Partner",
     title: "Your digital transformation, guided end to end",
     description:
-      "From onboarding to optimisation, our specialists deliver white-glove support so you can focus on what matters most—patient care.",
+      "From onboarding to optimisation, our specialists deliver white-glove support so you can focus on the moments that matter most for patient care.",
     highlight: "Dedicated success manager for every client",
     ctaLabel: "Speak to an expert",
     secondaryLabel: "Implementation roadmap",
     features: ["Hands-on onboarding", "Training academy", "24/7 priority support"],
+    visual: {
+      label: "Expert partnership",
+      caption: "Dedicated success specialists",
+      gradient: "from-purple-500/70 via-violet-500/60 to-fuchsia-500/60",
+    },
   },
   {
     id: 7,
-    image: b7,
     eyebrow: "Trusted Partner",
     title: "Your digital transformation, guided end to end",
     description:
-      "From onboarding to optimisation, our specialists deliver white-glove support so you can focus on what matters most—patient care.",
+      "From onboarding to optimisation, our specialists deliver white-glove support so clinical teams stay focused on patient care.",
     highlight: "Dedicated success manager for every client",
     ctaLabel: "Speak to an expert",
     secondaryLabel: "Implementation roadmap",
     features: ["Hands-on onboarding", "Training academy", "24/7 priority support"],
+    visual: {
+      label: "Momentum",
+      caption: "Keep teams aligned at scale",
+      gradient: "from-indigo-600/70 via-violet-600/70 to-sky-600/70",
+    },
   },
 ];
 
@@ -106,15 +125,19 @@ const Banner = () => {
 
   const totalSlides = slides.length;
 
-  const nextSlide = () =>
-    setCurrent((prev) => (prev === totalSlides - 1 ? 0 : prev + 1));
-  const prevSlide = () =>
-    setCurrent((prev) => (prev === 0 ? totalSlides - 1 : prev - 1));
+  const nextSlide = useCallback(
+    () => setCurrent((prev) => (prev === totalSlides - 1 ? 0 : prev + 1)),
+    [totalSlides],
+  );
+  const prevSlide = useCallback(
+    () => setCurrent((prev) => (prev === 0 ? totalSlides - 1 : prev - 1)),
+    [totalSlides],
+  );
 
   useEffect(() => {
     const timer = window.setInterval(nextSlide, AUTO_ROTATE_MS);
     return () => window.clearInterval(timer);
-  }, [totalSlides]);
+  }, [nextSlide]);
 
   const activeSlide = useMemo(() => slides[current], [current]);
 
@@ -167,16 +190,22 @@ const Banner = () => {
           </div>
 
           <div className="relative z-10 flex-1">
-            <div className="relative mx-auto aspect-[4/3] w-full max-w-[18rem] sm:max-w-sm lg:max-w-md overflow-hidden rounded-3xl shadow-xl">
-              <Image
-                src={activeSlide.image}
-                alt={activeSlide.title}
-                fill
-                priority
-                sizes="(min-width: 1280px) 420px, (min-width: 768px) 320px, 70vw"
-                className="object-cover"
+            <div
+              className={`relative mx-auto aspect-[4/3] w-full max-w-[18rem] overflow-hidden rounded-3xl border border-white/20 shadow-xl sm:max-w-sm lg:max-w-md`}
+            >
+              <div
+                className={`absolute inset-0 bg-gradient-to-br ${activeSlide.visual.gradient}`}
               />
-              <div className="absolute inset-0 bg-gradient-to-tr from-slate-900/20 via-transparent to-white/10" />
+              <div className="absolute -left-16 top-12 h-36 w-36 rounded-full bg-white/25 blur-3xl" aria-hidden />
+              <div className="absolute -right-14 bottom-10 h-48 w-48 rounded-full bg-white/15 blur-2xl" aria-hidden />
+              <div className="relative flex h-full flex-col items-center justify-center gap-4 px-8 text-center text-white">
+                <span className="rounded-full border border-white/40 bg-white/10 px-4 py-2 text-xs font-semibold uppercase tracking-[0.35em] text-white/90">
+                  {activeSlide.visual.label}
+                </span>
+                <p className="max-w-xs text-sm font-medium text-white/80">
+                  {activeSlide.visual.caption}
+                </p>
+              </div>
             </div>
           </div>
 

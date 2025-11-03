@@ -7,17 +7,6 @@ import Image from "next/image";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Clock, GraduationCap, MapPin, Stethoscope } from "lucide-react";
-
-
-interface IDoctorResponse {
-  meta: {
-    limit: number;
-    page: number;
-    total: number;
-    totalPage: number;
-  };
-  result: IDoctor[];
-}
 const DepartmentDoctorsPage = () => {
   const params = useParams();
   const rawSlug = params?.slug;

@@ -44,6 +44,15 @@ export type BloodRequest = {
   updatedAt?: string;
 };
 
+type BloodRequestQuery = Partial<{
+  status: string;
+  bloodGroup: string;
+  priority: string;
+  requesterEmail: string;
+  requesterPhone: string;
+  neededOn: string;
+}>;
+
 const bloodBankApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
     getInventorySummary: builder.query<Record<string, number>, void>({
@@ -122,15 +131,19 @@ const bloodBankApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: ["bloodRequests"],
     }),
-    getBloodRequests: builder.query<BloodRequest[], Record<string, unknown> | void>({
+    getBloodRequests: builder.query<BloodRequest[], BloodRequestQuery | void>({
       query: (params) => {
         const queryParams =
           params && typeof params === "object"
-            ? (params as Record<string, unknown>)
+            ? (Object.fromEntries(
+                Object.entries(params).filter(
+                  ([, value]) => value !== undefined && value !== ""
+                )
+              ) as Record<string, string>)
             : undefined;
         return {
           url: "/blood-bank/requests",
-          params: queryParams as Record<string, any> | undefined,
+          params: queryParams,
         };
       },
       transformResponse: (response: { data?: { result?: BloodRequest[] } }) =>

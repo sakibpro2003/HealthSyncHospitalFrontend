@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 import { Button } from "@/components/ui/button";
 import {
@@ -19,23 +18,108 @@ import {
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import React, { use, useEffect } from "react";
-import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
+import { SubmitHandler, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import {
   useGetSinglePatientQuery,
   useUpdatePatientMutation,
+  type IPatient,
 } from "@/redux/features/patient/patientApi";
 import Loader from "@/components/shared/Loader";
 
 interface IParams {
   params: Promise<{ id: string }>;
 }
+type PatientFormValues = {
+  name: string;
+  phone: string;
+  email: string;
+  gender: string;
+  address: string;
+  dateOfBirth: string;
+  bloodGroup: string;
+  maritalStatus: string;
+  emergencyContactName: string;
+  emergencyContactPhone: string;
+  relationship: string;
+  occupation: string;
+  medicalHistory: string;
+  allergies: string;
+  currentMedications: string;
+};
+
+const defaultFormValues: PatientFormValues = {
+  name: "",
+  phone: "",
+  email: "",
+  gender: "",
+  address: "",
+  dateOfBirth: "",
+  bloodGroup: "",
+  maritalStatus: "",
+  emergencyContactName: "",
+  emergencyContactPhone: "",
+  relationship: "",
+  occupation: "",
+  medicalHistory: "",
+  allergies: "",
+  currentMedications: "",
+};
+
+const normaliseListField = (value?: string | string[]) =>
+  Array.isArray(value)
+    ? value.join(", ")
+    : typeof value === "string"
+    ? value
+    : "";
+
+const parseListField = (value: string) =>
+  value
+    .split(",")
+    .map((item) => item.trim())
+    .filter(Boolean);
+
+const GENDER_OPTIONS = ["male", "female", "other"] as const;
+const BLOOD_GROUP_OPTIONS = [
+  "A+",
+  "A-",
+  "B+",
+  "B-",
+  "AB+",
+  "AB-",
+  "O+",
+  "O-",
+] as const;
+const MARITAL_STATUS_OPTIONS = [
+  "single",
+  "married",
+  "divorced",
+  "widowed",
+] as const;
+
+const extractErrorMessage = (error: unknown, fallback: string) => {
+  if (
+    typeof error === "object" &&
+    error !== null &&
+    "data" in error &&
+    typeof (error as { data?: { message?: unknown } }).data?.message === "string"
+  ) {
+    return (error as { data: { message: string } }).data.message;
+  }
+
+  if (error instanceof Error && error.message) {
+    return error.message;
+  }
+
+  return fallback;
+};
+
 const PatientDetailsPage = ({ params }: IParams) => {
   const { id } = use(params);
-  const { data, isLoading, error } = useGetSinglePatientQuery(id);
+  const { data, isLoading } = useGetSinglePatientQuery(id);
   const patientData = data?.data?.result;
-  const form = useForm();
-  const [updatePatient, { isLoading: isUpdating, error: updateError }] =
+  const form = useForm<PatientFormValues>({ defaultValues: defaultFormValues });
+  const [updatePatient, { isLoading: isUpdating }] =
     useUpdatePatientMutation();
 
   useEffect(() => {
@@ -48,19 +132,15 @@ const PatientDetailsPage = ({ params }: IParams) => {
         emergencyContactPhone:
           patientData.emergencyContact?.emergencyContactPhone || "",
         relationship: patientData.emergencyContact?.relationship || "",
-        medicalHistory: Array.isArray(patientData.medicalHistory)
-          ? patientData.medicalHistory.join(", ")
-          : patientData.medicalHistory || "",
-        allergies: Array.isArray(patientData.allergies)
-          ? patientData.allergies.join(", ")
-          : patientData.allergies || "",
-        currentMedications: Array.isArray(patientData.currentMedications)
-          ? patientData.currentMedications.join(", ")
-          : patientData.currentMedications || "",
+        medicalHistory: normaliseListField(patientData.medicalHistory),
+        allergies: normaliseListField(patientData.allergies),
+        currentMedications: normaliseListField(
+          patientData.currentMedications
+        ),
       });
     }
   }, [patientData, form]);
-  const onSubmit: SubmitHandler<FieldValues> = async (userData) => {
+  const onSubmit: SubmitHandler<PatientFormValues> = async (userData) => {
     const {
       emergencyContactName,
       emergencyContactPhone,
@@ -68,30 +148,49 @@ const PatientDetailsPage = ({ params }: IParams) => {
       ...rest
     } = userData;
     const emergencyContact = {
-      emergencyContactName: emergencyContactName,
-      relationship: relationship,
-      emergencyContactPhone: emergencyContactPhone,
+      emergencyContactName,
+      relationship,
+      emergencyContactPhone,
     };
 
-    const updatePayload = {
-      ...rest,
+    const updatePayload: Partial<IPatient> = {
+      name: rest.name.trim(),
+      phone: rest.phone.trim(),
+      email: rest.email.trim(),
+      address: rest.address.trim() || undefined,
+      dateOfBirth: rest.dateOfBirth || undefined,
+      occupation: rest.occupation.trim() || undefined,
+      gender: GENDER_OPTIONS.includes(
+        rest.gender as (typeof GENDER_OPTIONS)[number]
+      )
+        ? (rest.gender as IPatient["gender"])
+        : undefined,
+      bloodGroup: BLOOD_GROUP_OPTIONS.includes(
+        rest.bloodGroup as (typeof BLOOD_GROUP_OPTIONS)[number]
+      )
+        ? (rest.bloodGroup as IPatient["bloodGroup"])
+        : undefined,
+      maritalStatus: MARITAL_STATUS_OPTIONS.includes(
+        rest.maritalStatus as (typeof MARITAL_STATUS_OPTIONS)[number]
+      )
+        ? (rest.maritalStatus as IPatient["maritalStatus"])
+        : undefined,
       emergencyContact,
+      medicalHistory: parseListField(rest.medicalHistory ?? ""),
+      allergies: parseListField(rest.allergies ?? ""),
+      currentMedications: parseListField(rest.currentMedications ?? ""),
     };
 
-    //! Caution!!
     try {
-      const result2 = await updatePatient({
+      await updatePatient({
         id,
         updatePayload,
-      });
-      console.log(result2);
-      if (result2?.data?.success) {
-        toast.success("Patient updated successfully");
-      } else if (updateError) {
-        console.log(updateError, "pat update page");
-      }
-    } catch (err) {
-      console.log(err);
+      }).unwrap();
+      toast.success("Patient updated successfully");
+    } catch (error) {
+      toast.error(
+        extractErrorMessage(error, "Failed to update patient information")
+      );
     }
   };
 
@@ -99,7 +198,12 @@ const PatientDetailsPage = ({ params }: IParams) => {
     return <Loader></Loader>;
   }
 
-  const fields = [
+  const fields: Array<{
+    name: keyof PatientFormValues;
+    label: string;
+    type?: "text" | "email" | "date" | "select" | "textarea";
+    options?: string[];
+  }> = [
     { name: "name", label: "Full Name" },
     { name: "phone", label: "Phone *" },
     { name: "email", label: "Email", type: "email" },
@@ -107,7 +211,7 @@ const PatientDetailsPage = ({ params }: IParams) => {
       name: "gender",
       label: "Gender",
       type: "select",
-      options: ["male", "female", "other"],
+      options: [...GENDER_OPTIONS],
     },
     { name: "address", label: "Address" },
     { name: "dateOfBirth", label: "Date of Birth", type: "date" },
@@ -115,13 +219,13 @@ const PatientDetailsPage = ({ params }: IParams) => {
       name: "bloodGroup",
       label: "Blood Group",
       type: "select",
-      options: ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"],
+      options: [...BLOOD_GROUP_OPTIONS],
     },
     {
       name: "maritalStatus",
       label: "Marital Status",
       type: "select",
-      options: ["single", "married", "divorced", "widowed"],
+      options: [...MARITAL_STATUS_OPTIONS],
     },
     { name: "emergencyContactName", label: "Emergency Contact Name" },
     { name: "emergencyContactPhone", label: "Emergency Contact Phone" },
@@ -169,17 +273,13 @@ const PatientDetailsPage = ({ params }: IParams) => {
                         ) : type === "select" ? (
                           <Select
                             onValueChange={(value) => field.onChange(value)}
-                            value={(field.value as string) ?? ""}
+                            value={field.value ?? ""}
                           >
                             <SelectTrigger className="w-full">
                               <SelectValue placeholder={`${label}`} />
                             </SelectTrigger>
                             <SelectContent>
-                              {(options || []).concat(
-                                field.value && options && !options.includes(field.value)
-                                  ? [field.value]
-                                  : []
-                              ).map((option) => (
+                              {(options ?? []).map((option) => (
                                 <SelectItem key={option} value={option}>
                                   {option}
                                 </SelectItem>

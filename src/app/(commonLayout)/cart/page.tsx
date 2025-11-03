@@ -116,7 +116,7 @@ export default function CartPage() {
 
   if (!cart.length) {
     return (
-      <section className="min-h-screen bg-gradient-to-br from-slate-100 via-white to-slate-200">
+      <section className="min-h-screen bg-linear-to-br from-slate-100 via-white to-slate-200">
         <div className="mx-auto flex min-h-screen w-11/12 max-w-4xl flex-col items-center justify-center px-6 text-center">
           <div className="rounded-3xl border border-white/60 bg-white/70 p-12 shadow-xl backdrop-blur">
             <h1 className="mb-4 text-4xl font-black text-slate-800">🛒 Your Cart Is Empty</h1>
@@ -133,7 +133,7 @@ export default function CartPage() {
   }
 
   return (
-    <section className="min-h-screen bg-gradient-to-br from-slate-100 via-white to-slate-200">
+    <section className="min-h-screen bg-linear-to-br from-slate-100 via-white to-slate-200">
       <div className="mx-auto w-11/12 max-w-6xl px-6 py-14">
         <header className="mb-10 text-center sm:text-left">
           <p className="text-sm font-semibold uppercase tracking-[0.3em] text-violet-500">Shopping Cart</p>
@@ -152,7 +152,7 @@ export default function CartPage() {
                 key={item._id}
                 className="group flex rounded-3xl border border-slate-200/70 bg-white p-4 shadow-sm transition hover:-translate-y-1 hover:border-violet-200 hover:shadow-xl"
               >
-                <div className="relative h-24 w-24 flex-shrink-0 overflow-hidden rounded-2xl bg-slate-100 sm:h-28 sm:w-28">
+                <div className="relative h-24 w-24 shrink-0 overflow-hidden rounded-2xl bg-slate-100 sm:h-28 sm:w-28">
                   <Image
                     src={item.image}
                     alt={item.name}
@@ -176,7 +176,7 @@ export default function CartPage() {
                         >
                           -
                         </Button>
-                        <span className="min-w-[2.5rem] text-center text-base font-semibold text-slate-900">
+                        <span className="min-w-10 text-center text-base font-semibold text-slate-900">
                           {item.quantity}
                         </span>
                         <Button
@@ -220,7 +220,7 @@ export default function CartPage() {
           </div>
 
           <aside className="flex flex-col justify-between gap-6">
-            <div className="rounded-3xl bg-gradient-to-br from-violet-600 via-violet-500 to-purple-500 p-8 text-white shadow-2xl">
+            <div className="rounded-3xl bg-linear-to-br from-violet-600 via-violet-500 to-purple-500 p-8 text-white shadow-2xl">
               <h3 className="text-2xl font-semibold">Order Summary</h3>
               <p className="mt-2 text-sm text-violet-100">
                 Secure payments powered by Stripe. Review your booking before continuing.

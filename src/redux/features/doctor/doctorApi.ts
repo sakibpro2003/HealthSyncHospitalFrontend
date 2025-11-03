@@ -18,6 +18,7 @@ export interface IDoctor {
   experience?: string;
   consultationFee?: number;
   bio?: string;
+  password?: string; // only sent when updating credentials
   createdAt?: string;
   updatedAt?: string;
 }

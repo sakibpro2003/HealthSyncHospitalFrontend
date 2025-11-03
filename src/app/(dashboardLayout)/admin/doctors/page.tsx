@@ -80,6 +80,7 @@ type DoctorFormState = {
   education: string;
   experience: string;
   bio: string;
+  password: string;
 };
 
 const buildFormState = (doctor: IDoctor): DoctorFormState => ({
@@ -104,6 +105,7 @@ const buildFormState = (doctor: IDoctor): DoctorFormState => ({
     : "",
   experience: doctor.experience ?? "",
   bio: doctor.bio ?? "",
+  password: "",
 });
 
 const AdminDoctorsPage = () => {
@@ -219,6 +221,7 @@ const AdminDoctorsPage = () => {
       availabilityLocation,
       education,
       consultationFee,
+      password,
       ...rest
     } = formState;
 
@@ -243,7 +246,7 @@ const AdminDoctorsPage = () => {
       parsedFee = numeric;
     }
 
-    const payload: Partial<IDoctor> = {
+    const payload: Partial<IDoctor> & { password?: string } = {
       name: rest.name.trim(),
       email: rest.email.trim(),
       phone: rest.phone.trim(),
@@ -263,6 +266,11 @@ const AdminDoctorsPage = () => {
       },
       education: educationList,
     };
+
+    const trimmedPassword = password.trim();
+    if (trimmedPassword.length > 0) {
+      payload.password = trimmedPassword;
+    }
 
     if (!payload.availability?.from || !payload.availability?.to) {
       toast.error("Availability window requires both start and end times.");
@@ -725,6 +733,21 @@ const AdminDoctorsPage = () => {
                     placeholder="Short professional summary visible to patients."
                     rows={4}
                   />
+                </div>
+                <div className="grid gap-2">
+                  <Label htmlFor="doctor-password">Set login password</Label>
+                  <Input
+                    id="doctor-password"
+                    type="password"
+                    value={formState.password}
+                    onChange={(event) =>
+                      handleFieldChange("password", event.target.value)
+                    }
+                    placeholder="Leave blank to keep the current password"
+                  />
+                  <p className="text-xs text-slate-500">
+                    Doctors use this password with their email to sign in.
+                  </p>
                 </div>
               </div>
             </div>

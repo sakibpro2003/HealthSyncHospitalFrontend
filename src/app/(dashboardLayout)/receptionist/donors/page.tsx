@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useViewDonorQuery } from "@/redux/features/donor/donorApi";
+import { useViewDonorQuery, type DonorRecord } from "@/redux/features/donor/donorApi";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Table,
@@ -14,8 +14,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 
 const ReceptionistDonorListPage = () => {
-  const { data, isLoading, isError } = useViewDonorQuery(undefined);
-  const donors = data?.data?.result ?? data?.data ?? [];
+  const { data: donors = [], isLoading, isError } = useViewDonorQuery();
 
   return (
     <div className="space-y-8 p-6">
@@ -58,7 +57,7 @@ const ReceptionistDonorListPage = () => {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {donors.map((donor: any) => (
+                  {donors.map((donor: DonorRecord) => (
                     <TableRow key={donor._id}>
                       <TableCell className="font-semibold text-slate-800">
                         {donor.name}

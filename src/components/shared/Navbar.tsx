@@ -10,6 +10,15 @@ import { useAppDispatch } from "@/redux/hooks";
 import { logOut } from "@/redux/features/auth/authSlice";
 import { useLogoutUserMutation } from "@/redux/features/auth/authApi";
 import { useClientUser } from "@/hooks/useClientUser";
+import { clearClientTokenCookie } from "@/utils/clientTokenCookie";
+
+const clearTokenCookie = () => {
+  clearClientTokenCookie();
+
+  if (typeof document !== "undefined") {
+    document.cookie = "token=; Path=/; Max-Age=0";
+  }
+};
 
 const Navbar = () => {
   const [mounted, setMounted] = useState(false);
@@ -30,10 +39,18 @@ const Navbar = () => {
       await logoutUser({});
     } finally {
       dispatch(logOut());
+      clearTokenCookie();
       router.push("/login");
       setIsOpen(false);
     }
   };
+
+  const userDisplayLabel = useMemo(() => {
+    if (!user) {
+      return null;
+    }
+    return user.email ?? user.name ?? null;
+  }, [user]);
 
   const navLinks = useMemo(() => {
     const base = [
@@ -102,7 +119,6 @@ const Navbar = () => {
           </button>
           <Link href="/" className="flex items-center gap-3">
             <Logo />
-           
           </Link>
         </div>
 
@@ -113,7 +129,15 @@ const Navbar = () => {
         <div className="flex items-center gap-3">
           {user ? (
             <>
-              
+              {userDisplayLabel ? (
+                <span className="hidden items-center gap-2 rounded-full border border-violet-200 bg-white/80 px-4 py-2 text-sm font-semibold text-violet-600 shadow-sm md:inline-flex">
+                  <span
+                    className="inline-block h-2 w-2 rounded-full bg-emerald-500"
+                    aria-hidden
+                  />
+                  {userDisplayLabel}
+                </span>
+              ) : null}
 
               <Button
                 variant="outline"
@@ -138,7 +162,25 @@ const Navbar = () => {
       {isOpen && (
         <div className="border-t border-white/30 bg-white/95 shadow-lg backdrop-blur md:hidden">
           <div className="flex flex-col gap-2 px-4 py-4">
+            {userDisplayLabel ? (
+              <div className="flex items-center justify-between rounded-2xl border border-violet-100 bg-violet-50/70 px-4 py-2 text-sm font-semibold text-violet-600">
+                <span>{userDisplayLabel}</span>
+                <span
+                  className="inline-block h-2 w-2 rounded-full bg-emerald-500"
+                  aria-hidden
+                />
+              </div>
+            ) : null}
             {navLinks.map(renderLink)}
+            {user ? (
+              <Button
+                variant="outline"
+                className="mt-2 flex items-center justify-center gap-2 rounded-full border-violet-200 text-sm font-semibold text-violet-600 hover:border-violet-300 hover:bg-white"
+                onClick={handleLogout}
+              >
+                <LogOut className="h-4 w-4" /> Logout
+              </Button>
+            ) : null}
           </div>
         </div>
       )}

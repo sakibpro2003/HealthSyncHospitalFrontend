@@ -18,7 +18,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       email: payload.email,
       role: payload.role,
     });
-  } catch (err) {
+  } catch (error) {
+    console.error("Invalid token", error);
     res.status(401).json({ error: 'Invalid token' });
   }
 }

@@ -72,6 +72,7 @@ const VideoSection: React.FC<VideoSectionProps> = ({
                 title="Introduction video"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                 allowFullScreen
+                loading="lazy"
               ></iframe>
               <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-slate-900/10 via-transparent to-white/5" />
             </div>

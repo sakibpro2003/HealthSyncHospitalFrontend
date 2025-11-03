@@ -17,8 +17,6 @@ const publicRoutes = new Set([
   "/api/me",
 ]);
 const publicRoutePatterns: RegExp[] = [/^\/doctor-details\//];
-const authRoutes = ["/login", "/register"];
-
 // Role-based access map
 const roleBasedAccess: Record<string, RegExp[]> = {
   receptionist: [/^\/receptionist/, /^\//, /^\/additems/, /^\/success-payment/,/^\/failed-payment/],
@@ -31,6 +29,7 @@ const roleBasedAccess: Record<string, RegExp[]> = {
     /^\/additems/,/^\/success-payment/,/^\/failed-payment/
   ],
   doctor: [
+    /^\/doctor/,
     /^\//,
     /^\/departmentalDoctors/,
     /^\/success-payment/,

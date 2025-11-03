@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { toast } from "sonner";
-import { useRegisterDonorMutation } from "@/redux/features/donor/donorApi";
+import { useRegisterDonorMutation, type DonorPayload } from "@/redux/features/donor/donorApi";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -12,47 +12,74 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 const BLOOD_GROUPS = ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"];
 const GENDERS = ["male", "female", "other"];
 
+type DonorFormState = {
+  name: string;
+  bloodGroup: string;
+  quantity: string;
+  age: string;
+  gender: string;
+  phone: string;
+  email: string;
+  address: string;
+  lastDonationDate: string;
+};
+
+const initialFormState: DonorFormState = {
+  name: "",
+  bloodGroup: "",
+  quantity: "1",
+  age: "",
+  gender: "",
+  phone: "",
+  email: "",
+  address: "",
+  lastDonationDate: "",
+};
+
+const extractErrorMessage = (error: unknown, fallback: string) => {
+  if (
+    typeof error === "object" &&
+    error !== null &&
+    "data" in error &&
+    typeof (error as { data?: { message?: unknown } }).data?.message === "string"
+  ) {
+    return (error as { data: { message: string } }).data.message;
+  }
+
+  if (error instanceof Error && error.message) {
+    return error.message;
+  }
+
+  return fallback;
+};
+
 const RegisterDonorPage = () => {
   const [registerDonor, { isLoading }] = useRegisterDonorMutation();
-  const [form, setForm] = useState({
-    name: "",
-    bloodGroup: "",
-    quantity: "1",
-    age: "",
-    gender: "",
-    phone: "",
-    email: "",
-    address: "",
-    lastDonationDate: "",
-  });
+  const [form, setForm] = useState<DonorFormState>(initialFormState);
 
-  const handleChange = (key: string, value: string) => {
+  const handleChange = <Key extends keyof DonorFormState>(
+    key: Key,
+    value: DonorFormState[Key],
+  ) => {
     setForm((prev) => ({ ...prev, [key]: value }));
   };
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     try {
-      await registerDonor({
+      const payload: DonorPayload = {
         ...form,
         quantity: Number(form.quantity),
         age: form.age ? Number(form.age) : undefined,
         lastDonationDate: form.lastDonationDate || undefined,
-      }).unwrap();
+      };
+      await registerDonor(payload).unwrap();
       toast.success("Donor registered successfully");
-      setForm({
-        name: "",
-        bloodGroup: "",
-        quantity: "1",
-        age: "",
-        gender: "",
-        phone: "",
-        email: "",
-        address: "",
-        lastDonationDate: "",
-      });
-    } catch (error: any) {
-      toast.error(error?.data?.message ?? "Unable to register donor");
+      setForm(initialFormState);
+    } catch (error) {
+      toast.error(
+        extractErrorMessage(error, "Unable to register donor at the moment")
+      );
     }
   };
 

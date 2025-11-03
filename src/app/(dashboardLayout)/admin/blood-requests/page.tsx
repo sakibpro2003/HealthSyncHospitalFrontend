@@ -58,9 +58,26 @@ const formatDate = (value?: string) => {
   if (!value) return "--";
   try {
     return format(new Date(value), "dd MMM yyyy, HH:mm");
-  } catch (error) {
+  } catch {
     return "--";
   }
+};
+
+const extractErrorMessage = (error: unknown, fallback: string) => {
+  if (
+    typeof error === "object" &&
+    error !== null &&
+    "data" in error &&
+    typeof (error as { data?: { message?: unknown } }).data?.message === "string"
+  ) {
+    return (error as { data: { message: string } }).data.message;
+  }
+
+  if (error instanceof Error && error.message) {
+    return error.message;
+  }
+
+  return fallback;
 };
 
 const AdminBloodRequestsPage = () => {
@@ -105,8 +122,8 @@ const AdminBloodRequestsPage = () => {
       await updateStatus({ id, data: { status } }).unwrap();
       toast.success(`Request ${status}`);
       await refetch();
-    } catch (error: any) {
-      toast.error(error?.data?.message ?? "Failed to update request");
+    } catch (error: unknown) {
+      toast.error(extractErrorMessage(error, "Failed to update request"));
     }
   };
 

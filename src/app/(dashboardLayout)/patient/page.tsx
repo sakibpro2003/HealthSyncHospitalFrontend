@@ -18,14 +18,7 @@ import {
 } from "@/components/ui/sheet";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-
-interface AuthedUser {
-  userId?: string;
-  _id?: string;
-  name?: string;
-  email?: string;
-  role?: string;
-}
+import { useClientUser } from "@/hooks/useClientUser";
 
 const toDisplayList = (items?: string[]) => {
   if (!items || !items.length) {
@@ -41,29 +34,31 @@ const parseInputList = (value: string) =>
     .map((item) => item.trim())
     .filter(Boolean);
 
+const extractErrorMessage = (error: unknown, fallback: string) => {
+  if (
+    typeof error === "object" &&
+    error !== null &&
+    "data" in error &&
+    typeof (error as { data?: { message?: unknown } }).data?.message === "string"
+  ) {
+    return (error as { data: { message: string } }).data.message;
+  }
+
+  if (error instanceof Error && error.message) {
+    return error.message;
+  }
+
+  return fallback;
+};
+
 const PatientDashboardPage = () => {
-  const [user, setUser] = useState<AuthedUser | null>(null);
+  const { user } = useClientUser();
   const [sheetOpen, setSheetOpen] = useState(false);
   const [formState, setFormState] = useState({
     medicalHistory: "",
     allergies: "",
     currentMedications: "",
   });
-
-  useEffect(() => {
-    const fetchUser = async () => {
-      try {
-        const res = await fetch("/api/me");
-        if (!res.ok) throw new Error("Unauthorized");
-        const data = await res.json();
-        setUser(data.user);
-      } catch (error) {
-        console.error("Not logged in");
-      }
-    };
-
-    fetchUser();
-  }, []);
 
   const patientId = useMemo(
     () => user?.userId ?? user?._id ?? "",
@@ -119,9 +114,12 @@ const PatientDashboardPage = () => {
       toast.success("Medical history updated");
       setSheetOpen(false);
       refetch();
-    } catch (error: any) {
+    } catch (error: unknown) {
       toast.error(
-        error?.data?.message || "Unable to update medical history right now"
+        extractErrorMessage(
+          error,
+          "Unable to update medical history right now"
+        )
       );
     }
   };

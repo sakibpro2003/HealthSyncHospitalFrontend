@@ -8,7 +8,6 @@ import {
   Home,
   // Link,
   LogOut,
-  Sparkles,
 } from "lucide-react"
 
 import {

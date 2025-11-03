@@ -138,7 +138,6 @@ const NoticeBoard = () => {
   };
 
   const handleDelete = (id: string) => {
-    // eslint-disable-next-line no-alert
     if (!window.confirm("Remove this notice?")) {
       return;
     }

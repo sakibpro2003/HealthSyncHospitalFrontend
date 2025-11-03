@@ -20,10 +20,18 @@ import {
 import { Input } from "@/components/ui/input";
 import { useLoginMutation } from "@/redux/features/auth/authApi";
 import { Loader2, ShieldCheck, Sparkles, Stethoscope } from "lucide-react";
+import { useAppDispatch } from "@/redux/hooks";
+import { setUser } from "@/redux/features/auth/authSlice";
+import { setClientTokenCookie } from "@/utils/clientTokenCookie";
+
+const persistTokenCookie = (token: string) => {
+  setClientTokenCookie(token);
+};
 
 const LoginForm = () => {
   const router = useRouter();
   const [login] = useLoginMutation();
+  const dispatch = useAppDispatch();
   const form = useForm();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -55,12 +63,14 @@ const LoginForm = () => {
           return;
         }
         const decoded: any = jwtDecode(token);
+        persistTokenCookie(token);
+        dispatch(setUser({ user: decoded, token }));
         switch (decoded?.role) {
           case "user":
             router.push("/");
             break;
           case "doctor":
-            router.push("/");
+            router.push("/doctor/appointments");
             break;
           case "receptionist":
             router.push("/receptionist");

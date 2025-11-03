@@ -34,6 +34,7 @@ import { useGetAllMedicineQuery } from "@/redux/features/product/productApi";
 import { addToCart } from "@/utils/cart";
 import { toast } from "sonner";
 import { useClientUser } from "@/hooks/useClientUser";
+import { resolveImageSrc } from "@/utils/resolveImageSrc";
 
 const ITEMS_PER_PAGE = 8;
 
@@ -559,7 +560,7 @@ export default function MedicinePage() {
                         ) : null}
                         <div className="relative h-28 w-28">
                           <Image
-                            src={medicine?.image || "/placeholder.jpg"}
+                            src={resolveImageSrc(medicine?.image)}
                             alt={medicine?.name ?? "Medicine"}
                             fill
                             sizes="(min-width: 1280px) 10rem, (min-width: 640px) 8rem, 7rem"

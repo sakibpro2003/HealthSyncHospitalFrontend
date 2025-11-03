@@ -18,10 +18,10 @@ import {
 // import { register } from "module";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import React from "react";
+import React, { Suspense } from "react";
 import { useForm } from "react-hook-form";
 
-const Patients = () => {
+const PatientsContent = () => {
   const searchParams = useSearchParams();
   const pageParam = Number(searchParams.get("page"));
   const currentPage = Number.isNaN(pageParam) || pageParam < 1 ? 1 : pageParam;
@@ -104,5 +104,11 @@ const Patients = () => {
     </div>
   );
 };
+
+const Patients = () => (
+  <Suspense fallback={<Loader />}>
+    <PatientsContent />
+  </Suspense>
+);
 
 export default Patients;

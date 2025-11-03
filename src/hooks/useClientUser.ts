@@ -1,48 +1,59 @@
 import { useEffect, useState } from "react";
+import { jwtDecode } from "jwt-decode";
+import { useAppDispatch, useAppSelector } from "@/redux/hooks";
+import {
+  currentUser as selectCurrentUser,
+  useCurrentToken as selectCurrentToken,
+} from "@/redux/features/auth/authSlice";
+import { setUser as setAuthUser } from "@/redux/features/auth/authSlice";
+import { readClientTokenCookie } from "@/utils/clientTokenCookie";
 
-type ClientUser = {
+type ClientUserPayload = {
   userId?: string;
   _id?: string;
   email?: string;
   name?: string;
   role?: string;
-} | null;
+};
+
+type ClientUser = ClientUserPayload | null;
 
 export const useClientUser = () => {
-  const [user, setUser] = useState<ClientUser>(null);
+  const storeUser = useAppSelector(selectCurrentUser) as ClientUser;
+  const storeToken = useAppSelector(selectCurrentToken);
+  const dispatch = useAppDispatch();
+  const [user, setClientUser] = useState<ClientUser>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    let isMounted = true;
+    if (storeUser) {
+      setClientUser(storeUser);
+      setIsLoading(false);
+      return;
+    }
 
-    const fetchUser = async () => {
-      try {
-        const response = await fetch("/api/me");
-        if (!response.ok) {
-          throw new Error("Unauthenticated");
-        }
-        const payload = await response.json();
-        if (isMounted) {
-          setUser(payload?.user ?? null);
-        }
-      } catch {
-        if (isMounted) {
-          setUser(null);
-        }
-      } finally {
-        if (isMounted) {
-          setIsLoading(false);
-        }
+    const token = storeToken ?? readClientTokenCookie();
+
+    if (!token) {
+      setClientUser(null);
+      setIsLoading(false);
+      return;
+    }
+
+    try {
+      const decoded = jwtDecode<ClientUserPayload>(token);
+      setClientUser(decoded ?? null);
+
+      if (decoded && (!storeToken || storeToken !== token)) {
+        dispatch(setAuthUser({ user: decoded, token }));
       }
-    };
-
-    fetchUser();
-
-    return () => {
-      isMounted = false;
-    };
-  }, []);
+    } catch (error) {
+      console.error("Failed to decode auth token", error);
+      setClientUser(null);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [dispatch, storeUser, storeToken]);
 
   return { user, isLoading };
 };
-
