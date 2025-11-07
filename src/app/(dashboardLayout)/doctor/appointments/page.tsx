@@ -73,10 +73,89 @@ const parseDateTime = (date?: string, time?: string) => {
     return null;
   }
 
-  const normalizedTime = time?.length === 5 ? `${time}:00` : time ?? "00:00:00";
-  const candidate = new Date(`${date}T${normalizedTime}`);
+  const baseDate = new Date(date);
+  if (Number.isNaN(baseDate.getTime())) {
+    return null;
+  }
 
-  return Number.isNaN(candidate.getTime()) ? null : candidate;
+  if (!time) {
+    return baseDate;
+  }
+
+  const parts = time.trim().split(":");
+  const [hoursStr = "00", minutesStr = "00", secondsStr = "00"] = parts;
+  const hours = Number(hoursStr);
+  const minutes = Number(minutesStr);
+  const seconds = Number(secondsStr ?? "00");
+
+  if (
+    Number.isNaN(hours) ||
+    Number.isNaN(minutes) ||
+    Number.isNaN(seconds)
+  ) {
+    return baseDate;
+  }
+
+  const combined = new Date(baseDate);
+  combined.setHours(hours, minutes, seconds, 0);
+  return combined;
+};
+
+const isNonEmptyString = (value: unknown): value is string => {
+  return typeof value === "string" && value.trim().length > 0;
+};
+
+const extractErrorMessage = (error: unknown, fallback: string) => {
+  if (
+    typeof error === "object" &&
+    error !== null &&
+    "data" in error
+  ) {
+    const payload = (error as {
+      data?: {
+        message?: unknown;
+        errorSources?: Array<{ message?: unknown }>;
+      };
+      error?: unknown;
+    }).data;
+
+    if (payload) {
+      if (isNonEmptyString(payload.message)) {
+        return payload.message;
+      }
+
+      const sourceEntry = payload.errorSources?.find(
+        (item): item is { message: string } =>
+          isNonEmptyString(item?.message)
+      );
+
+      if (sourceEntry?.message) {
+        return sourceEntry.message;
+      }
+
+    }
+  }
+
+  if (
+    typeof error === "object" &&
+    error !== null &&
+    "error" in error &&
+    typeof (error as { error?: unknown }).error === "string"
+  ) {
+    return (error as { error: string }).error;
+  }
+
+  if (error instanceof Error && isNonEmptyString(error.message)) {
+    return error.message;
+  }
+
+  return fallback;
+};
+
+const logError = (error: unknown) => {
+  if (process.env.NODE_ENV !== "production") {
+    console.warn("[DoctorDashboard]", error);
+  }
 };
 
 const formatDate = (date?: string, time?: string) => {
@@ -161,8 +240,13 @@ const DoctorAppointmentsPage = () => {
         }
         await refetch();
       } catch (error) {
-        console.error(error);
-        toast.error("Failed to mark appointment as completed.");
+        logError(error);
+        toast.error(
+          extractErrorMessage(
+            error,
+            "Failed to mark appointment as completed."
+          )
+        );
       } finally {
         setCompletingAppointmentId(null);
       }
@@ -198,8 +282,13 @@ const DoctorAppointmentsPage = () => {
       handleClosePrescription();
       await refetch();
     } catch (error) {
-      console.error(error);
-      toast.error("Failed to save prescription. Please try again.");
+      logError(error);
+      toast.error(
+        extractErrorMessage(
+          error,
+          "Failed to save prescription. Please try again."
+        )
+      );
     }
   }, [
     createPrescription,

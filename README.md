@@ -9,7 +9,7 @@ A modern Next.js 15 application that delivers the HealthSync Hospital user exper
 - **State:** Redux Toolkit Query (RTK Query)
 - **Payments:** Stripe Checkout
 - **Icons:** lucide-react
-test
+
 ## Prerequisites
 
 - **Node.js** ≥ 18.18 (Next.js 15 requirement)

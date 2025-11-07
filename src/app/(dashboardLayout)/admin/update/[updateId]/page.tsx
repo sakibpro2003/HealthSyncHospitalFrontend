@@ -204,14 +204,24 @@ const MedicineUpdatePage = () => {
   const handleInputChange = (
     event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
-    const { name, value, type } = event.target;
+    const target = event.target;
 
-    if (type === "checkbox" && event.target instanceof HTMLInputElement) {
-      setFormState((previous) => ({ ...previous, [name]: event.target.checked }));
+    if (target instanceof HTMLInputElement) {
+      if (target.type === "checkbox") {
+        setFormState((previous) => ({
+          ...previous,
+          [target.name]: target.checked,
+        }));
+        return;
+      }
+
+      setFormState((previous) => ({ ...previous, [target.name]: target.value }));
       return;
     }
 
-    setFormState((previous) => ({ ...previous, [name]: value }));
+    if (target instanceof HTMLTextAreaElement) {
+      setFormState((previous) => ({ ...previous, [target.name]: target.value }));
+    }
   };
 
   const handleCategoryChange = (value: string) => {
