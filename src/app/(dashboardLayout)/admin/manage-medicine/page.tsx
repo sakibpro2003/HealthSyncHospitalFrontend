@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
@@ -84,6 +85,8 @@ const formatDate = (value: string | null | undefined): string => {
 };
 
 const ManageMedicinePage = () => {
+  const router = useRouter();
+
   const { data: medicinesData, isLoading, isError, refetch } =
     useGetAllMedicineQuery();
   const [removeMedicine, { isLoading: isRemoving }] =
@@ -467,12 +470,22 @@ const ManageMedicinePage = () => {
                         <TableCell>{formatDate(lastUpdated)}</TableCell>
                         <TableCell className="text-right">
                           <div className="flex justify-end gap-2">
-                            <Button asChild variant="outline" size="sm">
-                              <Link href={`/admin/update/${medicine._id}`}>Edit</Link>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              disabled={!medicine._id || isRemoving}
+                              onClick={() => {
+                                if (medicine._id) {
+                                  router.push(`/admin/update/${medicine._id}`);
+                                }
+                              }}
+                            >
+                              Edit
                             </Button>
                             <Button
                               variant="destructive"
                               size="sm"
+                              disabled={!medicine._id || isRemoving}
                               onClick={() => setSelectedMedId(medicine._id ?? null)}
                             >
                               Delete

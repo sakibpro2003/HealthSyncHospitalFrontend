@@ -46,6 +46,10 @@ const nextConfig = {
         protocol: "https",
         hostname: "squarehospital.com",
       },
+      {
+        protocol: "https",
+        hostname: "shombhob.com",
+      },
     ],
   },
 };

@@ -55,12 +55,44 @@ const productApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
     getAllMedicine: builder.query<{ data: TProduct[] } | undefined, void>({
       query: () => `/products`,
+      providesTags: (result) => {
+        if (!result?.data) {
+          return [{ type: "products" as const, id: "LIST" }];
+        }
+
+        const productTags = result.data
+          .map((product) =>
+            product._id
+              ? ({ type: "products" as const, id: product._id } as const)
+              : null
+          )
+          .filter(
+            (
+              tag
+            ): tag is {
+              type: "products";
+              id: string;
+            } => tag !== null
+          );
+
+        return [...productTags, { type: "products" as const, id: "LIST" }];
+      },
     }),
     getSingleProduct: builder.query<{ data: TProduct }, string | void>({
       query: (_id) => `/products/${_id}`,
+      providesTags: (result, _error, id) => {
+        const resolvedId =
+          result?.data?._id ?? (typeof id === "string" ? id : undefined);
+        return resolvedId
+          ? [{ type: "products" as const, id: resolvedId }]
+          : [];
+      },
     }),
 
-    updateProduct: builder.mutation({
+    updateProduct: builder.mutation<
+      unknown,
+      { id: string; updatePayload: Partial<TProduct> }
+    >({
       query: ({
         id,
         updatePayload,
@@ -72,6 +104,10 @@ const productApi = baseApi.injectEndpoints({
         method: "PUT",
         body: updatePayload,
       }),
+      invalidatesTags: (_result, _error, { id }) => [
+        { type: "products" as const, id },
+        { type: "products" as const, id: "LIST" },
+      ],
     }),
 
     createProduct: builder.mutation({
@@ -80,13 +116,17 @@ const productApi = baseApi.injectEndpoints({
         method: "POST",
         body: productInfo,
       }),
+      invalidatesTags: [{ type: "products" as const, id: "LIST" }],
     }),
-    removeMedicine: builder.mutation({
-      query: (_id) => ({
-        url: "/products",
+    removeMedicine: builder.mutation<unknown, string>({
+      query: (id) => ({
+        url: `/products/${id}`,
         method: "DELETE",
-        body: _id,
       }),
+      invalidatesTags: (_result, _error, id) => [
+        { type: "products" as const, id },
+        { type: "products" as const, id: "LIST" },
+      ],
     }),
   }),
 });
