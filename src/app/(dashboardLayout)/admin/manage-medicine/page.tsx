@@ -38,6 +38,7 @@ import {
   useRemoveMedicineMutation,
 } from "@/redux/features/product/productApi";
 import type { TProduct } from "@/types/product";
+import Loader from "@/components/shared/Loader";
 
 const ITEMS_PER_PAGE = 8;
 const LOW_STOCK_THRESHOLD = 20;
@@ -190,6 +191,24 @@ const ManageMedicinePage = () => {
     () => medicines.find((med) => med._id === selectedMedId) ?? null,
     [medicines, selectedMedId]
   );
+
+  if (isLoading) {
+    return (
+      <div className="p-6">
+        <Loader fullScreen={false} label="Loading medicines" />
+      </div>
+    );
+  }
+
+  if (isError) {
+    return (
+      <div className="p-6">
+        <p className="text-center text-red-500">
+          Unable to load medicines right now. Please try again later.
+        </p>
+      </div>
+    );
+  }
 
   const handleDelete = async () => {
     if (!selectedMedId) return;

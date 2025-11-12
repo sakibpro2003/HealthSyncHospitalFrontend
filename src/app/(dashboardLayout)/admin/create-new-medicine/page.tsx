@@ -1,296 +1,486 @@
 "use client";
 
-import React, { useState } from "react";
-import { useCreateProductMutation } from "@/redux/features/product/productApi";
-
+import React, { useMemo, useState } from "react";
+import {
+  Activity,
+  Beaker,
+  Factory,
+  Package,
+  ShieldCheck,
+  Sparkles,
+} from "lucide-react";
 import { toast } from "sonner";
 
+import { useCreateProductMutation } from "@/redux/features/product/productApi";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+
+type ProductFormState = {
+  name: string;
+  image: string;
+  description: string;
+  price: number | string;
+  quantity: number | string;
+  inStock: boolean;
+  requiredPrescription: boolean;
+  expiryDate: string;
+  rating: number | string;
+  discount: number | string;
+  packSize: string;
+  dosage: string;
+  category: string;
+  manufacturer: {
+    name: string;
+    address: string;
+    contact: string;
+  };
+};
+
+const initialProductState: ProductFormState = {
+  name: "",
+  image: "",
+  description: "",
+  price: "",
+  quantity: "",
+  inStock: true,
+  requiredPrescription: false,
+  expiryDate: "",
+  rating: "",
+  discount: "",
+  packSize: "",
+  dosage: "",
+  category: "Painkiller",
+  manufacturer: {
+    name: "",
+    address: "",
+    contact: "",
+  },
+};
+
+type ToggleField = "inStock" | "requiredPrescription";
+
 const ProductForm = () => {
+  const [product, setProduct] = useState<ProductFormState>(initialProductState);
   const [createProduct, { isLoading }] = useCreateProductMutation();
 
-  const [product, setProduct] = useState({
-    name: "",
-    image: "",
-    description: "",
-    price: 0,
-    quantity: 0,
-    inStock: true,
-    requiredPrescription: false,
-    expiryDate: "",
-    rating: 0,
-    discount: 0,
-    packSize: "",
-    dosage: "",
-    category: "Painkiller", // default
-    manufacturer: {
-      name: "",
-      address: "",
-      contact: "",
-    },
-  });
-
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+    event:
+      | React.ChangeEvent<HTMLInputElement>
+      | React.ChangeEvent<HTMLTextAreaElement>
+      | React.ChangeEvent<HTMLSelectElement>
   ) => {
-    const target = e.target;
-    const { name, value } = target;
-    const isCheckbox =
-      target instanceof HTMLInputElement && target.type === "checkbox";
+    const { name, value, type, checked } = event.target;
+    const isCheckbox = type === "checkbox";
 
-    if (name.includes("manufacturer.")) {
-      const field = name.split(".")[1];
+    if (name.startsWith("manufacturer.")) {
+      const [, field] = name.split(".");
       setProduct((prev) => ({
         ...prev,
-        manufacturer: { ...prev.manufacturer, [field]: value },
+        manufacturer: {
+          ...prev.manufacturer,
+          [field]: value,
+        },
       }));
-    } else {
-      setProduct((prev) => ({
-        ...prev,
-        [name]: isCheckbox ? target.checked : value,
-      }));
+      return;
     }
+
+    setProduct((prev) => ({
+      ...prev,
+      [name]: isCheckbox ? checked : value,
+    }));
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleToggle = (field: ToggleField) => {
+    setProduct((prev) => ({
+      ...prev,
+      [field]: !prev[field],
+    }));
+  };
+
+  const handleSubmit = async (event: React.FormEvent) => {
+    event.preventDefault();
 
     try {
       const payload = {
         ...product,
-        price: Number(product.price),
-        quantity: Number(product.quantity),
-        rating: Number(product.rating),
-        discount: Number(product.discount),
-        expiryDate: new Date(product.expiryDate),
+        price: Number(product.price) || 0,
+        quantity: Number(product.quantity) || 0,
+        rating: Number(product.rating) || 0,
+        discount: Number(product.discount) || 0,
+        expiryDate: product.expiryDate ? new Date(product.expiryDate) : undefined,
       };
 
       await createProduct(payload).unwrap();
       toast.success("Medicine added successfully");
-      // router.push("/manage-medicines");
-    } catch (err) {
+      setProduct(initialProductState);
+    } catch (error) {
       toast.error("Failed to create medicine");
-      console.error(err);
+      console.error(error);
     }
   };
 
+  const highlightCards = useMemo(
+    () => [
+      {
+        label: "List price",
+        value:
+          Number(product.price) > 0
+            ? `BDT ${Number(product.price).toFixed(2)}`
+            : "Awaiting price",
+        helper: "Retail before discount",
+        icon: Package,
+        accent: "bg-amber-50 text-amber-600 border-amber-100",
+      },
+      {
+        label: "Inventory batch",
+        value:
+          Number(product.quantity) > 0 ? `${product.quantity} units` : "Set quantity",
+        helper: "Visible to pharmacy ops",
+        icon: Activity,
+        accent: "bg-emerald-50 text-emerald-600 border-emerald-100",
+      },
+      {
+        label: "Regulatory tag",
+        value: product.requiredPrescription ? "Rx required" : "OTC ready",
+        helper: product.requiredPrescription
+          ? "Patients must upload prescriptions"
+          : "Available without prescription",
+        icon: ShieldCheck,
+        accent: "bg-sky-50 text-sky-600 border-sky-100",
+      },
+    ],
+    [product.price, product.quantity, product.requiredPrescription]
+  );
+
+  const complianceToggles: {
+    label: string;
+    description: string;
+    field: ToggleField;
+  }[] = [
+    {
+      label: "In stock and orderable",
+      description: "Display medicine in all patient storefronts.",
+      field: "inStock",
+    },
+    {
+      label: "Requires prescription upload",
+      description: "Only fulfil orders with verified doctor notes.",
+      field: "requiredPrescription",
+    },
+  ];
+
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100 overflow-auto">
-      <div className="max-w-4xl w-full p-6 bg-white shadow-lg rounded-lg border border-gray-300">
-        <h2 className="text-2xl font-bold mb-6 text-center">Create New Medicine</h2>
-
-        <form onSubmit={handleSubmit} className="grid grid-cols-2 gap-4">
-          {/* Left Column */}
-          <div className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium">Medicine Name</label>
-              <input
-                type="text"
-                name="name"
-                value={product.name}
-                onChange={handleChange}
-                className="w-full p-2 border border-gray-300 rounded"
-                required
-              />
+    <div className="min-h-screen bg-gradient-to-b from-slate-50 via-white to-slate-100 py-10 px-4">
+      <div className="mx-auto flex max-w-6xl flex-col gap-8">
+        <header className="rounded-3xl border border-white/60 bg-white/90 p-8 shadow-[0_30px_80px_rgba(15,23,42,0.08)] backdrop-blur">
+          <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
+            <div className="space-y-3">
+              <span className="inline-flex items-center gap-2 rounded-full bg-violet-50 px-4 py-1 text-xs font-semibold uppercase tracking-[0.35em] text-violet-600">
+                <Sparkles className="h-4 w-4" /> Pharmacy control room
+              </span>
+              <h1 className="text-3xl font-black text-slate-900 sm:text-4xl">
+                Launch a new medicine batch
+              </h1>
+              <p className="max-w-2xl text-base text-slate-600">
+                Capture commercial, safety, and manufacturing data in a single submission.
+                The preview cards update as you type, so your team stays in sync.
+              </p>
             </div>
-
-            <div>
-              <label className="block text-sm font-medium">Image URL</label>
-              <input
-                type="text"
-                name="image"
-                value={product.image}
-                onChange={handleChange}
-                className="w-full p-2 border border-gray-300 rounded"
-                required
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium">Description</label>
-              <textarea
-                name="description"
-                value={product.description}
-                onChange={handleChange}
-                className="w-full p-2 border border-gray-300 rounded"
-                required
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium">Price</label>
-              <input
-                type="number"
-                name="price"
-                value={product.price}
-                onChange={handleChange}
-                className="w-full p-2 border border-gray-300 rounded"
-                required
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium">Quantity</label>
-              <input
-                type="number"
-                name="quantity"
-                value={product.quantity}
-                onChange={handleChange}
-                className="w-full p-2 border border-gray-300 rounded"
-                required
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium">Discount (%)</label>
-              <input
-                type="number"
-                name="discount"
-                value={product.discount}
-                onChange={handleChange}
-                className="w-full p-2 border border-gray-300 rounded"
-              />
+            <div className="grid gap-3 sm:grid-cols-2 lg:w-80">
+              {highlightCards.map(({ label, value, helper, icon: Icon, accent }) => (
+                <article
+                  key={label}
+                  className="rounded-2xl border border-slate-100 bg-slate-50/70 p-4 text-sm"
+                >
+                  <div className="flex items-center gap-3">
+                    <span className={`rounded-2xl border px-3 py-2 text-xs ${accent}`}>
+                      <Icon className="h-4 w-4" />
+                    </span>
+                    <div>
+                      <p className="text-xs uppercase tracking-wide text-slate-400">
+                        {label}
+                      </p>
+                      <p className="text-base font-semibold text-slate-900">{value}</p>
+                    </div>
+                  </div>
+                  <p className="mt-3 text-xs text-slate-500">{helper}</p>
+                </article>
+              ))}
             </div>
           </div>
+        </header>
 
-          {/* Right Column */}
-          <div className="space-y-4">
-            <div className="flex items-center space-x-2">
-              <input
-                type="checkbox"
-                name="inStock"
-                checked={product.inStock}
-                onChange={handleChange}
-              />
-              <label className="text-sm font-medium">In Stock</label>
-            </div>
-
-            <div className="flex items-center space-x-2">
-              <input
-                type="checkbox"
-                name="requiredPrescription"
-                checked={product.requiredPrescription}
-                onChange={handleChange}
-              />
-              <label className="text-sm font-medium">Requires Prescription</label>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium">Expiry Date</label>
-              <input
-                type="date"
-                name="expiryDate"
-                value={product.expiryDate}
-                onChange={handleChange}
-                className="w-full p-2 border border-gray-300 rounded"
-                required
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium">Rating (1-5)</label>
-              <input
-                type="number"
-                name="rating"
-                min="1"
-                max="5"
-                value={product.rating}
-                onChange={handleChange}
-                className="w-full p-2 border border-gray-300 rounded"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium">Pack Size</label>
-              <input
-                type="text"
-                name="packSize"
-                value={product.packSize}
-                onChange={handleChange}
-                placeholder="e.g., 10 tablets"
-                className="w-full p-2 border border-gray-300 rounded"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium">Dosage</label>
-              <input
-                type="text"
-                name="dosage"
-                value={product.dosage}
-                onChange={handleChange}
-                placeholder="e.g., 500mg"
-                className="w-full p-2 border border-gray-300 rounded"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium">Category</label>
-              <select
-                name="category"
-                value={product.category}
-                onChange={handleChange}
-                className="w-full p-2 border border-gray-300 rounded"
-              >
-                <option value="Painkiller">Painkiller</option>
-                <option value="Antibiotic">Antibiotic</option>
-                <option value="Cold">Cold</option>
-                <option value="Vitamin">Vitamin</option>
-              </select>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium">Manufacturer Name</label>
-              <input
-                type="text"
-                name="manufacturer.name"
-                value={product.manufacturer.name}
-                onChange={handleChange}
-                className="w-full p-2 border border-gray-300 rounded"
-                required
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium">Manufacturer Address</label>
-              <input
-                type="text"
-                name="manufacturer.address"
-                value={product.manufacturer.address}
-                onChange={handleChange}
-                className="w-full p-2 border border-gray-300 rounded"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium">Manufacturer Contact</label>
-              <input
-                type="text"
-                name="manufacturer.contact"
-                value={product.manufacturer.contact}
-                onChange={handleChange}
-                className="w-full p-2 border border-gray-300 rounded"
-              />
-            </div>
-          </div>
-
-          {/* Submit Button */}
-          <div className="col-span-2">
-            <button
-              type="submit"
-              className={`w-full p-2 rounded-lg ${
-                isLoading ? "bg-gray-400 cursor-not-allowed" : "bg-black"
-              } text-white hover:bg-black/60`}
-              disabled={isLoading}
-            >
-              {isLoading ? (
-                <div className="flex justify-center items-center">
-                  <div className="animate-spin border-t-2 border-white w-6 h-6 rounded-full"></div>
-                  <span className="ml-2">Creating...</span>
+        <form
+          onSubmit={handleSubmit}
+          className="space-y-8 rounded-3xl border border-white/70 bg-white/95 p-8 shadow-[0_25px_60px_rgba(15,23,42,0.06)]"
+        >
+          <div className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
+            <div className="space-y-6">
+              <section className="rounded-2xl border border-slate-100 bg-slate-50/40 p-6">
+                <div className="mb-4 flex items-center gap-3 text-slate-700">
+                  <Package className="h-5 w-5 text-violet-500" />
+                  <div>
+                    <p className="text-sm font-semibold text-slate-900">Product profile</p>
+                    <p className="text-xs text-slate-500">
+                      Name, imagery, and therapeutic overview.
+                    </p>
+                  </div>
                 </div>
-              ) : (
-                "Create Product"
-              )}
-            </button>
+                <div className="space-y-4">
+                  <div className="space-y-2">
+                    <Label className="text-sm text-slate-600">Medicine name</Label>
+                    <Input
+                      name="name"
+                      value={product.name}
+                      onChange={handleChange}
+                      placeholder="e.g., Paracet 500"
+                      className="h-12 rounded-2xl bg-white/80"
+                      required
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label className="text-sm text-slate-600">Image URL</Label>
+                    <Input
+                      name="image"
+                      value={product.image}
+                      onChange={handleChange}
+                      placeholder="https://"
+                      className="h-12 rounded-2xl bg-white/80"
+                      required
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label className="text-sm text-slate-600">Therapeutic description</Label>
+                    <Textarea
+                      name="description"
+                      value={product.description}
+                      onChange={handleChange}
+                      placeholder="Summarise indications, key ingredients, and patient guidance."
+                      className="min-h-[120px] rounded-2xl bg-white/80"
+                      required
+                    />
+                  </div>
+                </div>
+              </section>
+
+              <section className="rounded-2xl border border-slate-100 bg-slate-50/40 p-6">
+                <div className="mb-4 flex items-center gap-3 text-slate-700">
+                  <Beaker className="h-5 w-5 text-emerald-500" />
+                  <div>
+                    <p className="text-sm font-semibold text-slate-900">
+                      Clinical configuration
+                    </p>
+                    <p className="text-xs text-slate-500">
+                      Dosage, pack size, categories, and review metadata.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <div className="space-y-2">
+                    <Label className="text-sm">Pack size</Label>
+                    <Input
+                      name="packSize"
+                      value={product.packSize}
+                      onChange={handleChange}
+                      placeholder="10 tablets"
+                      className="rounded-2xl bg-white/80"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label className="text-sm">Dosage strength</Label>
+                    <Input
+                      name="dosage"
+                      value={product.dosage}
+                      onChange={handleChange}
+                      placeholder="500mg"
+                      className="rounded-2xl bg-white/80"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label className="text-sm">Category</Label>
+                    <select
+                      name="category"
+                      value={product.category}
+                      onChange={handleChange}
+                      className="h-12 w-full rounded-2xl border border-slate-200 bg-white/80 px-3 text-sm text-slate-700 focus:border-violet-300 focus:outline-none"
+                    >
+                      <option value="Painkiller">Painkiller</option>
+                      <option value="Antibiotic">Antibiotic</option>
+                      <option value="Cold">Cold</option>
+                      <option value="Vitamin">Vitamin</option>
+                    </select>
+                  </div>
+                  <div className="space-y-2">
+                    <Label className="text-sm">Expiry date</Label>
+                    <Input
+                      type="date"
+                      name="expiryDate"
+                      value={product.expiryDate}
+                      onChange={handleChange}
+                      className="rounded-2xl bg-white/80"
+                      required
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label className="text-sm">Average rating (1-5)</Label>
+                    <Input
+                      type="number"
+                      min="1"
+                      max="5"
+                      name="rating"
+                      value={product.rating}
+                      onChange={handleChange}
+                      className="rounded-2xl bg-white/80"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label className="text-sm">Discount %</Label>
+                    <Input
+                      type="number"
+                      min="0"
+                      max="100"
+                      name="discount"
+                      value={product.discount}
+                      onChange={handleChange}
+                      className="rounded-2xl bg-white/80"
+                    />
+                  </div>
+                </div>
+              </section>
+            </div>
+
+            <div className="space-y-6">
+              <section className="rounded-2xl border border-slate-100 bg-slate-50/40 p-6">
+                <div className="mb-4 flex items-center gap-3 text-slate-700">
+                  <Activity className="h-5 w-5 text-amber-500" />
+                  <div>
+                    <p className="text-sm font-semibold text-slate-900">
+                      Commercial & availability
+                    </p>
+                    <p className="text-xs text-slate-500">
+                      Pricing, stock, and selling conditions.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <div className="space-y-2">
+                    <Label className="text-sm">Unit price (BDT)</Label>
+                    <Input
+                      type="number"
+                      min="0"
+                      step="0.01"
+                      name="price"
+                      value={product.price}
+                      onChange={handleChange}
+                      className="rounded-2xl bg-white/80"
+                      required
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label className="text-sm">Available quantity</Label>
+                    <Input
+                      type="number"
+                      min="0"
+                      name="quantity"
+                      value={product.quantity}
+                      onChange={handleChange}
+                      className="rounded-2xl bg-white/80"
+                      required
+                    />
+                  </div>
+                </div>
+
+                <div className="mt-6 space-y-3">
+                  {complianceToggles.map(({ label, description, field }) => (
+                    <button
+                      key={field}
+                      type="button"
+                      onClick={() => handleToggle(field)}
+                      className={`flex w-full flex-col rounded-2xl border px-4 py-3 text-left transition ${
+                        product[field]
+                          ? "border-emerald-200 bg-emerald-50"
+                          : "border-slate-200 bg-white"
+                      }`}
+                    >
+                      <span className="text-sm font-semibold text-slate-900">{label}</span>
+                      <span className="text-xs text-slate-500">{description}</span>
+                    </button>
+                  ))}
+                </div>
+              </section>
+
+              <section className="rounded-2xl border border-slate-100 bg-slate-50/40 p-6">
+                <div className="mb-4 flex items-center gap-3 text-slate-700">
+                  <Factory className="h-5 w-5 text-slate-500" />
+                  <div>
+                    <p className="text-sm font-semibold text-slate-900">
+                      Manufacturer dossier
+                    </p>
+                    <p className="text-xs text-slate-500">
+                      Official contact for recalls or batch clarifications.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="space-y-4">
+                  <div className="space-y-2">
+                    <Label className="text-sm">Manufacturer name</Label>
+                    <Input
+                      name="manufacturer.name"
+                      value={product.manufacturer.name}
+                      onChange={handleChange}
+                      placeholder="HealthSync Pharma Ltd."
+                      className="rounded-2xl bg-white/80"
+                      required
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label className="text-sm">Head office address</Label>
+                    <Input
+                      name="manufacturer.address"
+                      value={product.manufacturer.address}
+                      onChange={handleChange}
+                      placeholder="House 42, Road 12, Dhaka"
+                      className="rounded-2xl bg-white/80"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label className="text-sm">Primary contact</Label>
+                    <Input
+                      name="manufacturer.contact"
+                      value={product.manufacturer.contact}
+                      onChange={handleChange}
+                      placeholder="+880 17 0000 0000"
+                      className="rounded-2xl bg-white/80"
+                    />
+                  </div>
+                </div>
+              </section>
+            </div>
+          </div>
+
+          <div className="flex flex-col gap-4 rounded-2xl border border-slate-100 bg-slate-50/60 p-6 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <p className="text-base font-semibold text-slate-900">
+                Ready to publish this medicine?
+              </p>
+              <p className="text-sm text-slate-500">
+                We will validate the payload and broadcast the product across dashboards.
+              </p>
+            </div>
+            <Button
+              type="submit"
+              disabled={isLoading}
+              className="h-12 rounded-full bg-violet-600 px-8 text-sm font-semibold text-white shadow-lg transition hover:bg-violet-700 disabled:cursor-not-allowed disabled:opacity-70"
+            >
+              {isLoading ? "Publishing..." : "Create medicine"}
+            </Button>
           </div>
         </form>
       </div>

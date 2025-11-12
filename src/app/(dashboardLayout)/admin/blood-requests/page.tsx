@@ -27,6 +27,7 @@ import {
 } from "@/components/ui/table";
 import { toast } from "sonner";
 import { format } from "date-fns";
+import Loader from "@/components/shared/Loader";
 
 const BLOOD_GROUPS = [
   "A+",
@@ -207,7 +208,7 @@ const AdminBloodRequestsPage = () => {
       </Card>
 
       {isLoading ? (
-        <p className="text-sm text-slate-500">Loading requests...</p>
+        <Loader fullScreen={false} label="Loading blood requests" />
       ) : requests.length === 0 ? (
         <Card className="border border-dashed border-slate-300 bg-white/80 shadow-none">
           <CardContent className="py-12 text-center text-slate-500">

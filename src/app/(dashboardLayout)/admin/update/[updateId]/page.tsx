@@ -29,6 +29,7 @@ import {
   useUpdateProductMutation,
 } from "@/redux/features/product/productApi";
 import type { TProduct } from "@/types/product";
+import Loader from "@/components/shared/Loader";
 
 type FormState = {
   name: string;
@@ -158,6 +159,25 @@ const MedicineUpdatePage = () => {
   const [updateProduct, { isLoading: isUpdating }] = useUpdateProductMutation();
 
   const [formState, setFormState] = useState<FormState>(DEFAULT_FORM_STATE);
+  const showInitialLoader = (isLoading || isFetching) && !productResponse;
+
+  if (showInitialLoader) {
+    return (
+      <div className="p-6">
+        <Loader fullScreen={false} label="Loading medicine details" />
+      </div>
+    );
+  }
+
+  if (isError && !productResponse) {
+    return (
+      <div className="p-6">
+        <p className="text-center text-red-500">
+          Unable to load medicine information. Please try again later.
+        </p>
+      </div>
+    );
+  }
 
   useEffect(() => {
     if (!productResponse?.data) {

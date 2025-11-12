@@ -28,6 +28,7 @@ import {
 } from "@/components/ui/select";
 import { Select } from "@/components/ui/select";
 import { toast } from "sonner";
+import Loader from "@/components/shared/Loader";
 import type { UserSummary } from "@/redux/features/user/userApi";
 
 const extractErrorMessage = (error: unknown, fallback: string) => {
@@ -125,6 +126,24 @@ const ManageUser = () => {
       );
     }
   };
+
+  if (isLoading) {
+    return (
+      <div className="p-6">
+        <Loader fullScreen={false} label="Loading users" />
+      </div>
+    );
+  }
+
+  if (isError) {
+    return (
+      <div className="p-6">
+        <p className="text-center text-red-500">
+          Unable to load users right now. Please try again later.
+        </p>
+      </div>
+    );
+  }
 
   const handleUnBlock = async (userId: string) => {
     try {

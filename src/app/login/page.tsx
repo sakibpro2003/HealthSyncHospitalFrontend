@@ -108,7 +108,7 @@ const LoginForm = () => {
   ];
 
   return (
-    <section className="relative flex min-h-screen items-center justify-center overflow-hidden bg-gradient-to-br from-white via-violet-50/80 to-violet-100/40 px-4 py-10">
+    <section className="relative flex min-h-screen items-center justify-center overflow-hidden bg-linear-to-br from-white via-violet-50/80 to-violet-100/40 px-4 py-10">
       <div className="absolute -left-24 top-10 h-64 w-64 rounded-full bg-violet-200/50 blur-3xl" aria-hidden />
       <div className="absolute -right-32 bottom-0 h-72 w-72 rounded-full bg-sky-200/50 blur-3xl" aria-hidden />
 

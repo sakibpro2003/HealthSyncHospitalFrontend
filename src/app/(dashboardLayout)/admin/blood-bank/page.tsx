@@ -30,6 +30,7 @@ import {
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
+import Loader from "@/components/shared/Loader";
 
 const BLOOD_GROUPS = [
   "A+",
@@ -103,7 +104,7 @@ const formatDateTime = (value?: string) => {
 };
 
 const AdminBloodBankPage = () => {
-  const { data: inventories = [], isLoading, refetch } =
+  const { data: inventories = [], isLoading, isError, refetch } =
     useGetBloodInventoriesQuery();
   useGetInventorySummaryQuery();
 
@@ -137,6 +138,24 @@ const AdminBloodBankPage = () => {
         .map((item) => item.bloodGroup)
     );
   }, [inventories]);
+
+  if (isLoading) {
+    return (
+      <div className="p-6">
+        <Loader fullScreen={false} label="Loading blood inventory" />
+      </div>
+    );
+  }
+
+  if (isError) {
+    return (
+      <div className="p-6">
+        <p className="text-center text-red-500">
+          Unable to load blood inventory right now. Please try again later.
+        </p>
+      </div>
+    );
+  }
 
   const handleInventorySubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();

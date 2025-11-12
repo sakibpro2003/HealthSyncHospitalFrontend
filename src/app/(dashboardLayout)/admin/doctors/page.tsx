@@ -47,6 +47,7 @@ import {
   useUpdateDoctorMutation,
   type IDoctor,
 } from "@/redux/features/doctor/doctorApi";
+import Loader from "@/components/shared/Loader";
 
 const ALL_DEPARTMENTS = [
   "Cardiology",
@@ -153,6 +154,7 @@ const AdminDoctorsPage = () => {
   const meta = extractDoctorMeta(data?.data?.result, data?.data?.meta);
   const totalDoctors = meta?.total ?? doctors.length;
   const totalPages = meta?.totalPage ?? 1;
+  const isInitialLoading = (isLoading && !data) || (!data && isFetching);
 
   useEffect(() => {
     setPage(1);
@@ -163,6 +165,24 @@ const AdminDoctorsPage = () => {
       setPage(totalPages);
     }
   }, [page, totalPages]);
+
+  if (isInitialLoading) {
+    return (
+      <div className="p-6">
+        <Loader fullScreen={false} label="Loading doctors" />
+      </div>
+    );
+  }
+
+  if (isError && !data) {
+    return (
+      <div className="p-6">
+        <p className="text-center text-red-500">
+          Unable to load doctor records right now. Please try again later.
+        </p>
+      </div>
+    );
+  }
 
   const handleOpenEdit = (doctor: IDoctor) => {
     setSelectedDoctor(doctor);
