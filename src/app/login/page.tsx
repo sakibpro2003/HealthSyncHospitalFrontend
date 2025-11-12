@@ -35,7 +35,11 @@ const LoginForm = () => {
   const form = useForm();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handlePrefill = (credential: "receptionist" | "user" | "admin") => {
+  const submitPrefilled = () => {
+    void form.handleSubmit(onSubmit)();
+  };
+
+  const handlePrefill = (credential: "receptionist" | "doctor" | "user" | "admin") => {
     switch (credential) {
       case "receptionist":
         form.setValue("email", "sakibprodhan2003@gmail.com");
@@ -49,7 +53,13 @@ const LoginForm = () => {
         form.setValue("email", "admin@gmail.com");
         form.setValue("password", "12345678");
         break;
+      case "doctor":
+        form.setValue("email", "doctor4@hospital.com");
+        form.setValue("password", "1111");
+        break;
     }
+
+    submitPrefilled();
   };
 
   const onSubmit: SubmitHandler<FieldValues> = async (userData) => {
@@ -145,6 +155,13 @@ const LoginForm = () => {
               onClick={() => handlePrefill("admin")}
             >
               Admin demo
+            </Button>
+            <Button
+              variant="outline"
+              className="rounded-full border-violet-200 text-violet-600 hover:bg-violet-50"
+              onClick={() => handlePrefill("doctor")}
+            >
+              Doctor demo
             </Button>
           </div>
 

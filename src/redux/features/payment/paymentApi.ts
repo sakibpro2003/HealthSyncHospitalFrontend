@@ -32,9 +32,17 @@ export type PaymentSummary = {
   failedAmount: number;
 };
 
+export type PaymentsMeta = {
+  page: number;
+  limit: number;
+  total: number;
+  totalPages: number;
+};
+
 export type PaymentsResponse = {
   summary: PaymentSummary;
   payments: PaymentRecord[];
+  meta: PaymentsMeta;
 };
 
 const paymentApi = baseApi.injectEndpoints({

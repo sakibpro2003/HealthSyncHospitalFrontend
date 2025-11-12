@@ -5,7 +5,18 @@ import {
   useGetSinglePatientQuery,
   useUpdateMedicalHistoryMutation,
 } from "@/redux/features/patient/patientApi";
-import { Loader2, Sparkles, Stethoscope, Pill, ShieldAlert } from "lucide-react";
+import {
+  Loader2,
+  Sparkles,
+  Stethoscope,
+  Pill,
+  ShieldAlert,
+  IdCard,
+  Droplet,
+  HeartPulse,
+  CalendarDays,
+  PhoneCall,
+} from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import {
@@ -51,6 +62,59 @@ const extractErrorMessage = (error: unknown, fallback: string) => {
   return fallback;
 };
 
+const FALLBACK_TEXT = "Not specified yet";
+
+const formatTextValue = (value?: string | null, fallback = FALLBACK_TEXT) => {
+  if (typeof value !== "string") {
+    return fallback;
+  }
+
+  const trimmed = value.trim();
+  return trimmed.length ? trimmed : fallback;
+};
+
+const formatSentenceValue = (value?: string | null) => {
+  if (typeof value !== "string") {
+    return FALLBACK_TEXT;
+  }
+
+  const trimmed = value.trim();
+  if (!trimmed.length) {
+    return FALLBACK_TEXT;
+  }
+
+  return trimmed.charAt(0).toUpperCase() + trimmed.slice(1);
+};
+
+const formatDateValue = (value?: string | Date | null) => {
+  if (!value) {
+    return FALLBACK_TEXT;
+  }
+
+  const date =
+    value instanceof Date ? value : new Date(typeof value === "string" ? value : "");
+
+  if (Number.isNaN(date.getTime())) {
+    return formatTextValue(typeof value === "string" ? value : "", FALLBACK_TEXT);
+  }
+
+  return date.toLocaleDateString(undefined, {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+  });
+};
+
+const formatReleaseStatus = (status?: boolean | null) => {
+  if (status === true) {
+    return "Cleared for discharge";
+  }
+  if (status === false) {
+    return "Under active care";
+  }
+  return FALLBACK_TEXT;
+};
+
 const PatientDashboardPage = () => {
   const { user } = useClientUser();
   const [sheetOpen, setSheetOpen] = useState(false);
@@ -78,6 +142,113 @@ const PatientDashboardPage = () => {
     useUpdateMedicalHistoryMutation();
 
   const patient = patientData?.data?.result;
+  const greetingName = patient?.name ?? user?.name;
+
+  const summaryCards = [
+    {
+      label: "Patient ID",
+      value: formatTextValue(
+        patient?._id ?? user?.userId ?? user?._id ?? "",
+        "Pending assignment"
+      ),
+      helper: "Share this reference with the reception or care team.",
+      icon: IdCard,
+      accent: "bg-sky-50 text-sky-600 border-sky-100",
+    },
+    {
+      label: "Blood Group",
+      value: formatTextValue(patient?.bloodGroup ?? ""),
+      helper: "Critical for transfusions and surgical planning.",
+      icon: Droplet,
+      accent: "bg-rose-50 text-rose-600 border-rose-100",
+    },
+    {
+      label: "Care Status",
+      value: formatReleaseStatus(patient?.releaseStatus),
+      helper:
+        typeof patient?.releaseStatus === "boolean"
+          ? patient.releaseStatus
+            ? "You have been cleared for discharge."
+            : "Our doctors are still actively monitoring you."
+          : "This will update after your care team reviews your case.",
+      icon: HeartPulse,
+      accent: "bg-emerald-50 text-emerald-600 border-emerald-100",
+    },
+    {
+      label: "Record Updated",
+      value: formatDateValue(patient?.updatedAt ?? patient?.createdAt ?? null),
+      helper: patient?.updatedAt
+        ? "Latest update applied by your care team."
+        : "Records sync the moment your clinicians make a change.",
+      icon: CalendarDays,
+      accent: "bg-amber-50 text-amber-600 border-amber-100",
+    },
+  ];
+
+  const infoSections = [
+    {
+      title: "Personal Details",
+      description:
+        "Your demographic profile helps our clinicians tailor diagnostics.",
+      items: [
+        {
+          label: "Full Name",
+          value: formatTextValue(greetingName ?? ""),
+        },
+        {
+          label: "Gender",
+          value: formatSentenceValue(patient?.gender),
+        },
+        {
+          label: "Date of Birth",
+          value: formatDateValue(patient?.dateOfBirth),
+        },
+        {
+          label: "Marital Status",
+          value: formatSentenceValue(patient?.maritalStatus),
+        },
+      ],
+    },
+    {
+      title: "Contact & Lifestyle",
+      description: "Where and how we can reach you between appointments.",
+      items: [
+        {
+          label: "Primary Email",
+          value: formatTextValue(patient?.email ?? user?.email ?? ""),
+        },
+        {
+          label: "Phone Number",
+          value: formatTextValue(patient?.phone),
+        },
+        {
+          label: "Occupation",
+          value: formatTextValue(patient?.occupation),
+        },
+        {
+          label: "Home Address",
+          value: formatTextValue(patient?.address),
+        },
+      ],
+    },
+  ];
+
+  const emergencyDetails = [
+    {
+      label: "Contact Person",
+      value: formatTextValue(patient?.emergencyContact?.emergencyContactName),
+    },
+    {
+      label: "Relationship",
+      value: formatSentenceValue(patient?.emergencyContact?.relationship),
+    },
+    {
+      label: "Phone",
+      value: formatTextValue(
+        patient?.emergencyContact?.emergencyContactPhone
+      ),
+    },
+  ];
 
   useEffect(() => {
     if (patient) {
@@ -129,7 +300,7 @@ const PatientDashboardPage = () => {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
         <div>
           <h1 className="text-3xl font-semibold text-gray-800">
-            Hello{patient?.name ? `, ${patient.name}` : ""}
+            Hello{greetingName ? `, ${greetingName}` : ""}
           </h1>
           <p className="text-sm text-gray-500 mt-1">
             Keep your medical history current so our doctors can tailor the best
@@ -213,56 +384,142 @@ const PatientDashboardPage = () => {
       )}
 
       {!isLoading && !isFetching && (
-        <div className="grid gap-6 md:grid-cols-3">
-          <section className="bg-white/90 border border-sky-100 rounded-2xl shadow-sm p-6 flex flex-col gap-4">
-            <header className="flex items-center gap-3 text-sky-700">
-              <Stethoscope className="w-6 h-6" />
-              <h2 className="text-lg font-semibold">Chronic Conditions</h2>
-            </header>
-            <ul className="space-y-2 text-sm text-gray-700">
-              {toDisplayList(patient?.medicalHistory).map((item, index) => (
-                <li
-                  key={`${item}-${index}`}
-                  className="bg-sky-50 border border-sky-100 rounded-lg px-3 py-2"
-                >
-                  {item}
-                </li>
-              ))}
-            </ul>
+        <div className="flex flex-col gap-6">
+          <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+            {summaryCards.map(({ label, value, helper, icon: Icon, accent }, index) => (
+              <article
+                key={`${label}-${index}`}
+                className="bg-white/90 border border-gray-100 rounded-2xl shadow-sm p-4 flex flex-col justify-between"
+              >
+                <div className="flex items-center gap-3">
+                  <span className={`p-2 rounded-xl border ${accent}`}>
+                    <Icon className="w-5 h-5" />
+                  </span>
+                  <div>
+                    <p className="text-xs uppercase tracking-wide text-gray-500">
+                      {label}
+                    </p>
+                    <p className="text-lg font-semibold text-gray-800">{value}</p>
+                  </div>
+                </div>
+                <p className="text-xs text-gray-500 mt-3">{helper}</p>
+              </article>
+            ))}
           </section>
 
-          <section className="bg-white/90 border border-amber-100 rounded-2xl shadow-sm p-6 flex flex-col gap-4">
-            <header className="flex items-center gap-3 text-amber-600">
-              <ShieldAlert className="w-6 h-6" />
-              <h2 className="text-lg font-semibold">Allergies</h2>
-            </header>
-            <ul className="space-y-2 text-sm text-gray-700">
-              {toDisplayList(patient?.allergies).map((item, index) => (
-                <li
-                  key={`${item}-${index}`}
-                  className="bg-amber-50 border border-amber-100 rounded-lg px-3 py-2"
-                >
-                  {item}
-                </li>
-              ))}
-            </ul>
+          <section className="grid gap-6 lg:grid-cols-2">
+            {infoSections.map((infoSection) => (
+              <article
+                key={infoSection.title}
+                className="bg-white/90 border border-slate-100 rounded-2xl shadow-sm p-6 flex flex-col gap-4"
+              >
+                <header>
+                  <h2 className="text-lg font-semibold text-gray-800">
+                    {infoSection.title}
+                  </h2>
+                  <p className="text-sm text-gray-500">{infoSection.description}</p>
+                </header>
+                <dl className="grid gap-4 sm:grid-cols-2">
+                  {infoSection.items.map((item) => (
+                    <div
+                      key={`${infoSection.title}-${item.label}`}
+                      className="bg-slate-50 rounded-xl px-4 py-3 border border-slate-100"
+                    >
+                      <dt className="text-xs uppercase tracking-wide text-gray-500">
+                        {item.label}
+                      </dt>
+                      <dd className="text-sm font-medium text-gray-800 mt-1">
+                        {item.value}
+                      </dd>
+                    </div>
+                  ))}
+                </dl>
+              </article>
+            ))}
           </section>
 
-          <section className="bg-white/90 border border-emerald-100 rounded-2xl shadow-sm p-6 flex flex-col gap-4">
-            <header className="flex items-center gap-3 text-emerald-600">
-              <Pill className="w-6 h-6" />
-              <h2 className="text-lg font-semibold">Current Medications</h2>
+          <section className="bg-gradient-to-r from-rose-50 to-orange-50 border border-rose-100 rounded-2xl shadow-sm p-6">
+            <header className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between text-rose-600">
+              <div className="flex items-center gap-3">
+                <PhoneCall className="w-5 h-5" />
+                <div>
+                  <h2 className="text-lg font-semibold text-gray-800">
+                    Emergency Contact
+                  </h2>
+                  <p className="text-sm text-gray-600">
+                    We will reach out to them first during urgent situations.
+                  </p>
+                </div>
+              </div>
             </header>
-            <ul className="space-y-2 text-sm text-gray-700">
-              {toDisplayList(patient?.currentMedications).map((item, index) => (
-                <li
-                  key={`${item}-${index}`}
-                  className="bg-emerald-50 border border-emerald-100 rounded-lg px-3 py-2"
+            <dl className="grid gap-4 sm:grid-cols-3 mt-4">
+              {emergencyDetails.map((detail) => (
+                <div
+                  key={detail.label}
+                  className="bg-white/80 border border-white rounded-xl px-4 py-3"
                 >
-                  {item}
-                </li>
+                  <dt className="text-xs uppercase tracking-wide text-gray-500">
+                    {detail.label}
+                  </dt>
+                  <dd className="text-sm font-medium text-gray-800 mt-1">
+                    {detail.value}
+                  </dd>
+                </div>
               ))}
-            </ul>
+            </dl>
+          </section>
+
+          <section className="grid gap-6 md:grid-cols-3">
+            <article className="bg-white/90 border border-sky-100 rounded-2xl shadow-sm p-6 flex flex-col gap-4">
+              <header className="flex items-center gap-3 text-sky-700">
+                <Stethoscope className="w-6 h-6" />
+                <h2 className="text-lg font-semibold">Chronic Conditions</h2>
+              </header>
+              <ul className="space-y-2 text-sm text-gray-700">
+                {toDisplayList(patient?.medicalHistory).map((item, index) => (
+                  <li
+                    key={`${item}-${index}`}
+                    className="bg-sky-50 border border-sky-100 rounded-lg px-3 py-2"
+                  >
+                    {item}
+                  </li>
+                ))}
+              </ul>
+            </article>
+
+            <article className="bg-white/90 border border-amber-100 rounded-2xl shadow-sm p-6 flex flex-col gap-4">
+              <header className="flex items-center gap-3 text-amber-600">
+                <ShieldAlert className="w-6 h-6" />
+                <h2 className="text-lg font-semibold">Allergies</h2>
+              </header>
+              <ul className="space-y-2 text-sm text-gray-700">
+                {toDisplayList(patient?.allergies).map((item, index) => (
+                  <li
+                    key={`${item}-${index}`}
+                    className="bg-amber-50 border border-amber-100 rounded-lg px-3 py-2"
+                  >
+                    {item}
+                  </li>
+                ))}
+              </ul>
+            </article>
+
+            <article className="bg-white/90 border border-emerald-100 rounded-2xl shadow-sm p-6 flex flex-col gap-4">
+              <header className="flex items-center gap-3 text-emerald-600">
+                <Pill className="w-6 h-6" />
+                <h2 className="text-lg font-semibold">Current Medications</h2>
+              </header>
+              <ul className="space-y-2 text-sm text-gray-700">
+                {toDisplayList(patient?.currentMedications).map((item, index) => (
+                  <li
+                    key={`${item}-${index}`}
+                    className="bg-emerald-50 border border-emerald-100 rounded-lg px-3 py-2"
+                  >
+                    {item}
+                  </li>
+                ))}
+              </ul>
+            </article>
           </section>
         </div>
       )}
@@ -271,3 +528,4 @@ const PatientDashboardPage = () => {
 };
 
 export default PatientDashboardPage;
+

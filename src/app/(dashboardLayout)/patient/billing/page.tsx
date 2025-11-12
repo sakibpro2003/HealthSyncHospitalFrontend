@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import {
   AlertCircle,
   CreditCard,
@@ -22,6 +22,15 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationEllipsis,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
 import { useClientUser } from "@/hooks/useClientUser";
 import {
   useDownloadReceiptMutation,
@@ -45,18 +54,48 @@ const formatAmount = (value?: number) =>
     minimumFractionDigits: 2,
   }).format(Number.isFinite(value ?? NaN) ? Number(value) : 0);
 
-const formatDateTime = (value?: string) => {
-  if (!value) return "—";
-  const date = new Date(value);
-  return Number.isNaN(date.getTime())
-    ? "—"
-    : date.toLocaleString(undefined, {
-        day: "2-digit",
-        month: "short",
-        year: "numeric",
-        hour: "2-digit",
-        minute: "2-digit",
-      });
+const formatDateTime = (value?: string) => {
+  if (!value) return "--";
+  const date = new Date(value);
+  return Number.isNaN(date.getTime())
+    ? "--"
+    : date.toLocaleString(undefined, {
+        day: "2-digit",
+        month: "short",
+        year: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+      });
+};
+
+const DEFAULT_PAGE_SIZE = 10;
+
+const buildPaginationRange = (currentPage: number, totalPages: number) => {
+  const safeTotalPages = Math.max(totalPages, 1);
+
+  if (safeTotalPages <= 5) {
+    return Array.from({ length: safeTotalPages }, (_, index) => index + 1);
+  }
+
+  const range: (number | string)[] = [1];
+  const leftBoundary = Math.max(2, currentPage - 1);
+  const rightBoundary = Math.min(safeTotalPages - 1, currentPage + 1);
+
+  if (leftBoundary > 2) {
+    range.push("ellipsis-left");
+  }
+
+  for (let page = leftBoundary; page <= rightBoundary; page += 1) {
+    range.push(page);
+  }
+
+  if (rightBoundary < safeTotalPages - 1) {
+    range.push("ellipsis-right");
+  }
+
+  range.push(safeTotalPages);
+
+  return range;
 };
 
 const BillingPage = () => {
@@ -65,9 +104,17 @@ const BillingPage = () => {
 
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [typeFilter, setTypeFilter] = useState<string>("all");
+  const [currentPage, setCurrentPage] = useState(1);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [statusFilter, typeFilter]);
 
   const queryParams = useMemo(() => {
-    const params: Record<string, string> = {};
+    const params: Record<string, string | number> = {
+      page: currentPage,
+      limit: DEFAULT_PAGE_SIZE,
+    };
     if (statusFilter !== "all") {
       params.status = statusFilter;
     }
@@ -75,7 +122,7 @@ const BillingPage = () => {
       params.type = typeFilter;
     }
     return params;
-  }, [statusFilter, typeFilter]);
+  }, [currentPage, statusFilter, typeFilter]);
 
   const {
     data,
@@ -92,6 +139,24 @@ const BillingPage = () => {
 
   const payments = useMemo(() => data?.payments ?? [], [data]);
   const summary = data?.summary;
+  const meta = data?.meta;
+  const pageSize = meta?.limit ?? DEFAULT_PAGE_SIZE;
+  const totalPages = meta?.totalPages ? Math.max(meta.totalPages, 1) : 1;
+  const totalItems = meta?.total ?? payments.length;
+  const safeCurrentPage = Math.max(1, Math.min(currentPage, totalPages));
+  const firstItemIndex = totalItems ? (safeCurrentPage - 1) * pageSize + 1 : 0;
+  const lastItemIndex = totalItems
+    ? Math.min(firstItemIndex + pageSize - 1, totalItems)
+    : 0;
+  const paginationRange = buildPaginationRange(safeCurrentPage, totalPages);
+  const canGoPrevious = safeCurrentPage > 1;
+  const canGoNext = safeCurrentPage < totalPages;
+
+  useEffect(() => {
+    if (meta && currentPage > totalPages) {
+      setCurrentPage(totalPages);
+    }
+  }, [currentPage, meta, totalPages]);
 
   const filters = {
     status: ["all", "paid", "pending", "failed"] as const,
@@ -396,6 +461,73 @@ const BillingPage = () => {
                   </tbody>
                 </table>
               </div>
+              {meta && (
+                <div className="mt-6 flex flex-col gap-3 border-t border-slate-100 pt-4 sm:flex-row sm:items-center sm:justify-between">
+                  <p className="text-xs uppercase tracking-wide text-slate-500">
+                    Showing{" "}
+                    {firstItemIndex > 0 && lastItemIndex > 0
+                      ? `${firstItemIndex}-${lastItemIndex}`
+                      : "0-0"}{" "}
+                    of {totalItems} transaction(s)
+                  </p>
+                  {totalPages > 1 && (
+                    <Pagination className="sm:justify-end">
+                      <PaginationContent>
+                        <PaginationItem>
+                          <PaginationPrevious
+                            href="#"
+                            onClick={(event) => {
+                              event.preventDefault();
+                              if (canGoPrevious) {
+                                setCurrentPage((prev) => Math.max(prev - 1, 1));
+                              }
+                            }}
+                            className={!canGoPrevious ? "pointer-events-none opacity-50" : ""}
+                            aria-disabled={!canGoPrevious}
+                          />
+                        </PaginationItem>
+                        {paginationRange.map((pageValue) =>
+                          typeof pageValue === "number" ? (
+                            <PaginationItem key={`page-${pageValue}`}>
+                              <PaginationLink
+                                href="#"
+                                isActive={pageValue === safeCurrentPage}
+                                onClick={(event) => {
+                                  event.preventDefault();
+                                  if (pageValue !== safeCurrentPage) {
+                                    setCurrentPage(pageValue);
+                                  }
+                                }}
+                              >
+                                {pageValue}
+                              </PaginationLink>
+                            </PaginationItem>
+                          ) : (
+                            <PaginationItem key={pageValue}>
+                              <PaginationEllipsis />
+                            </PaginationItem>
+                          )
+                        )}
+                        <PaginationItem>
+                          <PaginationNext
+                            href="#"
+                            onClick={(event) => {
+                              event.preventDefault();
+                              if (canGoNext) {
+                                setCurrentPage((prev) =>
+                                  Math.min(prev + 1, totalPages)
+                                );
+                              }
+                            }}
+                            className={!canGoNext ? "pointer-events-none opacity-50" : ""}
+                            aria-disabled={!canGoNext}
+                          />
+                        </PaginationItem>
+                      </PaginationContent>
+                    </Pagination>
+                  )}
+                </div>
+              )}
             </CardContent>
           </Card>
         )}
