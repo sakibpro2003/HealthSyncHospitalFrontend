@@ -1,7 +1,21 @@
 "use client";
 
 import Link from "next/link";
-import { Stethoscope } from "lucide-react";
+import {
+  Baby,
+  Bone,
+  Brain,
+  Droplets,
+  HeartPulse,
+  MessageCircleHeart,
+  Radiation,
+  Ribbon,
+  SmilePlus,
+  Stethoscope,
+  Sun,
+  Ambulance,
+  type LucideIcon,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 import { buttonVariants } from "../ui/button";
 
@@ -19,6 +33,21 @@ const departments = [
   { name: "Oncology", slug: "Oncology" },
   { name: "Urology", slug: "Urology" },
 ];
+
+const departmentIcons: Record<string, LucideIcon> = {
+  Cardiology: HeartPulse,
+  Neurology: Brain,
+  Orthopedics: Bone,
+  Pediatrics: Baby,
+  Dermatology: Sun,
+  "General Medicine": Stethoscope,
+  Radiology: Radiation,
+  Psychiatry: MessageCircleHeart,
+  "Emergency Care": Ambulance,
+  Dental: SmilePlus,
+  Oncology: Ribbon,
+  Urology: Droplets,
+};
 
 const DepartmentButtons = () => {
   return (
@@ -39,31 +68,36 @@ const DepartmentButtons = () => {
       </div>
 
       <div className="relative mx-auto mt-10 grid w-full gap-4 px-2 sm:grid-cols-2 md:grid-cols-3 lg:px-8 xl:grid-cols-4">
-        {departments.map((dept) => (
-          <Link
-            key={dept.slug}
-            href={`/departmentalDoctors/${dept.slug}`}
-            className={cn(
-              buttonVariants({ variant: "ghost" }),
-              "group relative h-auto justify-start rounded-2xl border border-white/50 bg-white/80 p-5 text-left shadow-lg transition hover:-translate-y-1 hover:border-violet-300 hover:shadow-xl"
-            )}
-          >
-            <span className="absolute inset-x-5 bottom-5 h-[3px] rounded-full bg-gradient-to-r from-violet-500/80 to-indigo-500/80 opacity-0 transition group-hover:opacity-100" />
-            <div className="flex items-center gap-3">
-              <span className="flex h-12 w-12 items-center justify-center rounded-xl bg-violet-100 text-violet-600">
-                <Stethoscope className="h-5 w-5" />
-              </span>
-              <div>
-                <p className="text-base font-semibold text-slate-900">
-                  {dept.name}
-                </p>
-                <p className="text-xs text-slate-500">
-                  Consult top specialists
-                </p>
+        {departments.map((dept) => {
+          const Icon =
+            departmentIcons[dept.name] ?? departmentIcons["General Medicine"];
+
+          return (
+            <Link
+              key={dept.slug}
+              href={`/departmentalDoctors/${dept.slug}`}
+              className={cn(
+                buttonVariants({ variant: "ghost" }),
+                "group relative h-auto justify-start rounded-2xl border border-white/50 bg-white/80 p-5 text-left shadow-lg transition hover:-translate-y-1 hover:border-violet-300 hover:shadow-xl"
+              )}
+            >
+              <span className="absolute inset-x-5 bottom-5 h-[3px] rounded-full bg-gradient-to-r from-violet-500/80 to-indigo-500/80 opacity-0 transition group-hover:opacity-100" />
+              <div className="flex items-center gap-3">
+                <span className="flex h-12 w-12 items-center justify-center rounded-xl bg-violet-100 text-violet-600">
+                  <Icon className="h-5 w-5" />
+                </span>
+                <div>
+                  <p className="text-base font-semibold text-slate-900">
+                    {dept.name}
+                  </p>
+                  <p className="text-xs text-slate-500">
+                    Consult top specialists
+                  </p>
+                </div>
               </div>
-            </div>
-          </Link>
-        ))}
+            </Link>
+          );
+        })}
       </div>
     </section>
   );
