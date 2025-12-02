@@ -118,6 +118,13 @@ const productApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: [{ type: "products" as const, id: "LIST" }],
     }),
+    uploadProductImage: builder.mutation<{ url: string }, FormData>({
+      query: (formData) => ({
+        url: "/products/upload",
+        method: "POST",
+        body: formData,
+      }),
+    }),
     removeMedicine: builder.mutation<unknown, string>({
       query: (id) => ({
         url: `/products/${id}`,
@@ -137,4 +144,5 @@ export const {
   useRemoveMedicineMutation,
   useGetSingleProductQuery,
   useUpdateProductMutation,
+  useUploadProductImageMutation,
 } = productApi;

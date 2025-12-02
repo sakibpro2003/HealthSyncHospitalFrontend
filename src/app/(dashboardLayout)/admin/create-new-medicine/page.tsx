@@ -10,7 +10,10 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 
-import { useCreateProductMutation } from "@/redux/features/product/productApi";
+import {
+  useCreateProductMutation,
+  useUploadProductImageMutation,
+} from "@/redux/features/product/productApi";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -63,6 +66,8 @@ type ToggleField = "inStock" | "requiredPrescription";
 const ProductForm = () => {
   const [product, setProduct] = useState<ProductFormState>(initialProductState);
   const [createProduct, { isLoading }] = useCreateProductMutation();
+  const [uploadProductImage, { isLoading: isUploading }] =
+    useUploadProductImageMutation();
 
   const handleChange = (
     event:
@@ -98,8 +103,60 @@ const ProductForm = () => {
     }));
   };
 
+  const handleImageUpload = async (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const file = event.target.files?.[0];
+
+    if (!file) {
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append("image", file);
+
+    try {
+      const { url } = await uploadProductImage(formData).unwrap();
+      setProduct((prev) => ({ ...prev, image: url }));
+      toast.success("Image uploaded");
+    } catch (error) {
+      const errorMessage = (() => {
+        const isBaseQueryError =
+          typeof error === "object" &&
+          error !== null &&
+          "status" in error &&
+          "data" in error;
+
+        if (isBaseQueryError) {
+          const baseError = error as {
+            data?: { message?: string } | string;
+            error?: string;
+          };
+          if (typeof baseError.data === "string") return baseError.data;
+          if (baseError.data && typeof baseError.data === "object" && "message" in baseError.data) {
+            return (baseError.data as { message?: string }).message ?? "Image upload failed";
+          }
+          if (baseError.error === "TypeError: Failed to fetch") {
+            return "Upload failed. Is the backend running at the API base URL?";
+          }
+          return baseError.error ?? "Image upload failed";
+        }
+        if (error instanceof Error) return error.message;
+        return "Image upload failed";
+      })();
+
+      toast.error(errorMessage);
+      console.warn("Image upload failed", error);
+    }
+  };
+
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
+
+    if (!product.image) {
+      toast.error("Please upload a product image first");
+      return;
+    }
 
     try {
       const payload = {
@@ -241,15 +298,22 @@ const ProductForm = () => {
                   </div>
 
                   <div className="space-y-2">
-                    <Label className="text-sm text-slate-600">Image URL</Label>
+                    <Label className="text-sm text-slate-600">Product image</Label>
                     <Input
-                      name="image"
-                      value={product.image}
-                      onChange={handleChange}
-                      placeholder="https://"
+                      type="file"
+                      accept="image/*"
+                      onChange={handleImageUpload}
                       className="h-12 rounded-2xl bg-white/80"
-                      required
+                      required={!product.image}
+                      disabled={isUploading}
                     />
+                    <p className="text-xs text-slate-500">
+                      {isUploading
+                        ? "Uploading to Cloudinary..."
+                        : product.image
+                        ? `Uploaded: ${product.image}`
+                        : "Choose a clear pack shot or blister photo to upload."}
+                    </p>
                   </div>
 
                   <div className="space-y-2">
