@@ -30,7 +30,13 @@ const reminders = [
   { title: "Clinical alerts", detail: "Flag critical notes for attending doctor." },
 ];
 
-const RegisterPatient = () => {
+type RegisterPatientProps = {
+  baseSegment?: string;
+};
+
+const RegisterPatientScreen = ({ baseSegment = "receptionist" }: RegisterPatientProps) => {
+  const patientsPath = `/${baseSegment}/patients`;
+
   return (
     <section className="space-y-8 px-4 pb-12 pt-6 lg:px-10">
       <div className="grid gap-8 lg:grid-cols-[minmax(0,420px)_minmax(0,1fr)]">
@@ -133,7 +139,7 @@ const RegisterPatient = () => {
                   All sections are required unless marked optional.
                 </CardDescription>
               </div>
-              <Link href="/receptionist/patients">
+              <Link href={patientsPath}>
                 <Badge
                   variant="outline"
                   className="flex items-center gap-2 border-emerald-200 bg-emerald-50 text-emerald-700"
@@ -160,4 +166,8 @@ const RegisterPatient = () => {
   );
 };
 
-export default RegisterPatient;
+export default function RegisterPatientPage() {
+  return <RegisterPatientScreen />;
+}
+
+export { RegisterPatientScreen };

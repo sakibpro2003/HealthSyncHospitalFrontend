@@ -152,41 +152,6 @@ const ReceptionistPatientInsightsPage = () => {
       .slice(0, 5);
   }, [patients]);
 
-  if (isLoading) {
-    return (
-      <div className="p-10">
-        <Loader fullScreen={false} label="Loading patient insights" />
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="p-10">
-        <Card className="border-rose-100 bg-rose-50/60">
-          <CardHeader>
-            <CardTitle className="text-rose-900">
-              Unable to load patient summary
-            </CardTitle>
-            <CardDescription className="text-rose-700">
-              The analytics endpoint is unavailable right now. Try refreshing or
-              check your network connection.
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="flex flex-wrap gap-3">
-            <Button onClick={() => refetch()}>
-              <RefreshCcw className="h-4 w-4" />
-              Retry
-            </Button>
-            <Link href="/receptionist/patient-register">
-              <Button variant="outline">Go to patient register</Button>
-            </Link>
-          </CardContent>
-        </Card>
-      </div>
-    );
-  }
-
   const monthGrowth = monthlyBuckets[monthlyBuckets.length - 1]?.count ?? 0;
   const previousMonth = monthlyBuckets[monthlyBuckets.length - 2]?.count ?? 0;
   const trendDelta =
@@ -235,6 +200,41 @@ const ReceptionistPatientInsightsPage = () => {
       badge: "Based on registration history",
     },
   ];
+
+  if (isLoading) {
+    return (
+      <div className="p-10">
+        <Loader fullScreen={false} label="Loading patient insights" />
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="p-10">
+        <Card className="border-rose-100 bg-rose-50/60">
+          <CardHeader>
+            <CardTitle className="text-rose-900">
+              Unable to load patient summary
+            </CardTitle>
+            <CardDescription className="text-rose-700">
+              The analytics endpoint is unavailable right now. Try refreshing or
+              check your network connection.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="flex flex-wrap gap-3">
+            <Button onClick={() => refetch()}>
+              <RefreshCcw className="h-4 w-4" />
+              Retry
+            </Button>
+            <Link href="/receptionist/patient-register">
+              <Button variant="outline">Go to patient register</Button>
+            </Link>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-8 px-4 pb-12 pt-6 lg:px-10">

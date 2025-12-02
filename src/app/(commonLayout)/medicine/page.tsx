@@ -279,7 +279,7 @@ export default function MedicinePage() {
 
   return (
     <section className="min-h-screen bg-gradient-to-br from-slate-100 via-white to-slate-200">
-      <div className="mx-auto w-full px-6 py-14">
+      <div className="mx-auto w-full max-w-[85vw] px-4 py-14 sm:px-6 lg:px-8">
         <header className="mx-auto max-w-3xl text-center lg:max-w-none lg:text-left">
           <p className="text-xs font-semibold uppercase tracking-[0.35em] text-violet-500">
             Medicine Catalog
@@ -292,8 +292,8 @@ export default function MedicinePage() {
           </p>
         </header>
 
-        <div className="mt-12 grid gap-8 lg:grid-cols-[320px_minmax(0,1fr)]">
-          <aside className="space-y-8  rounded-3xl border border-slate-200/70 bg-white/80 p-6 shadow-xl backdrop-blur">
+          <div className="mt-12 grid gap-8 lg:grid-cols-[320px_minmax(0,1fr)]">
+            <aside className="space-y-8 rounded-3xl border border-slate-200/70 bg-white/80 p-6 shadow-xl backdrop-blur lg:sticky lg:top-6 lg:self-start lg:max-h-[calc(100vh-140px)] lg:overflow-y-auto">
             <div className="space-y-3">
               <Label htmlFor="medicine-search" className="text-xs uppercase tracking-[0.3em] text-slate-500">
                 Search

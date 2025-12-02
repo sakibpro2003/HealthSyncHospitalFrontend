@@ -8,7 +8,6 @@ import {
   FileDown,
   Loader2,
   PiggyBank,
-  Sparkles,
   TrendingUp,
 } from "lucide-react";
 import { toast } from "sonner";
@@ -198,7 +197,6 @@ const BillingPage = () => {
           <div className="flex flex-wrap items-start justify-between gap-6">
             <div className="max-w-2xl space-y-4">
               <span className="inline-flex items-center gap-2 rounded-full bg-sky-100 px-4 py-1 text-xs font-semibold uppercase tracking-[0.35em] text-sky-600">
-                <Sparkles className="h-4 w-4" />
                 Billing Center
               </span>
               <h1 className="text-4xl font-black text-slate-900 sm:text-5xl">

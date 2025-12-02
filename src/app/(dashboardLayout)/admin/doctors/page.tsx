@@ -359,7 +359,7 @@ const AdminDoctorsPage = () => {
         </Button>
       </header>
 
-      <div className="grid gap-3 md:grid-cols-[1fr_auto_auto]">
+      <div className="grid gap-3 md:grid-cols-[minmax(0,1fr)_200px_180px]">
         <div className="relative">
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
           <Input
@@ -391,7 +391,7 @@ const AdminDoctorsPage = () => {
             ))}
           </SelectContent>
         </Select>
-        <Card>
+        <Card className="md:min-w-[180px]">
           <CardHeader className="pb-2">
             <CardTitle className="flex items-center gap-2 text-sm text-slate-500">
               <Users className="h-4 w-4" />

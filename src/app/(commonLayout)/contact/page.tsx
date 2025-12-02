@@ -4,7 +4,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Clock, MapPin, Mail, Phone, Sparkles, UserRound, MessageCircle } from "lucide-react";
+import { Clock, MapPin, Mail, Phone, UserRound, MessageCircle } from "lucide-react";
 
 const contactChannels = [
   {
@@ -35,7 +35,7 @@ const contactChannels = [
 
 export default function ContactPage() {
   return (
-    <main className="relative mx-auto w-full space-y-16 py-16">
+    <main className="relative mx-auto w-full max-w-[85vw] space-y-16 px-4 py-16 sm:px-6 lg:px-8">
       <section className="relative overflow-hidden rounded-[2.5rem] bg-gradient-to-br from-white via-violet-50/70 to-white px-8 py-16 shadow-[0_40px_80px_-50px_rgba(79,70,229,0.35)] sm:px-12 md:px-16">
         <div className="absolute -left-24 top-0 h-48 w-48 rounded-full bg-violet-200/60 blur-3xl" aria-hidden />
         <div className="absolute -right-28 bottom-0 h-64 w-64 rounded-full bg-sky-200/50 blur-3xl" aria-hidden />
@@ -43,7 +43,6 @@ export default function ContactPage() {
         <div className="relative grid gap-10 lg:grid-cols-[1.2fr_1fr] lg:items-center">
           <div className="space-y-6">
             <span className="inline-flex items-center gap-2 rounded-full bg-violet-100 px-4 py-1 text-xs font-semibold uppercase tracking-[0.35em] text-violet-700">
-              <Sparkles className="size-4" />
               We are ready
             </span>
             <h1 className="text-3xl font-black leading-tight text-slate-900 sm:text-4xl lg:text-5xl">

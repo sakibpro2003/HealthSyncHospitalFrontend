@@ -7,7 +7,6 @@ import {
 } from "@/redux/features/patient/patientApi";
 import {
   Loader2,
-  Sparkles,
   Stethoscope,
   Pill,
   ShieldAlert,
@@ -296,113 +295,128 @@ const PatientDashboardPage = () => {
   };
 
   return (
-    <div className="p-6 bg-gradient-to-tr from-sky-50 via-white to-blue-50 min-h-screen">
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
-        <div>
-          <h1 className="text-3xl font-semibold text-gray-800">
-            Hello{greetingName ? `, ${greetingName}` : ""}
-          </h1>
-          <p className="text-sm text-gray-500 mt-1">
-            Keep your medical history current so our doctors can tailor the best
-            care for you.
-          </p>
-        </div>
-        <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
-          <SheetTrigger asChild>
-            <Button variant="default">
-              <Sparkles className="w-4 h-4 mr-1" /> Update Medical History
-            </Button>
-          </SheetTrigger>
-          <SheetContent side="right" className="sm:max-w-md">
-            <SheetHeader>
-              <SheetTitle className="text-xl font-semibold text-gray-800">
-                Edit Medical History
-              </SheetTitle>
-              <SheetDescription>
-                Separate each entry with commas or new lines. We’ll keep things
-                organized for you.
-              </SheetDescription>
-            </SheetHeader>
-            <form className="flex flex-col gap-4 p-4" onSubmit={handleSubmit}>
-              <div className="grid gap-2">
-                <Label htmlFor="medical-history">Chronic Conditions</Label>
-                <Textarea
-                  id="medical-history"
-                  rows={4}
-                  placeholder="E.g., Hypertension, Type 2 Diabetes"
-                  value={formState.medicalHistory}
-                  onChange={(event) =>
-                    setFormState((prev) => ({
-                      ...prev,
-                      medicalHistory: event.target.value,
-                    }))
-                  }
-                />
+    <div className="space-y-8">
+      <div className="relative overflow-hidden rounded-[2rem] border border-white/40 bg-gradient-to-br from-violet-700 via-indigo-600 to-sky-600 p-8 text-white shadow-2xl">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(255,255,255,0.18),transparent_35%),radial-gradient(circle_at_80%_0%,rgba(255,255,255,0.12),transparent_32%)]" aria-hidden />
+        <div className="relative flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
+          <div className="space-y-3">
+            <span className="inline-flex items-center gap-2 rounded-full bg-white/15 px-4 py-1 text-xs font-semibold uppercase tracking-[0.3em] text-white">
+              Patient dashboard
+            </span>
+            <h1 className="text-3xl font-black leading-tight sm:text-4xl">
+              Hello{greetingName ? `, ${greetingName}` : ""} — keep your records up to date
+            </h1>
+            <p className="max-w-2xl text-sm text-white/85">
+              Review your health profile, emergency contact, and medications in one place. Updates sync instantly with your care team.
+            </p>
+            <div className="flex flex-wrap gap-3">
+              <div className="rounded-2xl border border-white/25 bg-white/10 px-4 py-3 text-left shadow-sm backdrop-blur">
+                <p className="text-[11px] uppercase tracking-[0.3em] text-white/70">Care status</p>
+                <p className="text-lg font-semibold">{formatReleaseStatus(patient?.releaseStatus)}</p>
               </div>
-              <div className="grid gap-2">
-                <Label htmlFor="allergies">Allergies</Label>
-                <Textarea
-                  id="allergies"
-                  rows={4}
-                  placeholder="E.g., Penicillin, Peanuts"
-                  value={formState.allergies}
-                  onChange={(event) =>
-                    setFormState((prev) => ({
-                      ...prev,
-                      allergies: event.target.value,
-                    }))
-                  }
-                />
+              <div className="rounded-2xl border border-white/25 bg-white/10 px-4 py-3 text-left shadow-sm backdrop-blur">
+                <p className="text-[11px] uppercase tracking-[0.3em] text-white/70">Last update</p>
+                <p className="text-lg font-semibold">{formatDateValue(patient?.updatedAt ?? patient?.createdAt ?? null)}</p>
               </div>
-              <div className="grid gap-2">
-                <Label htmlFor="medications">Current Medications</Label>
-                <Textarea
-                  id="medications"
-                  rows={4}
-                  placeholder="E.g., Metformin 500mg, Lisinopril 10mg"
-                  value={formState.currentMedications}
-                  onChange={(event) =>
-                    setFormState((prev) => ({
-                      ...prev,
-                      currentMedications: event.target.value,
-                    }))
-                  }
-                />
-              </div>
-              <Button type="submit" disabled={isUpdating} className="w-full">
-                {isUpdating ? "Saving..." : "Save Changes"}
+            </div>
+          </div>
+          <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
+            <SheetTrigger asChild>
+              <Button className="rounded-full bg-white px-6 py-2 text-sm font-semibold text-violet-700 shadow-lg transition hover:bg-violet-50">
+                Update Medical History
               </Button>
-            </form>
-          </SheetContent>
-        </Sheet>
+            </SheetTrigger>
+            <SheetContent side="right" className="sm:max-w-md">
+              <SheetHeader>
+                <SheetTitle className="text-xl font-semibold text-gray-800">
+                  Edit Medical History
+                </SheetTitle>
+                <SheetDescription>
+                  Separate each entry with commas or new lines. We’ll keep things organized for you.
+                </SheetDescription>
+              </SheetHeader>
+              <form className="flex flex-col gap-4 p-4" onSubmit={handleSubmit}>
+                <div className="grid gap-2">
+                  <Label htmlFor="medical-history">Chronic Conditions</Label>
+                  <Textarea
+                    id="medical-history"
+                    rows={4}
+                    placeholder="E.g., Hypertension, Type 2 Diabetes"
+                    value={formState.medicalHistory}
+                    onChange={(event) =>
+                      setFormState((prev) => ({
+                        ...prev,
+                        medicalHistory: event.target.value,
+                      }))
+                    }
+                  />
+                </div>
+                <div className="grid gap-2">
+                  <Label htmlFor="allergies">Allergies</Label>
+                  <Textarea
+                    id="allergies"
+                    rows={4}
+                    placeholder="E.g., Penicillin, Peanuts"
+                    value={formState.allergies}
+                    onChange={(event) =>
+                      setFormState((prev) => ({
+                        ...prev,
+                        allergies: event.target.value,
+                      }))
+                    }
+                  />
+                </div>
+                <div className="grid gap-2">
+                  <Label htmlFor="medications">Current Medications</Label>
+                  <Textarea
+                    id="medications"
+                    rows={4}
+                    placeholder="E.g., Metformin 500mg, Lisinopril 10mg"
+                    value={formState.currentMedications}
+                    onChange={(event) =>
+                      setFormState((prev) => ({
+                        ...prev,
+                        currentMedications: event.target.value,
+                      }))
+                    }
+                  />
+                </div>
+                <Button type="submit" disabled={isUpdating} className="w-full">
+                  {isUpdating ? "Saving..." : "Save Changes"}
+                </Button>
+              </form>
+            </SheetContent>
+          </Sheet>
+        </div>
       </div>
 
       {(isLoading || isFetching) && (
-        <div className="flex items-center gap-2 text-gray-500">
-          <Loader2 className="animate-spin w-5 h-5" /> Loading your records...
+        <div className="flex items-center gap-2 rounded-2xl border border-violet-100 bg-white/80 px-4 py-3 text-slate-600 shadow-sm">
+          <Loader2 className="h-5 w-5 animate-spin text-violet-500" /> Loading your records...
         </div>
       )}
 
       {!isLoading && !isFetching && (
-        <div className="flex flex-col gap-6">
+        <div className="flex flex-col gap-8">
           <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
             {summaryCards.map(({ label, value, helper, icon: Icon, accent }, index) => (
               <article
                 key={`${label}-${index}`}
-                className="bg-white/90 border border-gray-100 rounded-2xl shadow-sm p-4 flex flex-col justify-between"
+                className="group relative overflow-hidden rounded-2xl border border-white/60 bg-gradient-to-br from-white/95 via-white to-violet-50/70 p-5 shadow-lg ring-1 ring-violet-100/70 transition hover:-translate-y-1 hover:shadow-xl hover:ring-violet-200"
               >
+                <span className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-violet-500 via-indigo-500 to-sky-400" aria-hidden />
                 <div className="flex items-center gap-3">
-                  <span className={`p-2 rounded-xl border ${accent}`}>
-                    <Icon className="w-5 h-5" />
+                  <span className={`flex size-10 items-center justify-center rounded-xl border ${accent}`}>
+                    <Icon className="h-5 w-5" />
                   </span>
                   <div>
-                    <p className="text-xs uppercase tracking-wide text-gray-500">
+                    <p className="text-[11px] uppercase tracking-[0.28em] text-slate-500">
                       {label}
                     </p>
-                    <p className="text-lg font-semibold text-gray-800">{value}</p>
+                    <p className="text-lg font-semibold text-slate-900">{value}</p>
                   </div>
                 </div>
-                <p className="text-xs text-gray-500 mt-3">{helper}</p>
+                <p className="mt-3 text-xs text-slate-500">{helper}</p>
               </article>
             ))}
           </section>
@@ -411,24 +425,22 @@ const PatientDashboardPage = () => {
             {infoSections.map((infoSection) => (
               <article
                 key={infoSection.title}
-                className="bg-white/90 border border-slate-100 rounded-2xl shadow-sm p-6 flex flex-col gap-4"
+                className="rounded-3xl border border-white/60 bg-white/90 p-6 shadow-lg ring-1 ring-violet-100/60 backdrop-blur"
               >
-                <header>
-                  <h2 className="text-lg font-semibold text-gray-800">
-                    {infoSection.title}
-                  </h2>
-                  <p className="text-sm text-gray-500">{infoSection.description}</p>
+                <header className="space-y-1">
+                  <h2 className="text-lg font-semibold text-slate-900">{infoSection.title}</h2>
+                  <p className="text-sm text-slate-600">{infoSection.description}</p>
                 </header>
-                <dl className="grid gap-4 sm:grid-cols-2">
+                <dl className="mt-4 grid gap-4 sm:grid-cols-2">
                   {infoSection.items.map((item) => (
                     <div
                       key={`${infoSection.title}-${item.label}`}
-                      className="bg-slate-50 rounded-xl px-4 py-3 border border-slate-100"
+                      className="rounded-xl border border-violet-50 bg-violet-50/40 px-4 py-3"
                     >
-                      <dt className="text-xs uppercase tracking-wide text-gray-500">
+                      <dt className="text-[11px] uppercase tracking-[0.28em] text-slate-500">
                         {item.label}
                       </dt>
-                      <dd className="text-sm font-medium text-gray-800 mt-1">
+                      <dd className="mt-1 text-sm font-semibold text-slate-900">
                         {item.value}
                       </dd>
                     </div>
@@ -438,30 +450,30 @@ const PatientDashboardPage = () => {
             ))}
           </section>
 
-          <section className="bg-gradient-to-r from-rose-50 to-orange-50 border border-rose-100 rounded-2xl shadow-sm p-6">
-            <header className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between text-rose-600">
+          <section className="rounded-3xl border border-rose-100 bg-gradient-to-r from-rose-50 to-orange-50 p-6 shadow-lg">
+            <header className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
               <div className="flex items-center gap-3">
-                <PhoneCall className="w-5 h-5" />
+                <span className="flex size-10 items-center justify-center rounded-full bg-white/70 text-rose-500 ring-1 ring-white/50">
+                  <PhoneCall className="h-5 w-5" />
+                </span>
                 <div>
-                  <h2 className="text-lg font-semibold text-gray-800">
-                    Emergency Contact
-                  </h2>
-                  <p className="text-sm text-gray-600">
+                  <h2 className="text-lg font-semibold text-slate-900">Emergency Contact</h2>
+                  <p className="text-sm text-rose-700">
                     We will reach out to them first during urgent situations.
                   </p>
                 </div>
               </div>
             </header>
-            <dl className="grid gap-4 sm:grid-cols-3 mt-4">
+            <dl className="mt-4 grid gap-4 sm:grid-cols-3">
               {emergencyDetails.map((detail) => (
                 <div
                   key={detail.label}
-                  className="bg-white/80 border border-white rounded-xl px-4 py-3"
+                  className="rounded-xl border border-white/70 bg-white/80 px-4 py-3 shadow-sm"
                 >
-                  <dt className="text-xs uppercase tracking-wide text-gray-500">
+                  <dt className="text-[11px] uppercase tracking-[0.28em] text-slate-500">
                     {detail.label}
                   </dt>
-                  <dd className="text-sm font-medium text-gray-800 mt-1">
+                  <dd className="mt-1 text-sm font-semibold text-slate-900">
                     {detail.value}
                   </dd>
                 </div>
@@ -470,16 +482,16 @@ const PatientDashboardPage = () => {
           </section>
 
           <section className="grid gap-6 md:grid-cols-3">
-            <article className="bg-white/90 border border-sky-100 rounded-2xl shadow-sm p-6 flex flex-col gap-4">
+            <article className="rounded-3xl border border-sky-100 bg-gradient-to-br from-white via-sky-50 to-white p-6 shadow-lg">
               <header className="flex items-center gap-3 text-sky-700">
-                <Stethoscope className="w-6 h-6" />
+                <Stethoscope className="h-6 w-6" />
                 <h2 className="text-lg font-semibold">Chronic Conditions</h2>
               </header>
-              <ul className="space-y-2 text-sm text-gray-700">
+              <ul className="mt-3 space-y-2 text-sm text-slate-700">
                 {toDisplayList(patient?.medicalHistory).map((item, index) => (
                   <li
                     key={`${item}-${index}`}
-                    className="bg-sky-50 border border-sky-100 rounded-lg px-3 py-2"
+                    className="rounded-lg border border-sky-100 bg-white/80 px-3 py-2"
                   >
                     {item}
                   </li>
@@ -487,16 +499,16 @@ const PatientDashboardPage = () => {
               </ul>
             </article>
 
-            <article className="bg-white/90 border border-amber-100 rounded-2xl shadow-sm p-6 flex flex-col gap-4">
+            <article className="rounded-3xl border border-amber-100 bg-gradient-to-br from-white via-amber-50 to-white p-6 shadow-lg">
               <header className="flex items-center gap-3 text-amber-600">
-                <ShieldAlert className="w-6 h-6" />
+                <ShieldAlert className="h-6 w-6" />
                 <h2 className="text-lg font-semibold">Allergies</h2>
               </header>
-              <ul className="space-y-2 text-sm text-gray-700">
+              <ul className="mt-3 space-y-2 text-sm text-slate-700">
                 {toDisplayList(patient?.allergies).map((item, index) => (
                   <li
                     key={`${item}-${index}`}
-                    className="bg-amber-50 border border-amber-100 rounded-lg px-3 py-2"
+                    className="rounded-lg border border-amber-100 bg-white/80 px-3 py-2"
                   >
                     {item}
                   </li>
@@ -504,16 +516,16 @@ const PatientDashboardPage = () => {
               </ul>
             </article>
 
-            <article className="bg-white/90 border border-emerald-100 rounded-2xl shadow-sm p-6 flex flex-col gap-4">
+            <article className="rounded-3xl border border-emerald-100 bg-gradient-to-br from-white via-emerald-50 to-white p-6 shadow-lg">
               <header className="flex items-center gap-3 text-emerald-600">
-                <Pill className="w-6 h-6" />
+                <Pill className="h-6 w-6" />
                 <h2 className="text-lg font-semibold">Current Medications</h2>
               </header>
-              <ul className="space-y-2 text-sm text-gray-700">
+              <ul className="mt-3 space-y-2 text-sm text-slate-700">
                 {toDisplayList(patient?.currentMedications).map((item, index) => (
                   <li
                     key={`${item}-${index}`}
-                    className="bg-emerald-50 border border-emerald-100 rounded-lg px-3 py-2"
+                    className="rounded-lg border border-emerald-100 bg-white/80 px-3 py-2"
                   >
                     {item}
                   </li>

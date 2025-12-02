@@ -10,7 +10,6 @@ import {
   Loader2,
   RefreshCcw,
   ShieldCheck,
-  Sparkles,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -156,7 +155,6 @@ const MySubscription = () => {
           <div className="flex flex-wrap items-start justify-between gap-6">
             <div className="max-w-2xl space-y-4">
               <span className="inline-flex items-center gap-2 rounded-full bg-violet-100 px-4 py-1 text-xs font-semibold uppercase tracking-[0.35em] text-violet-600">
-                <Sparkles className="h-4 w-4" />
                 Membership Hub
               </span>
               <h1 className="text-4xl font-black text-slate-900 sm:text-5xl">

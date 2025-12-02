@@ -13,7 +13,6 @@ import {
   Mail,
   MapPin,
   Phone,
-  Sparkles,
   Stethoscope,
   UserRound,
 } from "lucide-react";
@@ -196,7 +195,6 @@ export default function DoctorDetailsPage() {
           <div className="space-y-8">
             <div className="space-y-4">
               <span className="inline-flex items-center gap-2 rounded-full bg-violet-100 px-4 py-1 text-xs font-semibold uppercase tracking-[0.35em] text-violet-600">
-                <Sparkles className="size-4" />
                 HealthSync specialist
               </span>
               <div>
@@ -394,7 +392,6 @@ export default function DoctorDetailsPage() {
               key={item}
               className="flex items-start gap-3 rounded-2xl bg-violet-50/60 px-4 py-3 text-sm text-slate-600"
             >
-              <Sparkles className="mt-0.5 h-4 w-4 text-violet-500" />
               <span>{item}</span>
             </div>
           ))}

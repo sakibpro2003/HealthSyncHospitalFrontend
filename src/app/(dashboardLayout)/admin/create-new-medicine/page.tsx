@@ -7,7 +7,6 @@ import {
   Factory,
   Package,
   ShieldCheck,
-  Sparkles,
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -172,13 +171,13 @@ const ProductForm = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-50 via-white to-slate-100 py-10 px-4">
-      <div className="mx-auto flex max-w-6xl flex-col gap-8">
+    <div className="min-h-screen bg-gradient-to-b from-slate-50 via-white to-slate-100 py-10 px-4 sm:px-6 lg:px-8">
+      <div className="mx-auto flex w-full max-w-7xl flex-col gap-8">
         <header className="rounded-3xl border border-white/60 bg-white/90 p-8 shadow-[0_30px_80px_rgba(15,23,42,0.08)] backdrop-blur">
           <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
             <div className="space-y-3">
               <span className="inline-flex items-center gap-2 rounded-full bg-violet-50 px-4 py-1 text-xs font-semibold uppercase tracking-[0.35em] text-violet-600">
-                <Sparkles className="h-4 w-4" /> Pharmacy control room
+                <p className="h-4" /> Pharmacy control room
               </span>
               <h1 className="text-3xl font-black text-slate-900 sm:text-4xl">
                 Launch a new medicine batch
@@ -188,7 +187,7 @@ const ProductForm = () => {
                 The preview cards update as you type, so your team stays in sync.
               </p>
             </div>
-            <div className="grid gap-3 sm:grid-cols-2 lg:w-80">
+            <div className="grid gap-3 sm:grid-cols-2 lg:w-96 xl:w-[26rem]">
               {highlightCards.map(({ label, value, helper, icon: Icon, accent }) => (
                 <article
                   key={label}
@@ -216,7 +215,7 @@ const ProductForm = () => {
           onSubmit={handleSubmit}
           className="space-y-8 rounded-3xl border border-white/70 bg-white/95 p-8 shadow-[0_25px_60px_rgba(15,23,42,0.06)]"
         >
-          <div className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
+          <div className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr] xl:grid-cols-[1.2fr_0.8fr]">
             <div className="space-y-6">
               <section className="rounded-2xl border border-slate-100 bg-slate-50/40 p-6">
                 <div className="mb-4 flex items-center gap-3 text-slate-700">

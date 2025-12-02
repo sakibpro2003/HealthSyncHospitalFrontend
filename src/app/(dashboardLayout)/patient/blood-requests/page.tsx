@@ -10,7 +10,6 @@ import {
   Loader2,
   Phone,
   ShieldCheck,
-  Sparkles,
 } from "lucide-react";
 import { format } from "date-fns";
 import { toast } from "sonner";
@@ -210,7 +209,6 @@ const PatientBloodRequestsPage = () => {
           <div className="flex flex-wrap items-start justify-between gap-6">
             <div className="max-w-2xl space-y-4">
               <span className="inline-flex items-center gap-2 rounded-full bg-rose-100 px-4 py-1 text-xs font-semibold uppercase tracking-[0.35em] text-rose-600">
-                <Sparkles className="h-4 w-4" />
                 Blood Support Hub
               </span>
               <h1 className="text-4xl font-black text-slate-900 sm:text-5xl">

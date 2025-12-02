@@ -49,7 +49,7 @@ const page = () => {
       {/* TODO: uninstall slider js */}
       {/* <Slider /> */}
       {/* <DepartmentTabs /> */}
-      <div className="flex-1 pb-20">
+      <div className="mx-auto flex w-full max-w-[85vw] flex-1 flex-col pb-20">
         <DepartmentButtons />
         <PackageCard />
         <DiscountSection />

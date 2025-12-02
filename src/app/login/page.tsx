@@ -19,7 +19,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { useLoginMutation } from "@/redux/features/auth/authApi";
-import { Loader2, ShieldCheck, Sparkles, Stethoscope } from "lucide-react";
+import { Loader2, ShieldCheck, Stethoscope } from "lucide-react";
 import { useAppDispatch } from "@/redux/hooks";
 import { setUser } from "@/redux/features/auth/authSlice";
 import { setClientTokenCookie } from "@/utils/clientTokenCookie";
@@ -115,7 +115,7 @@ const LoginForm = () => {
       <div className="relative z-10 mx-auto flex w-full max-w-5xl flex-col gap-8 rounded-[2.5rem] border border-white/40 bg-white/90 shadow-[0_35px_80px_-45px_rgba(91,33,182,0.35)] backdrop-blur-xl lg:flex-row lg:gap-12">
         <div className="flex-1 space-y-6 border-b border-white/40 px-10 py-12 text-slate-700 lg:border-b-0 lg:border-r">
           <span className="inline-flex items-center gap-2 rounded-full bg-violet-100 px-4 py-1 text-xs font-semibold uppercase tracking-[0.35em] text-violet-600">
-            <Sparkles className="h-4 w-4" /> HealthSync Access
+            HealthSync Access
           </span>
           <h1 className="text-3xl font-black text-slate-900 sm:text-4xl">
             Welcome back to your command centre

@@ -46,10 +46,15 @@ const genderFilters: { label: string; value: GenderFilter }[] = [
   { label: "Other", value: "other" },
 ];
 
-const PatientsContent = () => {
+type PatientsPageProps = {
+  baseSegment?: string;
+};
+
+const PatientsContent = ({ baseSegment = "receptionist" }: PatientsPageProps) => {
   const searchParams = useSearchParams();
   const pageParam = Number(searchParams.get("page"));
   const currentPage = Number.isNaN(pageParam) || pageParam < 1 ? 1 : pageParam;
+  const basePath = `/${baseSegment}`;
 
   const form = useForm<{ search: string }>({
     defaultValues: { search: "" },
@@ -133,7 +138,7 @@ const PatientsContent = () => {
           <Button onClick={() => refetch()}>
             <RefreshCcw className="h-4 w-4" /> Try again
           </Button>
-          <Link href="/receptionist/patient-register">
+          <Link href={`${basePath}/patient-register`}>
             <Button variant="outline">Register patient</Button>
           </Link>
         </CardContent>
@@ -149,7 +154,7 @@ const PatientsContent = () => {
         <div className="flex flex-col gap-8 lg:flex-row lg:items-center lg:justify-between">
           <div className="max-w-2xl space-y-4">
             <Badge className="w-fit bg-emerald-100 text-emerald-700">
-              Reception / Patient desk
+              {baseSegment === "admin" ? "Admin / Patient desk" : "Reception / Patient desk"}
             </Badge>
             <div>
               <h1 className="text-3xl font-semibold text-slate-900 sm:text-4xl">
@@ -161,7 +166,7 @@ const PatientsContent = () => {
               </p>
             </div>
             <div className="flex flex-wrap gap-3">
-              <Link href="/receptionist/patient-register">
+              <Link href={`${basePath}/patient-register`}>
                 <Button size="lg" className="gap-2 rounded-full">
                   <UserPlus className="h-4 w-4" />
                   Register patient
@@ -335,7 +340,7 @@ const PatientsContent = () => {
                         {patient.address || "-"}
                       </TableCell>
                       <TableCell className="text-right">
-                        <Link href={`/receptionist/patients/${patient._id}`}>
+                        <Link href={`${basePath}/patients/${patient._id}`}>
                           <Button variant="ghost" size="sm" className="text-emerald-600">
                             View profile
                           </Button>
@@ -356,10 +361,11 @@ const PatientsContent = () => {
   );
 };
 
-const Patients = () => (
+const Patients = ({ baseSegment = "receptionist" }: PatientsPageProps) => (
   <Suspense fallback={<Loader />}>
-    <PatientsContent />
+    <PatientsContent baseSegment={baseSegment} />
   </Suspense>
 );
 
 export default Patients;
+export { PatientsContent };

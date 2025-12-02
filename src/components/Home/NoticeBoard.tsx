@@ -21,7 +21,6 @@ import {
   Pencil,
   Plus,
   ShieldAlert,
-  Sparkles,
   Trash2,
   Users2,
   X,
@@ -152,15 +151,18 @@ const NoticeBoard = () => {
   };
 
   return (
-    <section className="relative isolate mx-auto mt-20 w-full overflow-hidden rounded-[2.5rem] border border-white/10 bg-gradient-to-br from-white/95 via-white/80 to-violet-50/80 px-4 py-16 shadow-[0_35px_80px_-40px_rgba(30,41,59,0.55)] backdrop-blur sm:px-6 lg:px-10">
-      <div className="absolute inset-0 -z-10 bg-gradient-to-br from-violet-200 via-violet-100 to-white" aria-hidden />
-      <div className="absolute -top-16 right-0 h-56 w-56 rounded-full bg-violet-200/60 blur-3xl" aria-hidden />
-      <div className="absolute -bottom-16 left-8 h-48 w-48 rounded-full bg-sky-200/50 blur-3xl" aria-hidden />
+    <section className="relative isolate mx-auto mt-20 w-full overflow-hidden rounded-[2.5rem] border border-white/15 bg-gradient-to-br from-white/95 via-white/85 to-violet-50/80 px-4 py-16 shadow-[0_40px_90px_-45px_rgba(79,70,229,0.25)] backdrop-blur sm:px-6 lg:px-10">
+      <div
+        className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_12%_20%,rgba(124,58,237,0.12),transparent_32%),radial-gradient(circle_at_82%_8%,rgba(59,130,246,0.1),transparent_30%),radial-gradient(circle_at_20%_82%,rgba(99,102,241,0.1),transparent_30%)]"
+        aria-hidden
+      />
+      <div className="absolute -top-16 right-0 h-56 w-56 rounded-full bg-violet-200/50 blur-3xl" aria-hidden />
+      <div className="absolute -bottom-16 left-8 h-48 w-48 rounded-full bg-indigo-200/50 blur-3xl" aria-hidden />
 
       <div className="relative z-10 flex flex-col gap-8">
         <header className="flex flex-col items-center justify-between gap-6 text-center md:flex-row md:text-left">
           <div className="space-y-4">
-            <span className="inline-flex items-center gap-2 rounded-full bg-violet-100 px-4 py-1 text-xs font-semibold uppercase tracking-[0.32em] text-violet-700">
+            <span className="inline-flex items-center gap-2 rounded-full border border-violet-100 bg-violet-50 px-4 py-1 text-xs font-semibold uppercase tracking-[0.32em] text-violet-700 ring-1 ring-violet-200/70">
               <Megaphone className="size-4" />
               Notice Board
             </span>
@@ -174,14 +176,14 @@ const NoticeBoard = () => {
           {isAdmin ? (
             <Button
               onClick={() => openEditor()}
-              className="rounded-full bg-violet-600 px-6 py-2 text-sm font-semibold text-white shadow-lg transition hover:bg-violet-700"
+              className="rounded-full bg-gradient-to-r from-violet-600 via-indigo-600 to-sky-500 px-6 py-2 text-sm font-semibold text-white shadow-lg transition hover:brightness-110"
             >
               <Plus className="mr-2 size-4" /> Publish notice
             </Button>
           ) : (
             <div className="flex flex-col items-center gap-2 text-sm text-slate-500 md:items-end">
-              <div className="inline-flex items-center gap-2 rounded-full bg-white/70 px-4 py-2 shadow">
-                <Users2 className="size-4 text-violet-500" />
+              <div className="inline-flex items-center gap-2 rounded-full border border-violet-100 bg-white/80 px-4 py-2 shadow-sm">
+                <Users2 className="size-4 text-violet-600" />
                 <span>Managed by HealthSync admins</span>
               </div>
             </div>
@@ -189,7 +191,7 @@ const NoticeBoard = () => {
         </header>
 
         {sortedNotices.length === 0 ? (
-          <div className="rounded-3xl border border-dashed border-violet-200 bg-white/70 p-10 text-center text-slate-500">
+          <div className="rounded-3xl border border-dashed border-violet-200 bg-gradient-to-br from-white/90 to-violet-50/60 p-10 text-center text-slate-500 shadow-sm">
             No notices yet. Check back soon for updates.
           </div>
         ) : (
@@ -197,18 +199,21 @@ const NoticeBoard = () => {
             {sortedNotices.map((notice) => (
               <li
                 key={notice.id}
-                className="group relative overflow-hidden rounded-[1.75rem] border border-white/60 bg-white/80 p-6 shadow-lg transition hover:-translate-y-1 hover:shadow-xl md:p-8"
+                className="group relative overflow-hidden rounded-[1.75rem] border border-white/60 bg-gradient-to-br from-white/95 via-white to-violet-50/80 p-6 shadow-lg ring-1 ring-violet-100/70 transition hover:-translate-y-1.5 hover:shadow-2xl hover:ring-violet-200 md:p-8"
               >
-                <div className="absolute -right-8 -top-8 size-32 rounded-full bg-violet-200/40 blur-2xl" aria-hidden />
+                <div className="absolute -right-10 -top-12 size-36 rounded-full bg-violet-200/50 blur-3xl" aria-hidden />
+                <div className="absolute left-0 top-0 h-full w-[6px] bg-gradient-to-b from-violet-500 via-indigo-500 to-sky-500" aria-hidden />
                 <div className="relative z-10 flex flex-col gap-4">
                   <div className="flex flex-wrap items-center gap-3">
-                    <Badge className={priorityStyles[notice.priority]}>Priority: {notice.priority}</Badge>
-                    <Badge variant="outline" className="border-violet-200 bg-white/60 text-violet-600">
+                    <Badge className={`${priorityStyles[notice.priority]} border border-transparent px-3 py-1`}>
+                      Priority: {notice.priority}
+                    </Badge>
+                    <Badge variant="outline" className="border-violet-200 bg-white/70 text-violet-700">
                       {audienceLabels[notice.audience]}
                     </Badge>
                     {notice.author && (
-                      <span className="inline-flex items-center gap-2 rounded-full bg-white/60 px-3 py-1 text-xs font-medium text-slate-500 shadow-sm">
-                        <Sparkles className="size-3 text-violet-500" /> {notice.author}
+                      <span className="inline-flex items-center gap-2 rounded-full border border-slate-200/70 bg-white/70 px-3 py-1 text-xs font-medium text-slate-600 shadow-sm">
+                        {notice.author}
                       </span>
                     )}
                   </div>
@@ -216,7 +221,7 @@ const NoticeBoard = () => {
                   <h3 className="text-2xl font-semibold text-slate-900">{notice.title}</h3>
                   <p className="text-base text-slate-600">{notice.summary}</p>
 
-                  <div className="rounded-2xl border border-violet-100 bg-violet-50/70 p-4 text-sm text-slate-600">
+                  <div className="rounded-2xl border border-violet-100 bg-white/80 p-4 text-sm text-slate-600 shadow-inner">
                     {notice.body}
                   </div>
 
@@ -235,7 +240,7 @@ const NoticeBoard = () => {
                         <Button
                           size="sm"
                           variant="outline"
-                          className="rounded-full border-slate-200 text-slate-700 hover:border-violet-300 hover:bg-violet-50"
+                          className="rounded-full border-violet-200 text-slate-700 hover:border-violet-300 hover:bg-violet-50"
                           onClick={() => openEditor(notice)}
                         >
                           <Pencil className="mr-2 size-4" /> Edit
@@ -259,15 +264,15 @@ const NoticeBoard = () => {
       </div>
 
       {isEditorOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-violet-400/30 backdrop-blur">
-          <div className="relative mx-4 w-full max-w-3xl overflow-hidden rounded-3xl border border-white/40 bg-white/95 shadow-2xl">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-violet-600/25 backdrop-blur">
+          <div className="relative mx-4 w-full max-w-3xl overflow-hidden rounded-3xl border border-white/30 bg-gradient-to-br from-white via-white to-violet-50/80 shadow-2xl shadow-violet-200/40 ring-1 ring-violet-100/70">
             <div className="absolute -left-16 top-0 h-36 w-36 rounded-full bg-violet-200/60 blur-3xl" aria-hidden />
-            <div className="absolute -right-20 bottom-0 h-44 w-44 rounded-full bg-sky-200/60 blur-3xl" aria-hidden />
+            <div className="absolute -right-20 bottom-0 h-44 w-44 rounded-full bg-indigo-200/60 blur-3xl" aria-hidden />
 
             <form onSubmit={handleSubmit} className="relative z-10 flex flex-col gap-5 p-8 md:p-10">
               <header className="flex items-start justify-between gap-3">
                 <div>
-                  <span className="inline-flex items-center gap-2 rounded-full bg-violet-100 px-3 py-1 text-xs font-semibold uppercase tracking-[0.3em] text-violet-700">
+                  <span className="inline-flex items-center gap-2 rounded-full border border-violet-100 bg-violet-50 px-3 py-1 text-xs font-semibold uppercase tracking-[0.3em] text-violet-700 ring-1 ring-violet-200/70">
                     <Megaphone className="size-3.5" />
                     {editingNotice ? "Update notice" : "Publish notice"}
                   </span>
@@ -376,7 +381,7 @@ const NoticeBoard = () => {
                   </Button>
                   <Button
                     type="submit"
-                    className="rounded-full bg-violet-600 px-6 text-sm font-semibold text-white shadow-lg transition hover:bg-violet-700 disabled:cursor-not-allowed disabled:opacity-80"
+                    className="rounded-full bg-gradient-to-r from-violet-600 via-indigo-600 to-sky-500 px-6 text-sm font-semibold text-white shadow-lg transition hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-80"
                     disabled={isSubmitting}
                   >
                     {isSubmitting ? "Saving..." : editingNotice ? "Save changes" : "Publish notice"}

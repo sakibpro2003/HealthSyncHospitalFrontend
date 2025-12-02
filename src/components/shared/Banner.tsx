@@ -1,7 +1,16 @@
 "use client";
 import { useCallback, useEffect, useMemo, useState } from "react";
+import Image from "next/image";
 import { Button } from "@/components/ui/button";
-import { ChevronLeft, ChevronRight, Sparkles } from "lucide-react";
+import {
+  BadgeCheck,
+  ChevronLeft,
+  ChevronRight,
+  Clock3,
+  HeartPulse,
+  ShieldCheck,
+  Stethoscope,
+} from "lucide-react";
 
 const slides = [
   {
@@ -19,6 +28,7 @@ const slides = [
       caption: "Smart coordination across clinics",
       gradient: "from-violet-600/70 via-indigo-500/65 to-sky-500/70",
     },
+    image: "/hero-doctor.jpg",
   },
   {
     id: 2,
@@ -35,6 +45,7 @@ const slides = [
       caption: "Clinicians stay in sync",
       gradient: "from-emerald-500/70 via-blue-500/65 to-violet-600/60",
     },
+    image: "/hero-doctor.jpg",
   },
   {
     id: 3,
@@ -51,6 +62,7 @@ const slides = [
       caption: "Compliance baked into every workflow",
       gradient: "from-sky-600/70 via-indigo-500/70 to-slate-900/70",
     },
+    image: "/hero-doctor.jpg",
   },
   {
     id: 4,
@@ -67,6 +79,7 @@ const slides = [
       caption: "Patient updates in real time",
       gradient: "from-rose-500/70 via-orange-500/65 to-amber-400/70",
     },
+    image: "/hero-doctor.jpg",
   },
   {
     id: 5,
@@ -83,6 +96,7 @@ const slides = [
       caption: "Predictive analytics, ready to go",
       gradient: "from-blue-600/70 via-cyan-500/60 to-teal-500/70",
     },
+    image: "/hero-doctor.jpg",
   },
   {
     id: 6,
@@ -99,6 +113,7 @@ const slides = [
       caption: "Dedicated success specialists",
       gradient: "from-purple-500/70 via-violet-500/60 to-fuchsia-500/60",
     },
+    image: "/hero-doctor.jpg",
   },
   {
     id: 7,
@@ -115,10 +130,12 @@ const slides = [
       caption: "Keep teams aligned at scale",
       gradient: "from-indigo-600/70 via-violet-600/70 to-sky-600/70",
     },
+    image: "/hero-doctor.jpg",
   },
 ];
 
 const AUTO_ROTATE_MS = 6500;
+const featureIcons = [Stethoscope, ShieldCheck, HeartPulse];
 
 const Banner = () => {
   const [current, setCurrent] = useState(0);
@@ -142,69 +159,118 @@ const Banner = () => {
   const activeSlide = useMemo(() => slides[current], [current]);
 
   return (
-    <section className="relative isolate mx-auto mt-12 w-full px-4 sm:px-6 lg:px-8">
-      <div className="relative overflow-hidden rounded-[2.25rem] bg-gradient-to-br from-white/95 via-white/85 to-violet-50/80 shadow-2xl">
-        <div className="relative flex flex-col gap-10 px-6 py-10 backdrop-blur md:flex-row md:items-center md:px-12 md:py-14">
-          <div className="absolute -left-20 top-10 h-36 w-36 rounded-full bg-violet-200/70 blur-3xl" aria-hidden />
-          <div className="absolute -right-16 bottom-0 h-48 w-48 rounded-full bg-sky-200/60 blur-3xl" aria-hidden />
+    <section className="relative isolate mx-auto mt-12 w-full max-w-[85vw] px-4 sm:px-6 lg:px-8">
+      <div className="relative overflow-hidden rounded-[2.5rem] border border-white/70 bg-white shadow-2xl ring-1 ring-slate-100">
+        <div className="absolute inset-0 bg-gradient-to-br from-sky-50 via-white to-emerald-50" aria-hidden />
+        <div
+          className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(59,130,246,0.12),transparent_40%),radial-gradient(circle_at_80%_0%,rgba(16,185,129,0.12),transparent_35%),radial-gradient(circle_at_10%_70%,rgba(14,165,233,0.12),transparent_35%)]"
+          aria-hidden
+        />
 
-          <div className="relative z-10 flex-1 space-y-6 text-left">
-            <span className="inline-flex items-center gap-2 rounded-full bg-violet-100 px-4 py-1 text-sm font-semibold uppercase tracking-[0.35em] text-violet-700">
-              <Sparkles className="size-4 text-violet-500" />
-              {activeSlide.eyebrow}
-            </span>
+        <div className="relative grid items-center gap-12 px-6 py-12 backdrop-blur md:px-10 lg:grid-cols-[1.05fr_0.95fr] lg:px-14 lg:py-16">
+          <div className="absolute -left-28 top-10 h-40 w-40 rounded-full bg-sky-100 blur-3xl" aria-hidden />
+          <div className="absolute -right-20 bottom-6 h-52 w-52 rounded-full bg-emerald-100 blur-3xl" aria-hidden />
 
-            <h1 className="text-3xl font-black leading-tight text-slate-900 sm:text-4xl lg:text-5xl">
-              {activeSlide.title}
-            </h1>
+          <div className="relative z-10 space-y-6">
+            <div className="flex flex-wrap items-center gap-3">
+              <span className="inline-flex items-center gap-2 rounded-full bg-white/90 px-4 py-2 text-xs font-semibold uppercase tracking-[0.35em] text-slate-700 shadow-sm ring-1 ring-slate-100">
+                {activeSlide.eyebrow}
+              </span>
+              <span className="hidden items-center gap-2 rounded-full bg-emerald-50 px-3 py-1 text-xs font-medium text-emerald-700 ring-1 ring-emerald-100/80 sm:inline-flex">
+                <BadgeCheck className="size-4" />
+                Verified care teams
+              </span>
+            </div>
 
-            <p className="max-w-xl text-base text-slate-600 sm:text-lg">
-              {activeSlide.description}
-            </p>
+            <div className="space-y-4">
+              <h1 className="text-3xl font-black leading-tight text-slate-900 sm:text-4xl lg:text-5xl">
+                {activeSlide.title}
+              </h1>
+              <p className="max-w-2xl text-base text-slate-600 sm:text-lg">
+                {activeSlide.description}
+              </p>
+            </div>
 
             <div className="flex flex-wrap items-center gap-3 text-sm text-slate-500">
-              <span className="rounded-full bg-slate-900/10 px-3 py-2 font-semibold text-slate-900">
+              <span className="inline-flex items-center gap-2 rounded-full bg-slate-900 px-4 py-2 text-sm font-semibold text-white shadow-lg shadow-sky-100">
+                <ShieldCheck className="size-4 text-emerald-200" />
                 {activeSlide.highlight}
               </span>
-              {activeSlide.features.map((feature) => (
-                <span
-                  key={`${activeSlide.id}-${feature}`}
-                  className="rounded-full bg-white px-3 py-1 text-xs font-medium uppercase tracking-wide text-slate-500 shadow-sm"
-                >
-                  {feature}
-                </span>
-              ))}
+              {activeSlide.features.map((feature, index) => {
+                const Icon = featureIcons[index % featureIcons.length];
+                return (
+                  <span
+                    key={`${activeSlide.id}-${feature}`}
+                    className="inline-flex items-center gap-2 rounded-full bg-white/80 px-3 py-1.5 text-xs font-semibold uppercase tracking-wide text-slate-600 shadow-sm ring-1 ring-slate-100"
+                  >
+                    <Icon className="size-4 text-sky-500" />
+                    {feature}
+                  </span>
+                );
+              })}
             </div>
 
             <div className="flex flex-wrap gap-3 pt-2">
-              <Button className="rounded-full bg-violet-600 px-6 py-2 text-sm font-semibold text-white shadow-lg transition hover:bg-violet-700">
+              <Button className="rounded-full bg-sky-600 px-7 py-2 text-sm font-semibold text-white shadow-lg shadow-sky-100 transition hover:bg-sky-700">
                 {activeSlide.ctaLabel}
               </Button>
               <Button
                 variant="outline"
-                className="rounded-full border-slate-300 px-6 py-2 text-sm font-semibold text-slate-700 hover:border-slate-400 hover:bg-white"
+                className="rounded-full border-slate-200 bg-white/70 px-7 py-2 text-sm font-semibold text-slate-700 shadow-sm transition hover:border-slate-300 hover:bg-white"
               >
                 {activeSlide.secondaryLabel}
               </Button>
             </div>
+
+            <div className="grid grid-cols-2 gap-4 pt-2 sm:max-w-xl">
+              <div className="rounded-2xl border border-slate-100 bg-white/90 px-4 py-3 shadow-sm shadow-sky-50">
+                <p className="text-sm font-semibold text-slate-900">4.8/5 patient satisfaction</p>
+                <p className="text-xs text-slate-500">Feedback from 12k+ recent visits</p>
+              </div>
+              <div className="rounded-2xl border border-slate-100 bg-white/90 px-4 py-3 shadow-sm shadow-emerald-50">
+                <p className="text-sm font-semibold text-slate-900">25+ specialist departments</p>
+                <p className="text-xs text-slate-500">Direct routing to the right doctor</p>
+              </div>
+            </div>
           </div>
 
-          <div className="relative z-10 flex-1">
-            <div
-              className={`relative mx-auto aspect-[4/3] w-full max-w-[18rem] overflow-hidden rounded-3xl border border-white/20 shadow-xl sm:max-w-sm lg:max-w-md`}
-            >
-              <div
-                className={`absolute inset-0 bg-gradient-to-br ${activeSlide.visual.gradient}`}
+          <div className="relative z-10">
+            <div className="absolute -left-10 -top-12 h-48 w-48 rounded-full bg-white/60 blur-3xl" aria-hidden />
+            <div className="absolute -right-16 bottom-0 h-60 w-60 rounded-full bg-sky-100 blur-3xl" aria-hidden />
+
+            <div className="relative overflow-hidden rounded-[1.75rem] border border-white/80 bg-slate-900/80 shadow-2xl shadow-sky-100/60">
+              <div className={`absolute inset-0 bg-gradient-to-tr ${activeSlide.visual.gradient}`} aria-hidden />
+              <div className="absolute inset-0 bg-gradient-to-tr from-slate-900/35 via-slate-900/10 to-transparent" aria-hidden />
+              <Image
+                src={activeSlide.image}
+                alt="HealthSync care team"
+                fill
+                priority
+                className="object-cover"
+                sizes="(min-width: 1280px) 520px, (min-width: 1024px) 440px, 100vw"
               />
-              <div className="absolute -left-16 top-12 h-36 w-36 rounded-full bg-white/25 blur-3xl" aria-hidden />
-              <div className="absolute -right-14 bottom-10 h-48 w-48 rounded-full bg-white/15 blur-2xl" aria-hidden />
-              <div className="relative flex h-full flex-col items-center justify-center gap-4 px-8 text-center text-white">
-                <span className="rounded-full border border-white/40 bg-white/10 px-4 py-2 text-xs font-semibold uppercase tracking-[0.35em] text-white/90">
-                  {activeSlide.visual.label}
-                </span>
-                <p className="max-w-xs text-sm font-medium text-white/80">
-                  {activeSlide.visual.caption}
-                </p>
+
+              <div className="absolute left-5 top-5 inline-flex items-center gap-2 rounded-full bg-white/90 px-3 py-2 text-xs font-semibold text-slate-700 shadow-md shadow-sky-100">
+                <Stethoscope className="size-4 text-sky-600" />
+                Board-certified doctors
+              </div>
+
+              <div className="absolute bottom-5 right-5 flex items-center gap-3 rounded-2xl bg-white/90 px-4 py-3 text-left text-slate-900 shadow-xl shadow-sky-100">
+                <div className="flex size-10 items-center justify-center rounded-full bg-sky-50 text-sky-700">
+                  <HeartPulse className="size-5" />
+                </div>
+                <div>
+                  <p className="text-xs font-semibold text-slate-700">Response time</p>
+                  <p className="text-sm text-slate-600">Under 5 min average</p>
+                </div>
+              </div>
+            </div>
+
+            <div className="mt-6 flex items-center gap-3 rounded-2xl border border-slate-100 bg-white/90 px-5 py-4 shadow-sm shadow-sky-50">
+              <Clock3 className="size-6 text-sky-600" />
+              <div className="text-left">
+                <p className="text-sm font-semibold text-slate-900">Same-day appointments</p>
+                <p className="text-xs text-slate-500">We match you with the right specialist instantly.</p>
               </div>
             </div>
           </div>
@@ -217,7 +283,7 @@ const Banner = () => {
                 aria-label={`Go to slide ${index + 1}`}
                 className={`h-2.5 rounded-full transition ${
                   current === index
-                    ? "w-12 bg-violet-600 shadow-[0_0_12px_rgba(124,58,237,0.65)]"
+                    ? "w-12 bg-sky-600 shadow-[0_0_12px_rgba(14,165,233,0.45)]"
                     : "w-6 bg-slate-300/70 hover:bg-slate-400"
                 }`}
               />
@@ -228,14 +294,14 @@ const Banner = () => {
             <button
               onClick={prevSlide}
               aria-label="Previous slide"
-              className="flex size-10 items-center justify-center rounded-full border border-white/60 bg-white/80 text-slate-700 shadow-md backdrop-blur transition hover:scale-105"
+              className="flex size-10 items-center justify-center rounded-full border border-white/80 bg-white/90 text-slate-700 shadow-md backdrop-blur transition hover:scale-105"
             >
               <ChevronLeft className="size-5" />
             </button>
             <button
               onClick={nextSlide}
               aria-label="Next slide"
-              className="flex size-10 items-center justify-center rounded-full border border-white/60 bg-white/80 text-slate-700 shadow-md backdrop-blur transition hover:scale-105"
+              className="flex size-10 items-center justify-center rounded-full border border-white/80 bg-white/90 text-slate-700 shadow-md backdrop-blur transition hover:scale-105"
             >
               <ChevronRight className="size-5" />
             </button>

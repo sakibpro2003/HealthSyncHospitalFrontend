@@ -238,6 +238,7 @@ const ManageUser = () => {
                     <SelectItem value="user">User</SelectItem>
                     <SelectItem value="receptionist">Receptionist</SelectItem>
                     <SelectItem value="admin">Admin</SelectItem>
+                    <SelectItem value="doctor">Doctor</SelectItem>
                   </SelectContent>
                 </Select>
               </TableCell>
