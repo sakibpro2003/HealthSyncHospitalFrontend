@@ -1,9 +1,7 @@
 "use client";
 
-import Patients, { PatientsContent } from "@/app/(dashboardLayout)/receptionist/patients/page";
+import PatientsScreen from "@/app/(dashboardLayout)/receptionist/patients/PatientsScreen";
 
 export default function AdminPatientsPage() {
-  return <Patients baseSegment="admin" />;
+  return <PatientsScreen baseSegment="admin" />;
 }
-
-export { PatientsContent };

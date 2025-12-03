@@ -68,54 +68,62 @@ const leaders = [
 
 export default function AboutPage() {
   return (
-    <main className="relative mx-auto w-full max-w-[85vw] space-y-16 px-4 py-16 sm:px-6 lg:px-8">
-      <section className="relative overflow-hidden rounded-[2.75rem] bg-gradient-to-br from-white via-violet-50/70 to-white px-8 py-16 shadow-[0_40px_80px_-50px_rgba(79,70,229,0.35)] sm:px-12 md:px-16">
-        <div className="absolute -left-28 top-0 h-48 w-48 rounded-full bg-violet-200/60 blur-3xl" aria-hidden />
-        <div className="absolute -right-32 bottom-0 h-64 w-64 rounded-full bg-sky-200/55 blur-3xl" aria-hidden />
-        <div className="relative grid gap-10 lg:grid-cols-[1.15fr_1fr] lg:items-center">
-          <div className="space-y-6">
-            <span className="inline-flex items-center gap-2 rounded-full bg-violet-100 px-4 py-1 text-xs font-semibold uppercase tracking-[0.35em] text-violet-700">
+    <main className="flex min-h-screen flex-col bg-slate-50">
+      <section className="relative isolate overflow-hidden bg-gradient-to-br from-violet-900 via-indigo-900 to-slate-950">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_18%_20%,rgba(168,85,247,0.2),transparent_40%),radial-gradient(circle_at_82%_12%,rgba(79,70,229,0.22),transparent_38%),radial-gradient(circle_at_50%_80%,rgba(124,58,237,0.15),transparent_40%)]" />
+        <div className="mx-auto flex w-full max-w-6xl flex-col gap-6 px-4 py-12 sm:px-6 lg:flex-row lg:items-center lg:px-8">
+          <div className="relative z-10 space-y-4 text-white lg:w-3/5">
+            <span className="inline-flex items-center gap-2 rounded-full bg-white/15 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.32em] text-purple-50">
               Since 1995
             </span>
-            <h1 className="text-3xl font-black leading-tight text-slate-900 sm:text-4xl lg:text-5xl">
-              We are HealthSync Hospital — advancing care for every generation
-            </h1>
-            <p className="max-w-2xl text-base text-slate-600 sm:text-lg">
-              What started as a community initiative now supports more than 1.2 million patient journeys every year. Multidisciplinary teams, smart technology, and human kindness unite to deliver outcomes that families can trust.
-            </p>
+            <div className="space-y-3">
+              <h1 className="text-3xl font-black leading-tight sm:text-4xl lg:text-5xl">
+                HealthSync Hospital—care, data, and people working as one
+              </h1>
+              <p className="max-w-3xl text-base text-purple-100/80 sm:text-lg">
+                From a community clinic to a digitally enabled hospital network, we align teams, technology, and compassion to deliver trusted outcomes for every generation.
+              </p>
+            </div>
             <div className="flex flex-wrap gap-3">
-              <Button className="rounded-full bg-violet-600 px-6 py-2 text-sm font-semibold text-white shadow-lg transition hover:bg-violet-700">
+              <Button className="rounded-full bg-white px-6 py-2 text-sm font-semibold text-violet-800 shadow-lg shadow-purple-500/20 transition hover:-translate-y-0.5 hover:bg-purple-50">
                 Meet our leadership
               </Button>
               <Button
                 variant="outline"
-                className="rounded-full border-slate-300 px-6 py-2 text-sm font-semibold text-slate-700 hover:border-slate-400 hover:bg-white"
+                className="rounded-full border-white/30 bg-white/10 px-6 py-2 text-sm font-semibold text-white shadow-sm transition hover:-translate-y-0.5 hover:bg-white/15"
               >
-                Download impact report
+                View health packages
               </Button>
+            </div>
+            <div className="flex flex-wrap gap-2 text-sm text-purple-100/90">
+              <span className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-3 py-1.5">
+                <Hospital className="h-4 w-4 text-purple-200" />
+                500+ smart beds
+              </span>
+              <span className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-3 py-1.5">
+                <Users className="h-4 w-4 text-purple-200" />
+                200+ consultants
+              </span>
+              <span className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-3 py-1.5">
+                <HeartPulse className="h-4 w-4 text-purple-200" />
+                1.2M+ lives, 98% satisfaction
+              </span>
             </div>
           </div>
 
-          <div className="grid gap-4 rounded-3xl border border-white/60 bg-white/80 p-6 shadow-xl backdrop-blur lg:p-8">
-            <div className="flex items-center gap-4">
-              <Hospital className="size-10 rounded-full bg-violet-100 p-2 text-violet-600" />
-              <div>
-                <p className="text-xs font-semibold uppercase tracking-[0.3em] text-violet-500">Capacity</p>
-                <p className="text-lg font-semibold text-slate-900">500+ smart beds across 12 towers</p>
+          <div className="relative z-10 w-full max-w-md self-stretch overflow-hidden rounded-3xl border border-white/10 bg-white/5 p-6 text-white shadow-2xl shadow-purple-900/40 backdrop-blur">
+            <p className="text-sm font-semibold text-purple-100/90">
+              Unified ecosystem
+            </p>
+            <div className="mt-4 grid gap-3 text-sm text-purple-50/90">
+              <div className="rounded-2xl border border-white/15 bg-white/10 p-3">
+                Doctors directory → <span className="font-semibold">/doctors</span>
               </div>
-            </div>
-            <div className="flex items-center gap-4">
-              <Users className="size-10 rounded-full bg-violet-100 p-2 text-violet-600" />
-              <div>
-                <p className="text-xs font-semibold uppercase tracking-[0.3em] text-violet-500">Team</p>
-                <p className="text-lg font-semibold text-slate-900">200+ consultants, 800 nursing superheroes</p>
+              <div className="rounded-2xl border border-white/15 bg-white/10 p-3">
+                Health checkup bundles → <span className="font-semibold">/health-packages</span>
               </div>
-            </div>
-            <div className="flex items-center gap-4">
-              <HeartPulse className="size-10 rounded-full bg-violet-100 p-2 text-violet-600" />
-              <div>
-                <p className="text-xs font-semibold uppercase tracking-[0.3em] text-violet-500">Care delivered</p>
-                <p className="text-lg font-semibold text-slate-900">1.2M+ lives touched with 98% satisfaction</p>
+              <div className="rounded-2xl border border-white/15 bg-white/10 p-3">
+                Patient-first services → explore below
               </div>
             </div>
           </div>

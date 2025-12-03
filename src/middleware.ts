@@ -42,16 +42,31 @@ const JWT_ACCESS_SECRET = process.env.JWT_ACCESS_SECRET!;
 
 export async function middleware(request: NextRequest) {
   const token = request.cookies.get("token")?.value;
-  // console.log(token,'middleware')
   const pathname = request.nextUrl.pathname;
+  const isPublicRoute =
+    publicRoutes.has(pathname) ||
+    publicRoutePatterns.some((pattern) => pattern.test(pathname));
+
+  // Public routes: let through. If a bad token exists, clear it silently.
+  if (isPublicRoute) {
+    if (token) {
+      try {
+        const secret = new TextEncoder().encode(JWT_ACCESS_SECRET);
+        await jwtVerify(token, secret);
+      } catch {
+        const response = NextResponse.next();
+        response.cookies.set("token", "", { path: "/", maxAge: 0 });
+        return response;
+      }
+    }
+    return NextResponse.next();
+  }
 
   if (token) {
     try {
       const secret = new TextEncoder().encode(JWT_ACCESS_SECRET);
       const { payload } = await jwtVerify(token, secret);
       const userRole = payload?.role as string;
-
-      console.log("✅ Token is valid:", payload);
 
       // 🔐 Role-based route checking
       const allowedRoutes = roleBasedAccess[userRole] || [];
@@ -73,13 +88,7 @@ export async function middleware(request: NextRequest) {
     }
   } else {
     // User is not authenticated
-    const isPublicRoute =
-      publicRoutes.has(pathname) ||
-      publicRoutePatterns.some((pattern) => pattern.test(pathname));
-
-    if (!isPublicRoute) {
-      return NextResponse.redirect(new URL("/login", request.url));
-    }
+    return NextResponse.redirect(new URL("/login", request.url));
   }
 
   return NextResponse.next();

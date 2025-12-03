@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { ChevronRight, type LucideIcon } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 import {
   Collapsible,
@@ -27,6 +28,7 @@ type NavItem = {
   items?: {
     title: string;
     url: string;
+    isActive?: boolean;
   }[];
 };
 
@@ -42,7 +44,15 @@ export function NavMain({ items }: { items: NavItem[] }) {
           if (!hasChildren) {
             return (
               <SidebarMenuItem key={item.title}>
-                <SidebarMenuButton asChild tooltip={item.title}>
+                <SidebarMenuButton
+                  asChild
+                  tooltip={item.title}
+                  className={cn(
+                    item.isActive &&
+                      "bg-violet-800 shadow-lg ring-1 ring-violet-800 font-semibold"
+                  )}
+                  data-active={item.isActive}
+                >
                   <Link href={item.url}>
                     {Icon && <Icon />}
                     <span>{item.title}</span>
@@ -71,7 +81,14 @@ export function NavMain({ items }: { items: NavItem[] }) {
                   <SidebarMenuSub>
                     {item.items?.map((subItem) => (
                       <SidebarMenuSubItem key={subItem.title}>
-                        <SidebarMenuSubButton asChild>
+                        <SidebarMenuSubButton
+                          asChild
+                          className={cn(
+                            subItem.isActive &&
+                              "bg-violet-50 text-violet-800 ring-1 ring-violet-100 font-semibold"
+                          )}
+                          data-active={subItem.isActive}
+                        >
                           <Link href={subItem.url}>
                             <span>{subItem.title}</span>
                           </Link>

@@ -93,69 +93,68 @@ const carePathways = [
 
 export default function ServicesPage() {
   return (
-    <main className="relative mx-auto w-full max-w-[85vw] space-y-16 px-4 py-16 sm:px-6 lg:px-8">
-      <section className="relative overflow-hidden rounded-[2.5rem] bg-gradient-to-br from-white via-violet-50/60 to-white px-8 py-16 shadow-[0_40px_80px_-50px_rgba(79,70,229,0.35)] sm:px-12 md:px-16">
-        <div className="absolute -left-24 top-10 h-40 w-40 rounded-full bg-violet-200/60 blur-3xl" aria-hidden />
-        <div className="absolute -right-28 bottom-0 h-56 w-56 rounded-full bg-sky-200/50 blur-3xl" aria-hidden />
-
-        <div className="relative grid gap-10 lg:grid-cols-[1.2fr_1fr] lg:items-center">
-          <div className="space-y-6 text-left">
-            <span className="inline-flex items-center gap-2 rounded-full bg-violet-100 px-4 py-1 text-xs font-semibold uppercase tracking-[0.35em] text-violet-700">
+    <main className="flex min-h-screen flex-col bg-slate-50">
+      <section className="relative isolate overflow-hidden bg-gradient-to-br from-violet-900 via-indigo-900 to-slate-950">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_18%_20%,rgba(168,85,247,0.2),transparent_40%),radial-gradient(circle_at_82%_12%,rgba(79,70,229,0.22),transparent_38%),radial-gradient(circle_at_50%_80%,rgba(124,58,237,0.15),transparent_40%)]" />
+        <div className="mx-auto flex w-full max-w-6xl flex-col gap-6 px-4 py-12 sm:px-6 lg:flex-row lg:items-center lg:px-8">
+          <div className="relative z-10 space-y-4 text-white lg:w-3/5">
+            <span className="inline-flex items-center gap-2 rounded-full bg-white/15 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.32em] text-purple-50">
               <ShieldCheck className="size-4" />
-              Our promise
+              Integrated care
             </span>
-            <h1 className="text-3xl font-black leading-tight text-slate-900 sm:text-4xl lg:text-5xl">
-              Integrated care for every stage of the patient journey
-            </h1>
-            <p className="max-w-2xl text-base text-slate-600 sm:text-lg">
-              HealthSync Hospital blends clinical excellence with digital innovation. From urgent response to long-term recovery, our multidisciplinary teams choreograph every detail so patients and families can focus on healing.
-            </p>
+            <div className="space-y-3">
+              <h1 className="text-3xl font-black leading-tight sm:text-4xl lg:text-5xl">
+                Hospitals, doctors, and packages aligned in one continuum
+              </h1>
+              <p className="max-w-3xl text-base text-purple-100/80 sm:text-lg">
+                Explore specialties, meet the consultants behind them, and pair your journey with the right health checkup packages—seamlessly connected through HealthSync.
+              </p>
+            </div>
             <div className="flex flex-wrap gap-3">
-              <Button className="rounded-full bg-violet-600 px-6 py-2 text-sm font-semibold text-white shadow-lg transition hover:bg-violet-700">
-                Explore specialties
+              <Button className="rounded-full bg-white px-6 py-2 text-sm font-semibold text-violet-800 shadow-lg shadow-purple-500/20 transition hover:-translate-y-0.5 hover:bg-purple-50">
+                Browse doctors
               </Button>
               <Button
                 variant="outline"
-                className="rounded-full border-slate-300 px-6 py-2 text-sm font-semibold text-slate-700 hover:border-slate-400 hover:bg-white"
+                className="rounded-full border-white/30 bg-white/10 px-6 py-2 text-sm font-semibold text-white shadow-sm transition hover:-translate-y-0.5 hover:bg-white/15"
               >
-                Request a callback
+                View health packages
               </Button>
+            </div>
+            <div className="flex flex-wrap gap-2 text-sm text-purple-100/90">
+              <span className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-3 py-1.5">
+                <Bed className="h-4 w-4 text-purple-200" />
+                20+ centres of excellence
+              </span>
+              <span className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-3 py-1.5">
+                <Stethoscope className="h-4 w-4 text-purple-200" />
+                350+ consultants
+              </span>
+              <span className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-3 py-1.5">
+                <Activity className="h-4 w-4 text-purple-200" />
+                98% satisfaction
+              </span>
             </div>
           </div>
 
-          <div className="grid gap-4 rounded-3xl border border-white/60 bg-white/75 p-6 shadow-xl backdrop-blur lg:p-8">
-            <div className="flex items-center gap-4">
-              <Bed className="size-10 rounded-full bg-violet-100 p-2 text-violet-600" />
-              <div>
-                <p className="text-sm font-semibold uppercase tracking-[0.3em] text-violet-500">
-                  Centres of excellence
-                </p>
-                <p className="text-lg font-semibold text-slate-900">20+ specialised institutes</p>
+          <div className="relative z-10 w-full max-w-md self-stretch overflow-hidden rounded-3xl border border-white/10 bg-white/5 p-6 text-white shadow-2xl shadow-purple-900/40 backdrop-blur">
+            <p className="text-sm font-semibold text-purple-100/90">Quick links</p>
+            <div className="mt-3 grid gap-3 text-sm text-purple-50/90">
+              <div className="rounded-2xl border border-white/15 bg-white/10 p-3">
+                Specialist directory → connect to <span className="font-semibold">/doctors</span>
               </div>
-            </div>
-            <div className="flex items-center gap-4">
-              <Stethoscope className="size-10 rounded-full bg-violet-100 p-2 text-violet-600" />
-              <div>
-                <p className="text-sm font-semibold uppercase tracking-[0.3em] text-violet-500">
-                  Clinicians on duty
-                </p>
-                <p className="text-lg font-semibold text-slate-900">350 consultants & Fellows</p>
+              <div className="rounded-2xl border border-white/15 bg-white/10 p-3">
+                Health checkup bundles → explore <span className="font-semibold">/health-packages</span>
               </div>
-            </div>
-            <div className="flex items-center gap-4">
-              <Activity className="size-10 rounded-full bg-violet-100 p-2 text-violet-600" />
-              <div>
-                <p className="text-sm font-semibold uppercase tracking-[0.3em] text-violet-500">
-                  Patient satisfaction
-                </p>
-                <p className="text-lg font-semibold text-slate-900">98% discharge happiness index</p>
+              <div className="rounded-2xl border border-white/15 bg-white/10 p-3">
+                Care pathways → pick a service below
               </div>
             </div>
           </div>
         </div>
       </section>
 
-      <section className="space-y-6">
+      <section className="mx-auto w-full max-w-6xl space-y-6 px-4 pb-16 pt-12 sm:px-6 lg:px-8">
         <header className="flex flex-wrap items-end justify-between gap-4">
           <div className="space-y-2">
             <h2 className="text-2xl font-bold text-slate-900 sm:text-3xl">Clinical specialties</h2>

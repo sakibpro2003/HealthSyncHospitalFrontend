@@ -11,7 +11,7 @@ const SectionPlaceholder = ({ className = "h-64" }: { className?: string }) => (
 );
 
 const PackageCard = dynamic(() => import("@/components/Home/PackageCard"), {
-  loading: () => <SectionPlaceholder className="h-[28rem]" />,
+  loading: () => <SectionPlaceholder className="h-112" />,
 });
 
 const DiscountSection = dynamic(() => import("@/components/Home/DiscountSection"), {
@@ -19,7 +19,7 @@ const DiscountSection = dynamic(() => import("@/components/Home/DiscountSection"
 });
 
 const VideoSection = dynamic(() => import("@/components/Home/VideoSection"), {
-  loading: () => <SectionPlaceholder className="h-[26rem]" />,
+  loading: () => <SectionPlaceholder className="h-104" />,
 });
 
 const BloodAvailability = dynamic(() => import("@/components/Home/BloodAvailability"), {
@@ -35,7 +35,7 @@ const AccordioSection = dynamic(() => import("@/components/Home/AccordioSection"
 });
 
 const MyGallery = dynamic(() => import("@/components/Home/GallerySection"), {
-  loading: () => <SectionPlaceholder className="h-[22rem]" />,
+  loading: () => <SectionPlaceholder className="h-88" />,
 });
 
 const NoticeBoard = dynamic(() => import("@/components/Home/NoticeBoard"), {

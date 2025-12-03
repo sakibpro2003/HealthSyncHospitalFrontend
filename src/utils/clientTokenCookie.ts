@@ -27,6 +27,8 @@ export const setClientTokenCookie = (
 
   const encoded = encodeURIComponent(token);
   document.cookie = buildCookie(CLIENT_TOKEN_COOKIE, encoded, maxAgeSeconds);
+  // Set the main token cookie so middleware can read it
+  document.cookie = buildCookie(ACCESS_TOKEN_COOKIE, encoded, maxAgeSeconds);
 };
 
 export const clearClientTokenCookie = () => {
@@ -35,6 +37,7 @@ export const clearClientTokenCookie = () => {
   }
 
   document.cookie = `${CLIENT_TOKEN_COOKIE}=; Path=/; Max-Age=0`;
+  document.cookie = `${ACCESS_TOKEN_COOKIE}=; Path=/; Max-Age=0`;
 };
 
 export const readClientTokenCookie = (): string | null => {

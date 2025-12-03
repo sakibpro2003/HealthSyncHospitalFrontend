@@ -35,6 +35,7 @@ import { addToCart } from "@/utils/cart";
 import { toast } from "sonner";
 import { useClientUser } from "@/hooks/useClientUser";
 import { resolveImageSrc } from "@/utils/resolveImageSrc";
+import { Pill, ShieldCheck, Sparkles } from "lucide-react";
 
 const ITEMS_PER_PAGE = 8;
 
@@ -278,188 +279,219 @@ export default function MedicinePage() {
   }
 
   return (
-    <section className="min-h-screen bg-gradient-to-br from-slate-100 via-white to-slate-200">
-      <div className="mx-auto w-full max-w-[85vw] px-4 py-14 sm:px-6 lg:px-8">
-        <header className="mx-auto max-w-3xl text-center lg:max-w-none lg:text-left">
-          <p className="text-xs font-semibold uppercase tracking-[0.35em] text-violet-500">
-            Medicine Catalog
-          </p>
-          <h1 className="mt-4 text-4xl font-black text-slate-900 sm:text-5xl">
-            Find the right treatment with smart filters &amp; search
-          </h1>
-          <p className="mt-4 text-base text-slate-600 lg:max-w-2xl">
-            Browse prescription and over-the-counter medicines, compare prices, and quickly add essentials to your cart. Every product includes key safety details so you can shop confidently.
-          </p>
-        </header>
+    <main className="flex min-h-screen flex-col bg-slate-50">
+      <section className="relative isolate overflow-hidden bg-gradient-to-br from-violet-900 via-indigo-900 to-slate-950">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_18%_20%,rgba(168,85,247,0.2),transparent_40%),radial-gradient(circle_at_82%_12%,rgba(79,70,229,0.22),transparent_38%),radial-gradient(circle_at_50%_80%,rgba(124,58,237,0.15),transparent_40%)]" />
+        <div className="mx-auto flex w-full max-w-6xl flex-col gap-6 px-4 py-12 sm:px-6 lg:flex-row lg:items-center lg:px-8">
+          <div className="relative z-10 space-y-4 text-white lg:w-3/5">
+            <span className="inline-flex items-center gap-2 rounded-full bg-white/15 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.32em] text-purple-50">
+              <ShieldCheck className="h-4 w-4 text-purple-200" />
+              Trusted pharmacy
+            </span>
+            <div className="space-y-3">
+              <h1 className="text-3xl font-black leading-tight sm:text-4xl lg:text-5xl">
+                Find the right medicine with smart filters &amp; search
+              </h1>
+              <p className="max-w-3xl text-base text-purple-100/80 sm:text-lg">
+                Browse prescription and OTC items, compare prices, and add essentials to your cart. Each product includes safety details so you can shop confidently.
+              </p>
+            </div>
+            <div className="flex flex-wrap gap-2 text-sm text-purple-100/90">
+              <span className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-3 py-1.5">
+                <Pill className="h-4 w-4 text-purple-200" />
+                Verified inventory
+              </span>
+              <span className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-3 py-1.5">
+                <Sparkles className="h-4 w-4 text-purple-200" />
+                Smart filters
+              </span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="bg-gradient-to-br from-slate-100 via-white to-slate-200">
+        <div className="mx-auto w-full max-w-[85vw] px-4 py-14 sm:px-6 lg:px-8">
+          <header className="mx-auto max-w-3xl text-center lg:max-w-none lg:text-left">
+            <p className="text-xs font-semibold uppercase tracking-[0.35em] text-violet-500">
+              Medicine Catalog
+            </p>
+            <h1 className="mt-4 text-4xl font-black text-slate-900 sm:text-5xl">
+              Find the right treatment with smart filters &amp; search
+            </h1>
+            <p className="mt-4 text-base text-slate-600 lg:max-w-2xl">
+              Browse prescription and over-the-counter medicines, compare prices, and quickly add essentials to your cart. Every product includes key safety details so you can shop confidently.
+            </p>
+          </header>
 
           <div className="mt-12 grid gap-8 lg:grid-cols-[320px_minmax(0,1fr)]">
             <aside className="space-y-8 rounded-3xl border border-slate-200/70 bg-white/80 p-6 shadow-xl backdrop-blur lg:sticky lg:top-6 lg:self-start lg:max-h-[calc(100vh-140px)] lg:overflow-y-auto">
-            <div className="space-y-3">
-              <Label htmlFor="medicine-search" className="text-xs uppercase tracking-[0.3em] text-slate-500">
-                Search
-              </Label>
-              <Input
-                id="medicine-search"
-                placeholder="Search by name or purpose"
-                value={searchTerm}
-                onChange={(event) => setSearchTerm(event.target.value)}
-                className="rounded-2xl border-slate-200 bg-white/80 px-4 py-2 text-sm shadow-sm focus-visible:border-violet-400 focus-visible:ring-violet-200"
-              />
-            </div>
-
-            <div className="space-y-5">
               <div className="space-y-3">
-                <Label className="text-xs uppercase tracking-[0.3em] text-slate-500">
-                  Category
+                <Label htmlFor="medicine-search" className="text-xs uppercase tracking-[0.3em] text-slate-500">
+                  Search
                 </Label>
-                <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-                  <SelectTrigger className="w-full justify-between rounded-2xl border-slate-200 bg-white/80 px-4 py-2 text-sm shadow-sm">
-                    <SelectValue placeholder="All categories" />
-                  </SelectTrigger>
-                  <SelectContent className="rounded-2xl border-slate-200 bg-white/90 backdrop-blur">
-                    <SelectItem value="all">All categories</SelectItem>
-                    {categories.map((category) => (
-                      <SelectItem key={category} value={category}>
-                        {category}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <Input
+                  id="medicine-search"
+                  placeholder="Search by name or purpose"
+                  value={searchTerm}
+                  onChange={(event) => setSearchTerm(event.target.value)}
+                  className="rounded-2xl border-slate-200 bg-white/80 px-4 py-2 text-sm shadow-sm focus-visible:border-violet-400 focus-visible:ring-violet-200"
+                />
               </div>
 
-              <div className="space-y-3">
-                <Label className="text-xs uppercase tracking-[0.3em] text-slate-500">
-                  Form
-                </Label>
-                <Select value={selectedForm} onValueChange={setSelectedForm}>
-                  <SelectTrigger className="w-full justify-between rounded-2xl border-slate-200 bg-white/80 px-4 py-2 text-sm shadow-sm">
-                    <SelectValue placeholder="All forms" />
-                  </SelectTrigger>
-                  <SelectContent className="rounded-2xl border-slate-200 bg-white/90 backdrop-blur">
-                    <SelectItem value="all">All forms</SelectItem>
-                    {forms.map((form) => (
-                      <SelectItem key={form} value={form}>
-                        {form}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div className="space-y-3">
-                <Label className="text-xs uppercase tracking-[0.3em] text-slate-500">
-                  Prescription
-                </Label>
-                <Select
-                  value={prescriptionFilter}
-                  onValueChange={(value: "all" | "required" | "not-required") =>
-                    setPrescriptionFilter(value)
-                  }
-                >
-                  <SelectTrigger className="w-full justify-between rounded-2xl border-slate-200 bg-white/80 px-4 py-2 text-sm shadow-sm">
-                    <SelectValue placeholder="All" />
-                  </SelectTrigger>
-                  <SelectContent className="rounded-2xl border-slate-200 bg-white/90 backdrop-blur">
-                    <SelectItem value="all">All medicines</SelectItem>
-                    <SelectItem value="required">Prescription required</SelectItem>
-                    <SelectItem value="not-required">No prescription needed</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div className="space-y-3">
-                <Label className="text-xs uppercase tracking-[0.3em] text-slate-500">
-                  Availability
-                </Label>
-                <button
-                  type="button"
-                  onClick={() => setOnlyInStock((prev) => !prev)}
-                  className={`flex w-full items-center justify-between rounded-2xl border px-4 py-3 text-sm font-medium transition ${
-                    onlyInStock
-                      ? "border-emerald-300 bg-emerald-50 text-emerald-700 shadow-sm"
-                      : "border-slate-200 text-slate-600 hover:border-slate-300 hover:bg-slate-50"
-                  }`}
-                >
-                  <span>In stock only</span>
-                  <Badge
-                    variant={onlyInStock ? "secondary" : "outline"}
-                    className="rounded-full px-3 uppercase tracking-wide"
-                  >
-                    {onlyInStock ? "Active" : "Off"}
-                  </Badge>
-                </button>
-              </div>
-
-              <div className="space-y-3">
-                <Label className="text-xs uppercase tracking-[0.3em] text-slate-500">
-                  Minimum rating
-                </Label>
-                <Select value={minRating} onValueChange={setMinRating}>
-                  <SelectTrigger className="w-full justify-between rounded-2xl border-slate-200 bg-white/80 px-4 py-2 text-sm shadow-sm">
-                    <SelectValue placeholder="Any rating" />
-                  </SelectTrigger>
-                  <SelectContent className="rounded-2xl border-slate-200 bg-white/90 backdrop-blur">
-                    <SelectItem value="0">Any rating</SelectItem>
-                    <SelectItem value="3">3★ &amp; above</SelectItem>
-                    <SelectItem value="4">4★ &amp; above</SelectItem>
-                    <SelectItem value="4.5">4.5★ &amp; above</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div className="space-y-3">
-                <Label className="text-xs uppercase tracking-[0.3em] text-slate-500">
-                  Price range
-                </Label>
-                <div className="flex items-center gap-3">
-                  <div className="flex-1">
-                    <span className="text-[10px] uppercase tracking-[0.3em] text-slate-400">
-                      Min
-                    </span>
-                    <Input
-                      type="number"
-                      min={priceBounds[0]}
-                      max={priceRange[1]}
-                      value={priceRange[0]}
-                      onChange={(event) =>
-                        handlePriceChange(0, event.target.value)
-                      }
-                      className="mt-1 rounded-2xl border-slate-200 bg-white/80 px-4 py-2 text-sm shadow-sm"
-                    />
-                  </div>
-                  <div className="flex-1">
-                    <span className="text-[10px] uppercase tracking-[0.3em] text-slate-400">
-                      Max
-                    </span>
-                    <Input
-                      type="number"
-                      min={priceRange[0]}
-                      max={priceBounds[1] || 9999}
-                      value={priceRange[1]}
-                      onChange={(event) =>
-                        handlePriceChange(1, event.target.value)
-                      }
-                      className="mt-1 rounded-2xl border-slate-200 bg-white/80 px-4 py-2 text-sm shadow-sm"
-                    />
-                  </div>
+              <div className="space-y-5">
+                <div className="space-y-3">
+                  <Label className="text-xs uppercase tracking-[0.3em] text-slate-500">
+                    Category
+                  </Label>
+                  <Select value={selectedCategory} onValueChange={setSelectedCategory}>
+                    <SelectTrigger className="w-full justify-between rounded-2xl border-slate-200 bg-white/80 px-4 py-2 text-sm shadow-sm">
+                      <SelectValue placeholder="All categories" />
+                    </SelectTrigger>
+                    <SelectContent className="rounded-2xl border-slate-200 bg-white/90 backdrop-blur">
+                      <SelectItem value="all">All categories</SelectItem>
+                      {categories.map((category) => (
+                        <SelectItem key={category} value={category}>
+                          {category}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
-                <p className="text-xs text-slate-400">
-                  {formatPrice(priceRange[0])} - {formatPrice(priceRange[1])}
-                </p>
-              </div>
-            </div>
 
-            <div>
-              <Button
-                onClick={resetFilters}
-                variant="ghost"
-                className="w-full rounded-2xl border border-transparent text-sm font-semibold text-violet-600 transition hover:border-violet-200 hover:bg-violet-50"
-                disabled={!hasActiveFilters}
-              >
-                Reset filters
-              </Button>
-            </div>
-          </aside>
+                <div className="space-y-3">
+                  <Label className="text-xs uppercase tracking-[0.3em] text-slate-500">
+                    Form
+                  </Label>
+                  <Select value={selectedForm} onValueChange={setSelectedForm}>
+                    <SelectTrigger className="w-full justify-between rounded-2xl border-slate-200 bg-white/80 px-4 py-2 text-sm shadow-sm">
+                      <SelectValue placeholder="All forms" />
+                    </SelectTrigger>
+                    <SelectContent className="rounded-2xl border-slate-200 bg-white/90 backdrop-blur">
+                      <SelectItem value="all">All forms</SelectItem>
+                      {forms.map((form) => (
+                        <SelectItem key={form} value={form}>
+                          {form}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="space-y-3">
+                  <Label className="text-xs uppercase tracking-[0.3em] text-slate-500">
+                    Prescription
+                  </Label>
+                  <Select
+                    value={prescriptionFilter}
+                    onValueChange={(value: "all" | "required" | "not-required") =>
+                      setPrescriptionFilter(value)
+                    }
+                  >
+                    <SelectTrigger className="w-full justify-between rounded-2xl border-slate-200 bg-white/80 px-4 py-2 text-sm shadow-sm">
+                      <SelectValue placeholder="All" />
+                    </SelectTrigger>
+                    <SelectContent className="rounded-2xl border-slate-200 bg-white/90 backdrop-blur">
+                      <SelectItem value="all">All medicines</SelectItem>
+                      <SelectItem value="required">Prescription required</SelectItem>
+                      <SelectItem value="not-required">No prescription needed</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="space-y-3">
+                  <Label className="text-xs uppercase tracking-[0.3em] text-slate-500">
+                    Availability
+                  </Label>
+                  <button
+                    type="button"
+                    onClick={() => setOnlyInStock((prev) => !prev)}
+                    className={`flex w-full items-center justify-between rounded-2xl border px-4 py-3 text-sm font-medium transition ${
+                      onlyInStock
+                        ? "border-emerald-300 bg-emerald-50 text-emerald-700 shadow-sm"
+                        : "border-slate-200 text-slate-600 hover:border-slate-300 hover:bg-slate-50"
+                    }`}
+                  >
+                    <span>In stock only</span>
+                    <Badge
+                      variant={onlyInStock ? "secondary" : "outline"}
+                      className="rounded-full px-3 uppercase tracking-wide"
+                    >
+                      {onlyInStock ? "Active" : "Off"}
+                    </Badge>
+                  </button>
+                </div>
+
+                <div className="space-y-3">
+                  <Label className="text-xs uppercase tracking-[0.3em] text-slate-500">
+                    Minimum rating
+                  </Label>
+                  <Select value={minRating} onValueChange={setMinRating}>
+                    <SelectTrigger className="w-full justify-between rounded-2xl border-slate-200 bg-white/80 px-4 py-2 text-sm shadow-sm">
+                      <SelectValue placeholder="Any rating" />
+                    </SelectTrigger>
+                    <SelectContent className="rounded-2xl border-slate-200 bg-white/90 backdrop-blur">
+                      <SelectItem value="0">Any rating</SelectItem>
+                      <SelectItem value="3">3★ &amp; above</SelectItem>
+                      <SelectItem value="4">4★ &amp; above</SelectItem>
+                      <SelectItem value="4.5">4.5★ &amp; above</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="space-y-3">
+                  <Label className="text-xs uppercase tracking-[0.3em] text-slate-500">
+                    Price range
+                  </Label>
+                  <div className="flex items-center gap-3">
+                    <div className="flex-1">
+                      <span className="text-[10px] uppercase tracking-[0.3em] text-slate-400">
+                        Min
+                      </span>
+                      <Input
+                        type="number"
+                        min={priceBounds[0]}
+                        max={priceRange[1]}
+                        value={priceRange[0]}
+                        onChange={(event) =>
+                          handlePriceChange(0, event.target.value)
+                        }
+                        className="mt-1 rounded-2xl border-slate-200 bg-white/80 px-4 py-2 text-sm shadow-sm"
+                      />
+                    </div>
+                    <div className="flex-1">
+                      <span className="text-[10px] uppercase tracking-[0.3em] text-slate-400">
+                        Max
+                      </span>
+                      <Input
+                        type="number"
+                        min={priceRange[0]}
+                        max={priceBounds[1] || 9999}
+                        value={priceRange[1]}
+                        onChange={(event) =>
+                          handlePriceChange(1, event.target.value)
+                        }
+                        className="mt-1 rounded-2xl border-slate-200 bg-white/80 px-4 py-2 text-sm shadow-sm"
+                      />
+                    </div>
+                  </div>
+                  <p className="text-xs text-slate-400">
+                    {formatPrice(priceRange[0])} - {formatPrice(priceRange[1])}
+                  </p>
+                </div>
+              </div>
+
+              <div>
+                <Button
+                  onClick={resetFilters}
+                  variant="ghost"
+                  className="w-full rounded-2xl border border-transparent text-sm font-semibold text-violet-600 transition hover:border-violet-200 hover:bg-violet-50"
+                  disabled={!hasActiveFilters}
+                >
+                  Reset filters
+                </Button>
+              </div>
+            </aside>
 
           <div className="space-y-6">
             <div className="flex flex-col gap-4 rounded-3xl border border-slate-200/60 bg-white/70 p-6 shadow-sm backdrop-blur-lg sm:flex-row sm:items-center sm:justify-between">
@@ -735,7 +767,8 @@ export default function MedicinePage() {
             )}
           </div>
         </div>
-      </div>
-    </section>
+        </div>
+      </section>
+    </main>
   );
 }

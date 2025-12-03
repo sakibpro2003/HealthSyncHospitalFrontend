@@ -1,141 +1,143 @@
 "use client";
-import { useCallback, useEffect, useMemo, useState } from "react";
+
 import Image from "next/image";
+import { useCallback, useEffect, useMemo, useState } from "react";
+
 import { Button } from "@/components/ui/button";
 import {
+  Activity,
+  ArrowUpRight,
   BadgeCheck,
+  BedDouble,
   ChevronLeft,
   ChevronRight,
   Clock3,
   HeartPulse,
+  PhoneCall,
   ShieldCheck,
+  Sparkles,
   Stethoscope,
 } from "lucide-react";
 
-const slides = [
+type SlideMetric = {
+  label: string;
+  value: string;
+  detail: string;
+};
+
+type Slide = {
+  id: number;
+  eyebrow: string;
+  title: string;
+  description: string;
+  highlight: string;
+  ctaPrimary: string;
+  ctaSecondary: string;
+  tags: string[];
+  metrics: SlideMetric[];
+  spotlight: {
+    label: string;
+    value: string;
+    detail: string;
+  };
+    kpis: SlideMetric[];
+    nextSlot: string;
+    hotline: string;
+    accent: string;
+    image: string;
+};
+
+const slides: Slide[] = [
   {
     id: 1,
-    eyebrow: "Digital-first Healthcare",
-    title: "Seamless hospital care for every patient journey",
+    eyebrow: "HealthSync Command",
+    title: "Run a calm, connected hospital command center",
     description:
-      "Coordinate appointments, manage wards, and keep families informed with a single intuitive platform tailored for modern hospitals.",
-    highlight: "Trusted by 120+ leading healthcare providers",
-    ctaLabel: "Book a consultation",
-    secondaryLabel: "Explore departments",
-    features: ["Smart scheduling", "AI-assisted triage", "Real-time dashboards"],
-    visual: {
-      label: "Operations control",
-      caption: "Smart coordination across clinics",
-      gradient: "from-violet-600/70 via-indigo-500/65 to-sky-500/70",
+      "Coordinate beds, clinicians, and patient updates in one place. HealthSync keeps your teams aligned so patients move smoothly from triage to discharge.",
+    highlight: "ISO 27001-ready • HIPAA-aware workflows",
+    ctaPrimary: "Book an appointment",
+    ctaSecondary: "Explore departments",
+    tags: ["Smart triage", "Live capacity", "Family updates"],
+    metrics: [
+      { label: "Bed readiness", value: "92%", detail: "Updated live across wards" },
+      { label: "ER triage time", value: "4m", detail: "Median response to intake" },
+      { label: "No-show drop", value: "-28%", detail: "Automated reminders" },
+    ],
+    spotlight: {
+      label: "Critical care board",
+      value: "Under 5 min response",
+      detail: "Triage stream monitored",
     },
+    kpis: [
+      { label: "Inpatient occupancy", value: "78%", detail: "Balanced load" },
+      { label: "Telehealth queue", value: "6 patients", detail: "Routing now" },
+    ],
+    nextSlot: "Today • 11:30 AM",
+    hotline: "+880 9638-000-111",
+    accent: "from-violet-500/35 via-purple-500/25 to-indigo-500/25",
     image: "/hero-doctor.jpg",
   },
   {
     id: 2,
-    eyebrow: "Empowered Care Teams",
-    title: "Give your staff the tools they deserve",
+    eyebrow: "Care Team Alignment",
+    title: "Give clinicians clarity before every round",
     description:
-      "Automate paperwork, keep clinicians aligned, and respond faster with collaborative workflows built around your teams.",
-    highlight: "Up to 35% faster response times",
-    ctaLabel: "See how it works",
-    secondaryLabel: "Meet our doctors",
-    features: ["Unified patient history", "Role-based access", "Secure messaging"],
-    visual: {
-      label: "Care collaboration",
-      caption: "Clinicians stay in sync",
-      gradient: "from-emerald-500/70 via-blue-500/65 to-violet-600/60",
+      "Unify notes, vitals, and consults. HealthSync ensures the right specialists, equipment, and consent are ready before the patient arrives.",
+    highlight: "Role-based access • Audit-ready logs",
+    ctaPrimary: "View care pathways",
+    ctaSecondary: "Meet our specialists",
+    tags: ["Unified history", "Mobile updates", "Escalation guardrails"],
+    metrics: [
+      { label: "Handover accuracy", value: "99.2%", detail: "Structured templates" },
+      { label: "Rounds completed", value: "48", detail: "Past 24 hours" },
+      { label: "Delayed consults", value: "2", detail: "Flagged for today" },
+    ],
+    spotlight: {
+      label: "Rounds briefing",
+      value: "All teams synced",
+      detail: "No missing labs",
     },
+    kpis: [
+      { label: "Lab turnaround", value: "37 min", detail: "Median today" },
+      { label: "Clinician coverage", value: "98%", detail: "Shifts staffed" },
+    ],
+    nextSlot: "Today • 02:15 PM",
+    hotline: "+880 9638-000-222",
+    accent: "from-indigo-500/35 via-violet-500/30 to-purple-500/25",
     image: "/hero-doctor.jpg",
   },
   {
     id: 3,
-    eyebrow: "Future-ready Platform",
-    title: "Scale securely without compromising care",
+    eyebrow: "Patient-First Operations",
+    title: "Proactive communication that keeps families confident",
     description:
-      "From diagnostics to discharge, tailor HealthSync to your infrastructure and stay compliant with global healthcare standards.",
-    highlight: "ISO 27001 security & GDPR ready",
-    ctaLabel: "Start a free trial",
-    secondaryLabel: "View success stories",
-    features: ["Cloud or on-premise", "24/7 monitoring", "Advanced analytics"],
-    visual: {
-      label: "Platform security",
-      caption: "Compliance baked into every workflow",
-      gradient: "from-sky-600/70 via-indigo-500/70 to-slate-900/70",
+      "Multilingual reminders, follow-ups, and billing transparency—all on the channels patients prefer. Delight them while reducing inbound calls.",
+    highlight: "NPS 4.8 • 98% satisfaction",
+    ctaPrimary: "Start a virtual consult",
+    ctaSecondary: "Download brochure",
+    tags: ["Patient concierge", "Billing clarity", "Recovery coaching"],
+    metrics: [
+      { label: "Follow-up completion", value: "88%", detail: "Within 72 hours" },
+      { label: "Missed calls", value: "-41%", detail: "Automated updates" },
+      { label: "Billing disputes", value: "1.2%", detail: "Transparent steps" },
+    ],
+    spotlight: {
+      label: "Experience desk",
+      value: "Live multilingual support",
+      detail: "SMS • WhatsApp • Email",
     },
-    image: "/hero-doctor.jpg",
-  },
-  {
-    id: 4,
-    eyebrow: "Patient-first Experiences",
-    title: "Delight patients with proactive communication",
-    description:
-      "Automated reminders, multilingual portals, and personalised follow-ups keep patients confident and connected throughout their care.",
-    highlight: "98% patient satisfaction score",
-    ctaLabel: "Chat with us",
-    secondaryLabel: "Patient resources",
-    features: ["Personalised reminders", "Family updates", "Seamless billing"],
-    visual: {
-      label: "Experience design",
-      caption: "Patient updates in real time",
-      gradient: "from-rose-500/70 via-orange-500/65 to-amber-400/70",
-    },
-    image: "/hero-doctor.jpg",
-  },
-  {
-    id: 5,
-    eyebrow: "Insights at your fingertips",
-    title: "Turn hospital data into decisive action",
-    description:
-      "Visualise performance, forecast demand, and unlock operational intelligence that keeps every department in harmony.",
-    highlight: "85% admins report better visibility",
-    ctaLabel: "View analytics",
-    secondaryLabel: "Download brochure",
-    features: ["Custom dashboards", "Predictive alerts", "KPI tracking"],
-    visual: {
-      label: "Intelligence hub",
-      caption: "Predictive analytics, ready to go",
-      gradient: "from-blue-600/70 via-cyan-500/60 to-teal-500/70",
-    },
-    image: "/hero-doctor.jpg",
-  },
-  {
-    id: 6,
-    eyebrow: "Trusted Partner",
-    title: "Your digital transformation, guided end to end",
-    description:
-      "From onboarding to optimisation, our specialists deliver white-glove support so you can focus on the moments that matter most for patient care.",
-    highlight: "Dedicated success manager for every client",
-    ctaLabel: "Speak to an expert",
-    secondaryLabel: "Implementation roadmap",
-    features: ["Hands-on onboarding", "Training academy", "24/7 priority support"],
-    visual: {
-      label: "Expert partnership",
-      caption: "Dedicated success specialists",
-      gradient: "from-purple-500/70 via-violet-500/60 to-fuchsia-500/60",
-    },
-    image: "/hero-doctor.jpg",
-  },
-  {
-    id: 7,
-    eyebrow: "Trusted Partner",
-    title: "Your digital transformation, guided end to end",
-    description:
-      "From onboarding to optimisation, our specialists deliver white-glove support so clinical teams stay focused on patient care.",
-    highlight: "Dedicated success manager for every client",
-    ctaLabel: "Speak to an expert",
-    secondaryLabel: "Implementation roadmap",
-    features: ["Hands-on onboarding", "Training academy", "24/7 priority support"],
-    visual: {
-      label: "Momentum",
-      caption: "Keep teams aligned at scale",
-      gradient: "from-indigo-600/70 via-violet-600/70 to-sky-600/70",
-    },
+    kpis: [
+      { label: "Discharge ready", value: "34 patients", detail: "Paperwork queued" },
+      { label: "Remote coaching", value: "62 active", detail: "Recovery plans" },
+    ],
+    nextSlot: "Today • 04:00 PM",
+    hotline: "+880 9638-000-333",
+    accent: "from-purple-500/35 via-fuchsia-500/30 to-indigo-500/20",
     image: "/hero-doctor.jpg",
   },
 ];
 
-const AUTO_ROTATE_MS = 6500;
-const featureIcons = [Stethoscope, ShieldCheck, HeartPulse];
+const AUTO_ROTATE_MS = 7000;
 
 const Banner = () => {
   const [current, setCurrent] = useState(0);
@@ -159,152 +161,197 @@ const Banner = () => {
   const activeSlide = useMemo(() => slides[current], [current]);
 
   return (
-    <section className="relative isolate mx-auto mt-12 w-full max-w-[85vw] px-4 sm:px-6 lg:px-8">
-      <div className="relative overflow-hidden rounded-[2.5rem] border border-white/70 bg-white shadow-2xl ring-1 ring-slate-100">
-        <div className="absolute inset-0 bg-gradient-to-br from-sky-50 via-white to-emerald-50" aria-hidden />
-        <div
-          className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(59,130,246,0.12),transparent_40%),radial-gradient(circle_at_80%_0%,rgba(16,185,129,0.12),transparent_35%),radial-gradient(circle_at_10%_70%,rgba(14,165,233,0.12),transparent_35%)]"
-          aria-hidden
-        />
+    <section className="relative isolate px-4 sm:px-6 lg:px-8">
+      <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-white via-white to-transparent" />
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_10%_12%,rgba(109,40,217,0.12),transparent_30%),radial-gradient(circle_at_88%_8%,rgba(124,58,237,0.12),transparent_25%),radial-gradient(circle_at_50%_90%,rgba(99,102,241,0.12),transparent_28%)]" />
 
-        <div className="relative grid items-center gap-12 px-6 py-12 backdrop-blur md:px-10 lg:grid-cols-[1.05fr_0.95fr] lg:px-14 lg:py-16">
-          <div className="absolute -left-28 top-10 h-40 w-40 rounded-full bg-sky-100 blur-3xl" aria-hidden />
-          <div className="absolute -right-20 bottom-6 h-52 w-52 rounded-full bg-emerald-100 blur-3xl" aria-hidden />
+      <div className="mx-auto mt-8 w-full max-w-[1180px]">
+        <div className="relative overflow-hidden rounded-[28px] border border-white/10 bg-slate-950 text-white shadow-[0_18px_60px_rgba(0,0,0,0.42)] ring-1 ring-purple-400/15">
+          <div className="absolute inset-0 bg-gradient-to-br from-[#0e0a1f] via-slate-950 to-[#1b1238]" aria-hidden />
+          <div
+            className="absolute inset-0 bg-[radial-gradient(circle_at_18%_20%,rgba(147,51,234,0.22),transparent_36%),radial-gradient(circle_at_82%_10%,rgba(99,102,241,0.18),transparent_32%),radial-gradient(circle_at_10%_78%,rgba(139,92,246,0.18),transparent_28%)]"
+            aria-hidden
+          />
 
-          <div className="relative z-10 space-y-6">
-            <div className="flex flex-wrap items-center gap-3">
-              <span className="inline-flex items-center gap-2 rounded-full bg-white/90 px-4 py-2 text-xs font-semibold uppercase tracking-[0.35em] text-slate-700 shadow-sm ring-1 ring-slate-100">
-                {activeSlide.eyebrow}
-              </span>
-              <span className="hidden items-center gap-2 rounded-full bg-emerald-50 px-3 py-1 text-xs font-medium text-emerald-700 ring-1 ring-emerald-100/80 sm:inline-flex">
-                <BadgeCheck className="size-4" />
-                Verified care teams
-              </span>
-            </div>
+          <div className="relative grid items-start gap-8 px-7 py-8 sm:px-10 lg:grid-cols-[1.05fr_0.95fr] lg:px-12 lg:py-12">
+            <div className="space-y-6">
+              <div className="flex flex-wrap items-center gap-3">
+                <span className="inline-flex items-center gap-2 rounded-full bg-white text-purple-800 px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.35em] shadow-md shadow-purple-500/20">
+                  <Sparkles className="size-4" />
+                  {activeSlide.eyebrow}
+                </span>
+                <span className="inline-flex items-center gap-2 rounded-full border border-white/25 bg-white/5 px-3 py-1.5 text-[11px] font-semibold text-purple-50">
+                  <BadgeCheck className="size-4 text-purple-200" />
+                  24/7 hospital desk
+                </span>
+              </div>
 
-            <div className="space-y-4">
-              <h1 className="text-3xl font-black leading-tight text-slate-900 sm:text-4xl lg:text-5xl">
-                {activeSlide.title}
-              </h1>
-              <p className="max-w-2xl text-base text-slate-600 sm:text-lg">
-                {activeSlide.description}
-              </p>
-            </div>
+              <div className="space-y-2.5">
+                <h1 className="text-[32px] font-black leading-tight sm:text-4xl lg:text-[44px]">
+                  {activeSlide.title}
+                </h1>
+                <p className="max-w-2xl text-[15px] text-purple-50/80 sm:text-base">
+                  {activeSlide.description}
+                </p>
+              </div>
 
-            <div className="flex flex-wrap items-center gap-3 text-sm text-slate-500">
-              <span className="inline-flex items-center gap-2 rounded-full bg-slate-900 px-4 py-2 text-sm font-semibold text-white shadow-lg shadow-sky-100">
-                <ShieldCheck className="size-4 text-emerald-200" />
-                {activeSlide.highlight}
-              </span>
-              {activeSlide.features.map((feature, index) => {
-                const Icon = featureIcons[index % featureIcons.length];
-                return (
+              <div className="flex flex-wrap gap-2">
+                {activeSlide.tags.map((tag) => (
                   <span
-                    key={`${activeSlide.id}-${feature}`}
-                    className="inline-flex items-center gap-2 rounded-full bg-white/80 px-3 py-1.5 text-xs font-semibold uppercase tracking-wide text-slate-600 shadow-sm ring-1 ring-slate-100"
+                    key={`${activeSlide.id}-${tag}`}
+                    className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-3 py-1.5 text-[11px] font-semibold text-purple-50"
                   >
-                    <Icon className="size-4 text-sky-500" />
-                    {feature}
+                    <ShieldCheck className="size-4 text-purple-200" />
+                    {tag}
                   </span>
-                );
-              })}
-            </div>
-
-            <div className="flex flex-wrap gap-3 pt-2">
-              <Button className="rounded-full bg-sky-600 px-7 py-2 text-sm font-semibold text-white shadow-lg shadow-sky-100 transition hover:bg-sky-700">
-                {activeSlide.ctaLabel}
-              </Button>
-              <Button
-                variant="outline"
-                className="rounded-full border-slate-200 bg-white/70 px-7 py-2 text-sm font-semibold text-slate-700 shadow-sm transition hover:border-slate-300 hover:bg-white"
-              >
-                {activeSlide.secondaryLabel}
-              </Button>
-            </div>
-
-            <div className="grid grid-cols-2 gap-4 pt-2 sm:max-w-xl">
-              <div className="rounded-2xl border border-slate-100 bg-white/90 px-4 py-3 shadow-sm shadow-sky-50">
-                <p className="text-sm font-semibold text-slate-900">4.8/5 patient satisfaction</p>
-                <p className="text-xs text-slate-500">Feedback from 12k+ recent visits</p>
+                ))}
               </div>
-              <div className="rounded-2xl border border-slate-100 bg-white/90 px-4 py-3 shadow-sm shadow-emerald-50">
-                <p className="text-sm font-semibold text-slate-900">25+ specialist departments</p>
-                <p className="text-xs text-slate-500">Direct routing to the right doctor</p>
+
+              <div className="flex flex-wrap gap-3 pt-1">
+                <Button className="group rounded-full bg-white px-7 py-2 text-sm font-semibold text-purple-800 shadow-lg shadow-purple-500/20 transition hover:-translate-y-0.5 hover:bg-purple-50">
+                  <span className="flex items-center gap-2">
+                    {activeSlide.ctaPrimary}
+                    <ArrowUpRight className="size-4 text-purple-700 transition group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+                  </span>
+                </Button>
+                <Button
+                  variant="outline"
+                  className="rounded-full border-white/25 bg-white/10 px-7 py-2 text-sm font-semibold text-white shadow-md shadow-purple-900/30 transition hover:-translate-y-0.5 hover:bg-white/15"
+                >
+                  {activeSlide.ctaSecondary}
+                </Button>
+              </div>
+
+              <div className="grid gap-3 sm:grid-cols-3">
+                {activeSlide.metrics.map((metric) => (
+                  <div
+                    key={`${activeSlide.id}-${metric.label}`}
+                    className="rounded-2xl border border-white/10 bg-white/5 p-3.5 shadow-inner shadow-purple-900/20"
+                  >
+                    <p className="text-[11px] font-semibold uppercase tracking-wide text-purple-100/70">
+                      {metric.label}
+                    </p>
+                    <p className="mt-1 text-xl font-bold text-white">{metric.value}</p>
+                    <p className="text-[11px] text-purple-50/70">{metric.detail}</p>
+                  </div>
+                ))}
+              </div>
+
+              <div className="flex flex-wrap items-center gap-3 text-sm text-purple-50/85">
+                <span className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-3 py-1.5">
+                  <ShieldCheck className="size-4 text-purple-200" />
+                  {activeSlide.highlight}
+                </span>
+                <span className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1.5">
+                  <Clock3 className="size-4 text-purple-200" />
+                  Next slot: {activeSlide.nextSlot}
+                </span>
+                <span className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1.5">
+                  <PhoneCall className="size-4 text-purple-200" />
+                  Hotline: {activeSlide.hotline}
+                </span>
+              </div>
+            </div>
+
+            <div className="relative">
+              <div className="relative overflow-hidden rounded-[26px] border border-white/12 bg-white/5 backdrop-blur">
+                <div className={`absolute inset-0 bg-gradient-to-br ${activeSlide.accent}`} aria-hidden />
+                <div className="absolute inset-0 bg-gradient-to-t from-slate-950/70 via-slate-900/25 to-transparent" aria-hidden />
+                <Image
+                  src={activeSlide.image}
+                  alt="HealthSync care team"
+                  fill
+                  priority
+                  className="object-cover"
+                  sizes="(min-width: 1280px) 520px, (min-width: 1024px) 440px, 100vw"
+                />
+
+                <div className="absolute left-4 top-4 inline-flex items-center gap-2 rounded-full bg-white/90 px-3 py-2 text-xs font-semibold text-purple-800 shadow-lg shadow-purple-500/20">
+                  <Stethoscope className="size-4 text-purple-600" />
+                  Live care board
+                </div>
+
+                <div className="absolute right-4 top-4 flex gap-2">
+                  <span className="rounded-full border border-white/20 bg-white/15 px-3 py-1 text-xs font-semibold text-purple-50">
+                    Secure by design
+                  </span>
+                  <span className="inline-flex items-center gap-1 rounded-full bg-purple-100/90 px-3 py-1 text-xs font-semibold text-purple-800">
+                    <Activity className="size-4" />
+                    Live
+                  </span>
+                </div>
+
+                <div className="absolute inset-x-4 bottom-5 grid gap-3 sm:grid-cols-2">
+                  <div className="rounded-2xl bg-white/92 p-4 text-slate-900 shadow-xl shadow-purple-900/25">
+                    <p className="text-sm font-semibold text-slate-800">{activeSlide.spotlight.label}</p>
+                    <p className="text-lg font-bold text-purple-700">{activeSlide.spotlight.value}</p>
+                    <p className="text-xs text-slate-600">{activeSlide.spotlight.detail}</p>
+                  </div>
+                  <div className="rounded-2xl border border-white/40 bg-white/15 p-4 text-white shadow-lg shadow-purple-900/25">
+                    <p className="text-sm font-semibold text-white/90">On-call triage</p>
+                    <p className="text-lg font-bold text-white">Team Aurora</p>
+                    <p className="text-xs text-purple-100/80">Nursing, ER, Respiratory</p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="mt-4 grid gap-4 sm:grid-cols-3">
+                {activeSlide.kpis.map((kpi) => (
+                  <div
+                    key={`${activeSlide.id}-${kpi.label}`}
+                    className="rounded-2xl border border-white/12 bg-white/5 p-4 text-white shadow-inner shadow-purple-900/25"
+                  >
+                    <div className="flex items-center justify-between">
+                      <p className="text-sm font-semibold text-purple-50/85">{kpi.label}</p>
+                      <BedDouble className="size-4 text-purple-200" />
+                    </div>
+                    <p className="text-xl font-bold text-white">{kpi.value}</p>
+                    <p className="text-xs text-purple-100/75">{kpi.detail}</p>
+                  </div>
+                ))}
+                <div className="rounded-2xl border border-white/12 bg-gradient-to-br from-purple-500/30 via-purple-500/20 to-purple-500/10 p-4 text-white shadow-inner shadow-purple-900/25">
+                  <div className="flex items-center gap-2 text-sm font-semibold">
+                    <HeartPulse className="size-4 text-white" />
+                    Patient safety focus
+                  </div>
+                  <p className="mt-1 text-2xl font-bold text-white">4.8 / 5</p>
+                  <p className="text-xs text-purple-100/80">Recent patient experience score</p>
+                </div>
               </div>
             </div>
           </div>
 
-          <div className="relative z-10">
-            <div className="absolute -left-10 -top-12 h-48 w-48 rounded-full bg-white/60 blur-3xl" aria-hidden />
-            <div className="absolute -right-16 bottom-0 h-60 w-60 rounded-full bg-sky-100 blur-3xl" aria-hidden />
-
-            <div className="relative overflow-hidden rounded-[1.75rem] border border-white/80 bg-slate-900/80 shadow-2xl shadow-sky-100/60">
-              <div className={`absolute inset-0 bg-gradient-to-tr ${activeSlide.visual.gradient}`} aria-hidden />
-              <div className="absolute inset-0 bg-gradient-to-tr from-slate-900/35 via-slate-900/10 to-transparent" aria-hidden />
-              <Image
-                src={activeSlide.image}
-                alt="HealthSync care team"
-                fill
-                priority
-                className="object-cover"
-                sizes="(min-width: 1280px) 520px, (min-width: 1024px) 440px, 100vw"
-              />
-
-              <div className="absolute left-5 top-5 inline-flex items-center gap-2 rounded-full bg-white/90 px-3 py-2 text-xs font-semibold text-slate-700 shadow-md shadow-sky-100">
-                <Stethoscope className="size-4 text-sky-600" />
-                Board-certified doctors
-              </div>
-
-              <div className="absolute bottom-5 right-5 flex items-center gap-3 rounded-2xl bg-white/90 px-4 py-3 text-left text-slate-900 shadow-xl shadow-sky-100">
-                <div className="flex size-10 items-center justify-center rounded-full bg-sky-50 text-sky-700">
-                  <HeartPulse className="size-5" />
-                </div>
-                <div>
-                  <p className="text-xs font-semibold text-slate-700">Response time</p>
-                  <p className="text-sm text-slate-600">Under 5 min average</p>
-                </div>
-              </div>
+          <div className="relative flex items-center justify-between px-6 pb-5 sm:px-9">
+            <div className="flex items-center gap-2">
+              {slides.map((slide, index) => (
+                <button
+                  key={slide.id}
+                  onClick={() => setCurrent(index)}
+                  aria-label={`Go to slide ${index + 1}`}
+                  className={`h-2.5 rounded-full transition ${
+                    current === index
+                      ? "w-11 bg-purple-400 shadow-[0_0_18px_rgba(168,85,247,0.6)]"
+                      : "w-6 bg-white/30 hover:bg-white/50"
+                  }`}
+                />
+              ))}
             </div>
-
-            <div className="mt-6 flex items-center gap-3 rounded-2xl border border-slate-100 bg-white/90 px-5 py-4 shadow-sm shadow-sky-50">
-              <Clock3 className="size-6 text-sky-600" />
-              <div className="text-left">
-                <p className="text-sm font-semibold text-slate-900">Same-day appointments</p>
-                <p className="text-xs text-slate-500">We match you with the right specialist instantly.</p>
-              </div>
-            </div>
-          </div>
-
-          <div className="absolute inset-x-0 bottom-6 flex items-center justify-center gap-3">
-            {slides.map((slide, index) => (
+            <div className="flex items-center gap-2">
               <button
-                key={slide.id}
-                onClick={() => setCurrent(index)}
-                aria-label={`Go to slide ${index + 1}`}
-                className={`h-2.5 rounded-full transition ${
-                  current === index
-                    ? "w-12 bg-sky-600 shadow-[0_0_12px_rgba(14,165,233,0.45)]"
-                    : "w-6 bg-slate-300/70 hover:bg-slate-400"
-                }`}
-              />
-            ))}
-          </div>
-
-          <div className="absolute right-6 top-6 flex items-center gap-2">
-            <button
-              onClick={prevSlide}
-              aria-label="Previous slide"
-              className="flex size-10 items-center justify-center rounded-full border border-white/80 bg-white/90 text-slate-700 shadow-md backdrop-blur transition hover:scale-105"
-            >
-              <ChevronLeft className="size-5" />
-            </button>
-            <button
-              onClick={nextSlide}
-              aria-label="Next slide"
-              className="flex size-10 items-center justify-center rounded-full border border-white/80 bg-white/90 text-slate-700 shadow-md backdrop-blur transition hover:scale-105"
-            >
-              <ChevronRight className="size-5" />
-            </button>
+                onClick={prevSlide}
+                aria-label="Previous slide"
+                className="flex size-10 items-center justify-center rounded-full border border-white/25 bg-white/10 text-white shadow-md backdrop-blur transition hover:-translate-y-0.5"
+              >
+                <ChevronLeft className="size-5" />
+              </button>
+              <button
+                onClick={nextSlide}
+                aria-label="Next slide"
+                className="flex size-10 items-center justify-center rounded-full border border-white/25 bg-white/10 text-white shadow-md backdrop-blur transition hover:-translate-y-0.5"
+              >
+                <ChevronRight className="size-5" />
+              </button>
+            </div>
           </div>
         </div>
       </div>

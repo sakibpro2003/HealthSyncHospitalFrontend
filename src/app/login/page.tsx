@@ -86,7 +86,7 @@ const LoginForm = () => {
             router.push("/receptionist");
             break;
           case "admin":
-            router.push("/admin/create-new-medicine");
+            router.push("/admin/dashboard");
             break;
           default:
             toast.error("Unknown role detected.");

@@ -1,47 +1,78 @@
-"use client"
+"use client";
 
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 import {
-  BadgeCheck,
-  Bell,
   ChevronsUpDown,
-  CreditCard,
   Home,
-  // Link,
   LogOut,
-} from "lucide-react"
+  UserRound,
+} from "lucide-react";
 
-import {
-  Avatar,
-  AvatarFallback,
-  AvatarImage,
-} from "@/components/ui/avatar"
+import { useAppDispatch } from "@/redux/hooks";
+import { logOut } from "@/redux/features/auth/authSlice";
+import { useLogoutUserMutation } from "@/redux/features/auth/authApi";
+import { clearClientTokenCookie } from "@/utils/clientTokenCookie";
+
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
+} from "@/components/ui/dropdown-menu";
 import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
   useSidebar,
-} from "@/components/ui/sidebar"
-import Link from "next/link"
+} from "@/components/ui/sidebar";
 
-export function NavUser({
-  user,
-}: {
+type NavUserProps = {
   user: {
-    name: string
-    email: string
-    avatar: string
+    name: string;
+    email: string;
+    avatar: string;
+    role?: string;
+  };
+};
+
+const resolveHomeHref = (role?: string) => {
+  switch (role) {
+    case "admin":
+      return "/admin/dashboard";
+    case "doctor":
+      return "/doctor/appointments";
+    case "receptionist":
+      return "/receptionist";
+    case "patient":
+      return "/patient";
+    case "user":
+      return "/";
+    default:
+      return "/";
   }
-}) {
-  const { isMobile } = useSidebar()
+};
+
+export function NavUser({ user }: NavUserProps) {
+  const { isMobile } = useSidebar();
+  const router = useRouter();
+  const dispatch = useAppDispatch();
+  const [logoutUser] = useLogoutUserMutation();
+
+  const homeHref = resolveHomeHref(user.role);
+
+  const handleLogout = async () => {
+    try {
+      await logoutUser({});
+    } finally {
+      dispatch(logOut());
+      clearClientTokenCookie();
+      router.push("/login");
+    }
+  };
 
   return (
     <SidebarMenu>
@@ -54,7 +85,9 @@ export function NavUser({
             >
               <Avatar className="h-8 w-8 rounded-lg">
                 <AvatarImage src={user.avatar} alt={user.name} />
-                <AvatarFallback className="rounded-lg">CN</AvatarFallback>
+                <AvatarFallback className="rounded-lg">
+                  {user.name?.slice(0, 2).toUpperCase() || "HS"}
+                </AvatarFallback>
               </Avatar>
               <div className="grid flex-1 text-left text-sm leading-tight">
                 <span className="truncate font-medium">{user.name}</span>
@@ -73,7 +106,9 @@ export function NavUser({
               <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
                 <Avatar className="h-8 w-8 rounded-lg">
                   <AvatarImage src={user.avatar} alt={user.name} />
-                  <AvatarFallback className="rounded-lg">CN</AvatarFallback>
+                  <AvatarFallback className="rounded-lg">
+                    {user.name?.slice(0, 2).toUpperCase() || "HS"}
+                  </AvatarFallback>
                 </Avatar>
                 <div className="grid flex-1 text-left text-sm leading-tight">
                   <span className="truncate font-medium">{user.name}</span>
@@ -82,35 +117,26 @@ export function NavUser({
               </div>
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuGroup>
-              <DropdownMenuItem>
-                <Home />
-                <Link href="/">Home</Link>
-              </DropdownMenuItem>
-            </DropdownMenuGroup>
+            <DropdownMenuItem asChild>
+              <Link href={homeHref} className="flex items-center gap-2">
+                <Home className="h-4 w-4" />
+                <span>Home</span>
+              </Link>
+            </DropdownMenuItem>
+            <DropdownMenuItem asChild>
+              <Link href="/profile" className="flex items-center gap-2">
+                <UserRound className="h-4 w-4" />
+                <span>Account</span>
+              </Link>
+            </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuGroup>
-              <DropdownMenuItem>
-                <BadgeCheck />
-                Account
-              </DropdownMenuItem>
-              <DropdownMenuItem>
-                <CreditCard />
-                Billing
-              </DropdownMenuItem>
-              <DropdownMenuItem>
-                <Bell />
-                Notifications
-              </DropdownMenuItem>
-            </DropdownMenuGroup>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem>
-              <LogOut />
-              Log out
+            <DropdownMenuItem onSelect={handleLogout} className="text-destructive">
+              <LogOut className="h-4 w-4" />
+              <span>Log out</span>
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       </SidebarMenuItem>
     </SidebarMenu>
-  )
+  );
 }

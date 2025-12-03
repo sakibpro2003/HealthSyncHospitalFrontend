@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import React, { useEffect, useMemo, useState } from "react";
 import {
   Activity,
@@ -87,8 +88,15 @@ const ProductForm = () => {
       | React.ChangeEvent<HTMLTextAreaElement>
       | React.ChangeEvent<HTMLSelectElement>
   ) => {
-    const { name, value, type, checked } = event.target;
-    const isCheckbox = type === "checkbox";
+    const target = event.target as
+      | HTMLInputElement
+      | HTMLTextAreaElement
+      | HTMLSelectElement;
+    const { name, value, type } = target;
+    const nextValue =
+      target instanceof HTMLInputElement && type === "checkbox"
+        ? target.checked
+        : value;
 
     if (name.startsWith("manufacturer.")) {
       const [, field] = name.split(".");
@@ -104,7 +112,7 @@ const ProductForm = () => {
 
     setProduct((prev) => ({
       ...prev,
-      [name]: isCheckbox ? checked : value,
+      [name]: nextValue,
     }));
   };
 
@@ -408,10 +416,14 @@ const ProductForm = () => {
                       <div className="relative h-full min-h-[160px] overflow-hidden rounded-2xl border border-slate-200 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
                         <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,_white,_transparent_35%),_radial-gradient(circle_at_80%_0%,_white,_transparent_25%)] opacity-10" />
                         {imagePreview || product.image ? (
-                          <img
+                          <Image
                             src={imagePreview || product.image}
                             alt="Selected medicine preview"
-                            className="absolute inset-0 h-full w-full object-cover opacity-90"
+                            fill
+                            className="object-cover opacity-90"
+                            sizes="(max-width: 1024px) 100vw, 50vw"
+                            priority
+                            unoptimized
                           />
                         ) : (
                           <div className="absolute inset-0 flex items-center justify-center px-4 text-center text-sm text-white/70">

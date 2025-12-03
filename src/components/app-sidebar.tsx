@@ -3,11 +3,11 @@
 
 import * as React from "react";
 import { useState, useEffect } from "react";
+import { usePathname } from "next/navigation";
 import {
   GalleryVerticalEnd,
   SquareTerminal,
   Users,
-  Settings,
   ClipboardList,
   Pill,
   HeartPulse,
@@ -35,7 +35,7 @@ type NavItem = {
   url: string;
   icon?: any;
   isActive?: boolean;
-  items?: { title: string; url: string }[];
+  items?: { title: string; url: string; isActive?: boolean }[];
 };
 
 const teams = [
@@ -49,6 +49,7 @@ const teams = [
 export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
   const { user } = useClientUser();
   const [navItems, setNavItems] = useState<NavItem[]>([]);
+  const pathname = usePathname();
 
   useEffect(() => {
     if (!user) {
@@ -120,11 +121,7 @@ export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
               },
             ],
           },
-          {
-            title: "Settings",
-            url: "/admin/settings",
-            icon: Settings,
-          },
+         
         ]);
         break;
       case "doctor":
@@ -193,13 +190,33 @@ export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
     }
   }, [user]);
 
+  const enhancedNavItems = React.useMemo<NavItem[]>(() => {
+    return navItems.map((item) => {
+      const childItems = item.items?.map((subItem) => {
+        const activeSub =
+          pathname === subItem.url || pathname.startsWith(`${subItem.url}/`);
+        return { ...subItem, isActive: activeSub };
+      });
+
+      const hasActiveChild = childItems?.some((child) => child.isActive);
+      const isSelfActive =
+        pathname === item.url || pathname.startsWith(`${item.url}/`);
+
+      return {
+        ...item,
+        isActive: isSelfActive || hasActiveChild,
+        items: childItems,
+      };
+    });
+  }, [navItems, pathname]);
+
   return (
     <Sidebar collapsible="icon" {...props}>
       <SidebarHeader>
         <TeamSwitcher teams={teams} />
       </SidebarHeader>
       <SidebarContent>
-        <NavMain items={navItems} />
+        <NavMain items={enhancedNavItems} />
       </SidebarContent>
       <SidebarFooter>
         <NavUser
@@ -207,6 +224,7 @@ export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
             name: user?.name || "Guest",
             email: user?.email || "unknown@example.com",
             avatar: "https://i.ibb.co/WNTsHZq2/9434621.png",
+            role: user?.role,
           }}
         />
       </SidebarFooter>

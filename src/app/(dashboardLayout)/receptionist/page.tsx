@@ -10,10 +10,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import {
-  IPatient,
-  useGetAllPatientQuery,
-} from "@/redux/features/patient/patientApi";
+import { useGetAllPatientQuery } from "@/redux/features/patient/patientApi";
 import { cn } from "@/lib/utils";
 import {
   Activity,
@@ -48,7 +45,7 @@ const ReceptionistPatientInsightsPage = () => {
     searchTerm: "",
   });
 
-  const patients = data?.result ?? [];
+  const patients = useMemo(() => data?.result ?? [], [data?.result]);
   const totalPatients = data?.meta?.total ?? patients.length;
 
   const normalizeDate = (value?: string | Date | null) => {
