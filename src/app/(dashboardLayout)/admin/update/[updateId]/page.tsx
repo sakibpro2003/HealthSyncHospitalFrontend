@@ -161,24 +161,6 @@ const MedicineUpdatePage = () => {
   const [formState, setFormState] = useState<FormState>(DEFAULT_FORM_STATE);
   const showInitialLoader = (isLoading || isFetching) && !productResponse;
 
-  if (showInitialLoader) {
-    return (
-      <div className="p-6">
-        <Loader fullScreen={false} label="Loading medicine details" />
-      </div>
-    );
-  }
-
-  if (isError && !productResponse) {
-    return (
-      <div className="p-6">
-        <p className="text-center text-red-500">
-          Unable to load medicine information. Please try again later.
-        </p>
-      </div>
-    );
-  }
-
   useEffect(() => {
     if (!productResponse?.data) {
       return;
@@ -220,6 +202,24 @@ const MedicineUpdatePage = () => {
       manufacturerContact: manufacturer.contact,
     });
   }, [productResponse]);
+
+  if (showInitialLoader) {
+    return (
+      <div className="p-6">
+        <Loader fullScreen={false} label="Loading medicine details" />
+      </div>
+    );
+  }
+
+  if (isError && !productResponse) {
+    return (
+      <div className="p-6">
+        <p className="text-center text-red-500">
+          Unable to load medicine information. Please try again later.
+        </p>
+      </div>
+    );
+  }
 
   const handleInputChange = (
     event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>

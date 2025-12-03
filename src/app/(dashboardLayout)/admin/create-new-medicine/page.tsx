@@ -1,12 +1,14 @@
 "use client";
 
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import {
   Activity,
   Beaker,
   Factory,
+  Image as ImageIcon,
   Package,
   ShieldCheck,
+  UploadCloud,
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -65,9 +67,19 @@ type ToggleField = "inStock" | "requiredPrescription";
 
 const ProductForm = () => {
   const [product, setProduct] = useState<ProductFormState>(initialProductState);
+  const [isDragging, setIsDragging] = useState(false);
+  const [selectedImageFile, setSelectedImageFile] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState("");
   const [createProduct, { isLoading }] = useCreateProductMutation();
   const [uploadProductImage, { isLoading: isUploading }] =
     useUploadProductImageMutation();
+
+  useEffect(
+    () => () => {
+      if (imagePreview) URL.revokeObjectURL(imagePreview);
+    },
+    [imagePreview]
+  );
 
   const handleChange = (
     event:
@@ -103,64 +115,90 @@ const ProductForm = () => {
     }));
   };
 
-  const handleImageUpload = async (
-    event: React.ChangeEvent<HTMLInputElement>
-  ) => {
+  const prepareImageForUpload = (file: File | undefined) => {
+    if (!file) return;
+
+    if (imagePreview) {
+      URL.revokeObjectURL(imagePreview);
+    }
+
+    const preview = URL.createObjectURL(file);
+    setSelectedImageFile(file);
+    setImagePreview(preview);
+  };
+
+  const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
 
-    if (!file) {
-      return;
+    prepareImageForUpload(file);
+  };
+
+  const handleDrop = (event: React.DragEvent<HTMLLabelElement>) => {
+    event.preventDefault();
+    setIsDragging(false);
+    const file = event.dataTransfer.files?.[0];
+    prepareImageForUpload(file);
+  };
+
+  const handleDragOver = (event: React.DragEvent<HTMLLabelElement>) => {
+    event.preventDefault();
+    setIsDragging(true);
+  };
+
+  const handleDragLeave = () => setIsDragging(false);
+
+  const getUploadErrorMessage = (error: unknown) => {
+    const isBaseQueryError =
+      typeof error === "object" &&
+      error !== null &&
+      "status" in error &&
+      "data" in error;
+
+    if (isBaseQueryError) {
+      const baseError = error as {
+        data?: { message?: string } | string;
+        error?: string;
+      };
+      if (typeof baseError.data === "string") return baseError.data;
+      if (baseError.data && typeof baseError.data === "object" && "message" in baseError.data) {
+        return (baseError.data as { message?: string }).message ?? "Image upload failed";
+      }
+      if (baseError.error === "TypeError: Failed to fetch") {
+        return "Upload failed. Is the backend running at the API base URL?";
+      }
+      return baseError.error ?? "Image upload failed";
     }
 
-    const formData = new FormData();
-    formData.append("image", file);
-
-    try {
-      const { url } = await uploadProductImage(formData).unwrap();
-      setProduct((prev) => ({ ...prev, image: url }));
-      toast.success("Image uploaded");
-    } catch (error) {
-      const errorMessage = (() => {
-        const isBaseQueryError =
-          typeof error === "object" &&
-          error !== null &&
-          "status" in error &&
-          "data" in error;
-
-        if (isBaseQueryError) {
-          const baseError = error as {
-            data?: { message?: string } | string;
-            error?: string;
-          };
-          if (typeof baseError.data === "string") return baseError.data;
-          if (baseError.data && typeof baseError.data === "object" && "message" in baseError.data) {
-            return (baseError.data as { message?: string }).message ?? "Image upload failed";
-          }
-          if (baseError.error === "TypeError: Failed to fetch") {
-            return "Upload failed. Is the backend running at the API base URL?";
-          }
-          return baseError.error ?? "Image upload failed";
-        }
-        if (error instanceof Error) return error.message;
-        return "Image upload failed";
-      })();
-
-      toast.error(errorMessage);
-      console.warn("Image upload failed", error);
-    }
+    if (error instanceof Error) return error.message;
+    return "Image upload failed";
   };
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
 
-    if (!product.image) {
-      toast.error("Please upload a product image first");
+    if (!selectedImageFile) {
+      toast.error("Please choose a product image before publishing");
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append("image", selectedImageFile);
+
+    let uploadedImageUrl = "";
+
+    try {
+      const { url } = await uploadProductImage(formData).unwrap();
+      uploadedImageUrl = url;
+    } catch (error) {
+      toast.error(getUploadErrorMessage(error));
+      console.warn("Image upload failed", error);
       return;
     }
 
     try {
       const payload = {
         ...product,
+        image: uploadedImageUrl,
         price: Number(product.price) || 0,
         quantity: Number(product.quantity) || 0,
         rating: Number(product.rating) || 0,
@@ -171,6 +209,11 @@ const ProductForm = () => {
       await createProduct(payload).unwrap();
       toast.success("Medicine added successfully");
       setProduct(initialProductState);
+      setSelectedImageFile(null);
+      if (imagePreview) {
+        URL.revokeObjectURL(imagePreview);
+        setImagePreview("");
+      }
     } catch (error) {
       toast.error("Failed to create medicine");
       console.error(error);
@@ -299,20 +342,101 @@ const ProductForm = () => {
 
                   <div className="space-y-2">
                     <Label className="text-sm text-slate-600">Product image</Label>
-                    <Input
-                      type="file"
-                      accept="image/*"
-                      onChange={handleImageUpload}
-                      className="h-12 rounded-2xl bg-white/80"
-                      required={!product.image}
-                      disabled={isUploading}
-                    />
+                    <div className="grid gap-3 sm:grid-cols-[1fr_220px] sm:items-center">
+                      <label
+                        htmlFor="productImage"
+                        onDragOver={handleDragOver}
+                        onDragLeave={handleDragLeave}
+                        onDrop={handleDrop}
+                        className={`group relative flex min-h-[160px] flex-col justify-between rounded-2xl border-2 border-dashed px-4 py-5 transition ${
+                          isDragging
+                            ? "border-violet-400 bg-violet-50/70"
+                            : "border-slate-200 bg-white/80 hover:border-violet-200 hover:bg-violet-50/40"
+                        }`}
+                      >
+                        <input
+                          id="productImage"
+                          type="file"
+                          accept="image/*"
+                          onChange={handleImageUpload}
+                          key={imagePreview || "empty"}
+                          className="hidden"
+                          required={!selectedImageFile}
+                          disabled={isUploading}
+                        />
+                        <div className="flex items-center justify-between gap-3">
+                          <div className="flex items-center gap-3">
+                            <span className="rounded-full bg-violet-600/10 p-2 text-violet-700 ring-1 ring-violet-100">
+                              <UploadCloud className="h-5 w-5" />
+                            </span>
+                            <div>
+                              <p className="text-sm font-semibold text-slate-900">
+                                Drag a medicine shot
+                              </p>
+                              <p className="text-xs text-slate-500">
+                                JPG or PNG, staged and uploaded on publish.
+                              </p>
+                            </div>
+                          </div>
+                          <span className="rounded-full bg-slate-900 px-3 py-1 text-xs font-semibold text-white shadow-sm">
+                            {isUploading ? "Uploading..." : "Browse"}
+                          </span>
+                        </div>
+                        <div className="mt-4 flex flex-wrap items-center gap-2 text-[11px] text-slate-500">
+                          <span className="inline-flex items-center gap-1 rounded-full bg-slate-100 px-3 py-1">
+                            <ImageIcon className="h-3.5 w-3.5 text-slate-400" />
+                            Smart scaling for storefront
+                          </span>
+                          {selectedImageFile ? (
+                            <span className="inline-flex items-center gap-2 rounded-full bg-emerald-100 px-3 py-1 text-emerald-700">
+                              <span className="h-2 w-2 rounded-full bg-emerald-500" />
+                              Staged for upload
+                              <span className="truncate text-[10px] text-emerald-800/80">
+                                {selectedImageFile.name}
+                              </span>
+                            </span>
+                          ) : (
+                            <span className="inline-flex items-center gap-1 rounded-full bg-amber-100 px-3 py-1 text-amber-700">
+                              <span className="h-2 w-2 rounded-full bg-amber-500" />
+                              No file selected
+                            </span>
+                          )}
+                        </div>
+                        <div className="pointer-events-none absolute inset-x-4 bottom-3 h-px bg-gradient-to-r from-transparent via-violet-200 to-transparent" />
+                      </label>
+
+                      <div className="relative h-full min-h-[160px] overflow-hidden rounded-2xl border border-slate-200 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
+                        <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,_white,_transparent_35%),_radial-gradient(circle_at_80%_0%,_white,_transparent_25%)] opacity-10" />
+                        {imagePreview || product.image ? (
+                          <img
+                            src={imagePreview || product.image}
+                            alt="Selected medicine preview"
+                            className="absolute inset-0 h-full w-full object-cover opacity-90"
+                          />
+                        ) : (
+                          <div className="absolute inset-0 flex items-center justify-center px-4 text-center text-sm text-white/70">
+                            Live preview will appear here
+                          </div>
+                        )}
+                        <div className="relative flex h-full flex-col justify-between p-4 text-white">
+                          <div className="flex items-center gap-2 text-xs uppercase tracking-[0.2em] text-white/60">
+                            <span className="h-2 w-2 rounded-full bg-emerald-400" />
+                            Preview
+                          </div>
+                          <div className="space-y-1">
+                            <p className="text-sm font-semibold">
+                              {product.name || "Medicine name"}
+                            </p>
+                            <p className="text-xs text-white/70">
+                              {product.category} • {product.packSize || "pack size TBD"}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
                     <p className="text-xs text-slate-500">
-                      {isUploading
-                        ? "Uploading to Cloudinary..."
-                        : product.image
-                        ? `Uploaded: ${product.image}`
-                        : "Choose a clear pack shot or blister photo to upload."}
+                      Drop from desktop or tap browse; we upload after you click Create medicine so you
+                      can swap files freely.
                     </p>
                   </div>
 
@@ -539,10 +663,14 @@ const ProductForm = () => {
             </div>
             <Button
               type="submit"
-              disabled={isLoading}
+              disabled={isLoading || isUploading}
               className="h-12 rounded-full bg-violet-600 px-8 text-sm font-semibold text-white shadow-lg transition hover:bg-violet-700 disabled:cursor-not-allowed disabled:opacity-70"
             >
-              {isLoading ? "Publishing..." : "Create medicine"}
+              {isUploading
+                ? "Uploading image..."
+                : isLoading
+                ? "Publishing..."
+                : "Create medicine"}
             </Button>
           </div>
         </form>
