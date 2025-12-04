@@ -30,6 +30,10 @@ const NewsletterSection = dynamic(() => import("@/components/Home/NewsletterSect
   loading: () => <SectionPlaceholder className="h-64" />,
 });
 
+const TestimonialsSection = dynamic(() => import("@/components/Home/TestimonialsSection"), {
+  loading: () => <SectionPlaceholder className="h-96" />,
+});
+
 const AccordioSection = dynamic(() => import("@/components/Home/AccordioSection"), {
   loading: () => <SectionPlaceholder className="h-60" />,
 });
@@ -58,6 +62,7 @@ const page = () => {
           videoUrl="https://www.youtube.com/embed/FHeq7a_2AiE?si=ytMC-rc7mD5a9q1N"
         />
         <BloodAvailability />
+        <TestimonialsSection />
         <NewsletterSection />
         <AccordioSection />
         <MyGallery />

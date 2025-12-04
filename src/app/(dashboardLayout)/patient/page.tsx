@@ -15,6 +15,8 @@ import {
   HeartPulse,
   CalendarDays,
   PhoneCall,
+  MessageCircleHeart,
+  Star,
 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -28,7 +30,12 @@ import {
 } from "@/components/ui/sheet";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { Badge } from "@/components/ui/badge";
 import { useClientUser } from "@/hooks/useClientUser";
+import {
+  useGetMyTestimonialsQuery,
+  useSubmitTestimonialMutation,
+} from "@/redux/features/testimonial/testimonialApi";
 
 const toDisplayList = (items?: string[]) => {
   if (!items || !items.length) {
@@ -122,6 +129,10 @@ const PatientDashboardPage = () => {
     allergies: "",
     currentMedications: "",
   });
+  const [testimonialForm, setTestimonialForm] = useState({
+    content: "",
+    rating: 5,
+  });
 
   const patientId = useMemo(
     () => user?.userId ?? user?._id ?? "",
@@ -140,8 +151,30 @@ const PatientDashboardPage = () => {
   const [updateMedicalHistory, { isLoading: isUpdating }] =
     useUpdateMedicalHistoryMutation();
 
+  const {
+    data: myTestimonialsData,
+    isLoading: isLoadingTestimonials,
+    refetch: refetchTestimonials,
+  } = useGetMyTestimonialsQuery(undefined, {
+    skip: !patientId,
+  });
+
+  const [submitTestimonial, { isLoading: isSubmittingTestimonial }] =
+    useSubmitTestimonialMutation();
+
   const patient = patientData?.data?.result;
   const greetingName = patient?.name ?? user?.name;
+
+  const testimonialStatusStyles = {
+    pending: "bg-amber-50 text-amber-700 ring-amber-200",
+    approved: "bg-emerald-50 text-emerald-700 ring-emerald-200",
+    rejected: "bg-rose-50 text-rose-700 ring-rose-200",
+  } as const;
+
+  const myTestimonials = useMemo(
+    () => myTestimonialsData ?? [],
+    [myTestimonialsData]
+  );
 
   const summaryCards = [
     {
@@ -290,6 +323,38 @@ const PatientDashboardPage = () => {
           error,
           "Unable to update medical history right now"
         )
+      );
+    }
+  };
+
+  const handleTestimonialSubmit = async (
+    event: React.FormEvent<HTMLFormElement>
+  ) => {
+    event.preventDefault();
+
+    if (!testimonialForm.content.trim()) {
+      toast.error("Please share a few words about your experience");
+      return;
+    }
+
+    if (!patientId) {
+      toast.error("You need to log in to share a testimonial");
+      return;
+    }
+
+    try {
+      await submitTestimonial({
+        content: testimonialForm.content.trim(),
+        rating: testimonialForm.rating,
+        patientName: greetingName ?? user?.name,
+      }).unwrap();
+
+      toast.success("Thanks! Your testimonial is awaiting approval.");
+      setTestimonialForm({ content: "", rating: 5 });
+      refetchTestimonials();
+    } catch (error: unknown) {
+      toast.error(
+        extractErrorMessage(error, "Unable to submit testimonial right now")
       );
     }
   };
@@ -531,6 +596,154 @@ const PatientDashboardPage = () => {
                   </li>
                 ))}
               </ul>
+            </article>
+          </section>
+
+          <section className="grid gap-6 lg:grid-cols-[1.15fr_0.85fr]">
+            <article className="rounded-3xl border border-violet-100 bg-gradient-to-br from-white via-violet-50 to-white p-6 shadow-lg ring-1 ring-violet-100">
+              <header className="flex items-start gap-3 text-violet-700">
+                <span className="flex size-10 items-center justify-center rounded-2xl bg-violet-100 text-violet-700 ring-1 ring-violet-200/70">
+                  <MessageCircleHeart className="h-5 w-5" />
+                </span>
+                <div>
+                  <p className="text-[11px] uppercase tracking-[0.3em] text-violet-600">Patient voice</p>
+                  <h2 className="text-xl font-semibold text-slate-900">Share your experience</h2>
+                  <p className="text-sm text-slate-600">
+                    Tell us how your care went. We will review your words before publishing them on the homepage.
+                  </p>
+                </div>
+              </header>
+
+              <form className="mt-4 space-y-4" onSubmit={handleTestimonialSubmit}>
+                <div className="space-y-2">
+                  <Label htmlFor="testimonial-message">Your testimonial</Label>
+                  <Textarea
+                    id="testimonial-message"
+                    rows={5}
+                    placeholder="E.g., The care team was attentive and explained every step."
+                    value={testimonialForm.content}
+                    onChange={(event) =>
+                      setTestimonialForm((prev) => ({
+                        ...prev,
+                        content: event.target.value,
+                      }))
+                    }
+                  />
+                </div>
+
+                <div className="flex flex-col gap-3 rounded-2xl border border-violet-100 bg-white/70 px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
+                  <div>
+                    <p className="text-sm font-semibold text-slate-900">Rate your experience</p>
+                    <p className="text-xs text-slate-500">Tap to select between 1 (poor) and 5 (excellent).</p>
+                  </div>
+                  <div className="flex items-center gap-1" role="group" aria-label="Select rating">
+                    {[1, 2, 3, 4, 5].map((value) => {
+                      const isActive = testimonialForm.rating >= value;
+                      return (
+                        <button
+                          key={value}
+                          type="button"
+                          onClick={() =>
+                            setTestimonialForm((prev) => ({
+                              ...prev,
+                              rating: value,
+                            }))
+                          }
+                          className={`rounded-full p-2 transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-violet-400 ${isActive ? "text-amber-500" : "text-slate-300 hover:text-amber-400"}`}
+                          aria-label={`${value} star rating`}
+                        >
+                          <Star
+                            className="h-5 w-5"
+                            fill={isActive ? "#f59e0b" : "none"}
+                            strokeWidth={isActive ? 1.5 : 2}
+                          />
+                        </button>
+                      );
+                    })}
+                    <span className="ml-2 text-xs font-semibold text-amber-700">
+                      {testimonialForm.rating}/5
+                    </span>
+                  </div>
+                </div>
+
+                <div className="flex flex-wrap items-center gap-3 text-xs text-slate-500">
+                  <Badge className="rounded-full bg-violet-100 text-violet-700 ring-1 ring-violet-200">
+                    Reviewed by admin before publishing
+                  </Badge>
+                  <span>We aim to approve testimonials within one business day.</span>
+                </div>
+
+                <Button
+                  type="submit"
+                  disabled={isSubmittingTestimonial}
+                  className="w-full"
+                >
+                  {isSubmittingTestimonial ? "Submitting..." : "Submit testimonial"}
+                </Button>
+              </form>
+            </article>
+
+            <article className="rounded-3xl border border-slate-100 bg-white/90 p-6 shadow-lg">
+              <header className="flex items-start justify-between gap-3">
+                <div>
+                  <p className="text-[11px] uppercase tracking-[0.3em] text-slate-500">Status</p>
+                  <h3 className="text-lg font-semibold text-slate-900">Your recent submissions</h3>
+                  <p className="text-sm text-slate-600">Track approval and see what will appear on the homepage.</p>
+                </div>
+                <Badge className="rounded-full bg-violet-100 text-violet-700 ring-1 ring-violet-200">
+                  {myTestimonials.length}
+                </Badge>
+              </header>
+
+              <div className="mt-4 space-y-3">
+                {isLoadingTestimonials ? (
+                  <div className="flex items-center gap-2 text-sm text-slate-600">
+                    <Loader2 className="h-4 w-4 animate-spin text-violet-500" />
+                    Loading testimonials...
+                  </div>
+                ) : myTestimonials.length === 0 ? (
+                  <p className="rounded-2xl border border-dashed border-slate-200 bg-slate-50 px-4 py-6 text-sm text-slate-600">
+                    You haven’t shared any testimonials yet. Your first one helps other patients know what to expect.
+                  </p>
+                ) : (
+                  myTestimonials.map((testimonial) => {
+                    const rating = Math.max(1, Math.round(testimonial.rating ?? 5));
+                    const statusStyle =
+                      testimonialStatusStyles[testimonial.status] ??
+                      "bg-slate-100 text-slate-700 ring-slate-200";
+                    return (
+                      <div
+                        key={testimonial._id}
+                        className="rounded-2xl border border-slate-200 bg-white px-4 py-3 shadow-sm"
+                      >
+                        <div className="flex items-start justify-between gap-3">
+                          <div>
+                            <p className="text-sm font-semibold text-slate-900">{testimonial.patientName ?? "You"}</p>
+                            <p className="text-xs text-slate-500">
+                              Submitted {formatDateValue(testimonial.createdAt ?? testimonial.updatedAt ?? null)}
+                            </p>
+                          </div>
+                          <Badge className={`rounded-full px-3 py-1 text-[11px] font-semibold ring-1 ${statusStyle}`}>
+                            {testimonial.status.charAt(0).toUpperCase() + testimonial.status.slice(1)}
+                          </Badge>
+                        </div>
+                        <p className="mt-2 text-sm text-slate-700">{testimonial.content}</p>
+                        <div className="mt-2 flex items-center gap-1 text-amber-500">
+                          {Array.from({ length: 5 }).map((_, index) => (
+                            <Star
+                              key={`${testimonial._id}-star-${index}`}
+                              className="h-4 w-4"
+                              fill={index < rating ? "#f59e0b" : "none"}
+                              strokeWidth={index < rating ? 1.5 : 2}
+                            />
+                          ))}
+                          <span className="ml-1 text-xs font-semibold text-amber-700">{rating}/5</span>
+                        </div>
+                      </div>
+                    );
+                  })
+                )}
+              </div>
             </article>
           </section>
         </div>

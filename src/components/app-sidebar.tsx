@@ -16,6 +16,7 @@ import {
   BarChart3,
   Stethoscope,
   FileText,
+  MessageSquareQuote,
 } from "lucide-react";
 
 import { NavMain } from "@/components/nav-main";
@@ -117,6 +118,17 @@ export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
             items: [
               { title: "Inventory", url: "/admin/blood-bank" },
               { title: "Requests", url: "/admin/blood-requests" },
+            ],
+          },
+          {
+            title: "Testimonials",
+            url: "/admin/testimonials",
+            icon: MessageSquareQuote,
+            items: [
+              {
+                title: "Approval queue",
+                url: "/admin/testimonials",
+              },
             ],
           },
           {
