@@ -1,5 +1,8 @@
 "use client";
 
+import emailjs, { EmailJSResponseStatus } from "@emailjs/browser";
+import { FormEvent, useState } from "react";
+import { toast } from "sonner";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -41,6 +44,91 @@ const contactChannels = [
 ];
 
 export default function ContactPage() {
+  const [formValues, setFormValues] = useState({
+    name: "",
+    email: "",
+    phone: "",
+    department: "",
+    message: "",
+  });
+  const [status, setStatus] = useState<"idle" | "submitting" | "success" | "error">("idle");
+  const [feedback, setFeedback] = useState<string | null>(null);
+
+  const serviceId = process.env.NEXT_PUBLIC_EMAIL_JS_SERVICE_ID;
+  const templateId = process.env.NEXT_PUBLIC_EMAIL_JS_TEMPLATE_ID;
+  const publicKey = process.env.NEXT_PUBLIC_EMAIL_JS_PUBLIC_ID;
+
+  const updateField = (key: keyof typeof formValues, value: string) => {
+    setFormValues((prev) => ({ ...prev, [key]: value }));
+  };
+
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    setFeedback(null);
+
+    if (!serviceId || !templateId || !publicKey) {
+      setStatus("error");
+      setFeedback("Email service is not configured. Please try again later.");
+      toast.error("Email service not configured. Please try again later.");
+      return;
+    }
+
+    if (
+      !formValues.name.trim() ||
+      !formValues.email.trim() ||
+      !formValues.phone.trim() ||
+      !formValues.department.trim() ||
+      !formValues.message.trim()
+    ) {
+      setStatus("error");
+      setFeedback("Please fill in all fields so we can route your enquiry correctly.");
+      return;
+    }
+
+    setStatus("submitting");
+    try {
+      await emailjs.send(
+        serviceId,
+        templateId,
+        {
+          from_name: formValues.name,
+          reply_to: formValues.email,
+          phone: formValues.phone,
+          department: formValues.department,
+          message: formValues.message,
+        },
+        { publicKey }
+      );
+      setFormValues({ name: "", email: "", phone: "", department: "", message: "" });
+      setStatus("success");
+      setFeedback("Thanks for reaching out. Our team will reply within one business day.");
+      toast.success("Enquiry sent", {
+        description: "Our patient relations team will reach out within one business day.",
+      });
+    } catch (error: unknown) {
+      console.error("Email send failed:", error);
+      setStatus("error");
+
+      if (error instanceof EmailJSResponseStatus) {
+        if (error.status === 412) {
+          const message =
+            "Email service needs to be reconnected. Please reconnect the linked Gmail account in EmailJS and retry.";
+          setFeedback(message);
+          toast.error("Unable to send", { description: message });
+          return;
+        }
+        const message = `We could not send your message (error ${error.status}). Please retry in a moment.`;
+        setFeedback(message);
+        toast.error("Unable to send", { description: message });
+        return;
+      }
+
+      const message = "We could not send your message. Please retry in a moment.";
+      setFeedback(message);
+      toast.error("Unable to send", { description: message });
+    }
+  };
+
   return (
     <main className="flex min-h-screen flex-col bg-slate-50">
       <section className="relative isolate overflow-hidden bg-gradient-to-br from-violet-900 via-indigo-900 to-slate-950">
@@ -140,7 +228,7 @@ export default function ContactPage() {
               </p>
             </div>
 
-            <form className="grid gap-4 sm:grid-cols-2" onSubmit={(event) => event.preventDefault()}>
+            <form className="grid gap-4 sm:grid-cols-2" onSubmit={handleSubmit}>
               <div className="sm:col-span-1">
                 <label className="text-sm font-semibold text-slate-600" htmlFor="contact-name">
                   Full name
@@ -148,6 +236,9 @@ export default function ContactPage() {
                 <Input
                   id="contact-name"
                   placeholder="Your name"
+                  value={formValues.name}
+                  onChange={(event) => updateField("name", event.target.value)}
+                  required
                   className="mt-2 rounded-xl border-slate-200 bg-white/90 focus:border-violet-400 focus:ring-2 focus:ring-violet-200"
                 />
               </div>
@@ -159,6 +250,9 @@ export default function ContactPage() {
                   id="contact-email"
                   type="email"
                   placeholder="you@example.com"
+                  value={formValues.email}
+                  onChange={(event) => updateField("email", event.target.value)}
+                  required
                   className="mt-2 rounded-xl border-slate-200 bg-white/90 focus:border-violet-400 focus:ring-2 focus:ring-violet-200"
                 />
               </div>
@@ -170,6 +264,9 @@ export default function ContactPage() {
                   id="contact-phone"
                   type="tel"
                   placeholder="(+880)"
+                  value={formValues.phone}
+                  onChange={(event) => updateField("phone", event.target.value)}
+                  required
                   className="mt-2 rounded-xl border-slate-200 bg-white/90 focus:border-violet-400 focus:ring-2 focus:ring-violet-200"
                 />
               </div>
@@ -180,6 +277,9 @@ export default function ContactPage() {
                 <Input
                   id="contact-subject"
                   placeholder="e.g., Cardiology"
+                  value={formValues.department}
+                  onChange={(event) => updateField("department", event.target.value)}
+                  required
                   className="mt-2 rounded-xl border-slate-200 bg-white/90 focus:border-violet-400 focus:ring-2 focus:ring-violet-200"
                 />
               </div>
@@ -191,16 +291,34 @@ export default function ContactPage() {
                   id="contact-message"
                   rows={4}
                   placeholder="Tell us about your request"
+                  value={formValues.message}
+                  onChange={(event) => updateField("message", event.target.value)}
+                  required
                   className="mt-2 rounded-xl border-slate-200 bg-white/90 focus:border-violet-400 focus:ring-2 focus:ring-violet-200"
                 />
               </div>
               <div className="sm:col-span-2 flex flex-wrap items-center gap-3">
-                <Button type="submit" className="rounded-full bg-violet-600 px-6 py-2 text-sm font-semibold text-white shadow-lg transition hover:bg-violet-700">
-                  Submit enquiry
+                <Button
+                  type="submit"
+                  disabled={status === "submitting"}
+                  className="rounded-full bg-violet-600 px-6 py-2 text-sm font-semibold text-white shadow-lg transition hover:bg-violet-700 disabled:cursor-not-allowed disabled:opacity-75"
+                >
+                  {status === "submitting" ? "Sending..." : "Submit enquiry"}
                 </Button>
-                <p className="text-xs text-slate-500 sm:text-sm">
-                  By submitting, you agree to our privacy policy. We never share your information without consent.
-                </p>
+                <div className="space-y-1">
+                  <p className="text-xs text-slate-500 sm:text-sm">
+                    By submitting, you agree to our privacy policy. We never share your information without consent.
+                  </p>
+                  {feedback && (
+                    <p
+                      className={`text-xs font-semibold sm:text-sm ${
+                        status === "success" ? "text-emerald-600" : "text-rose-600"
+                      }`}
+                    >
+                      {feedback}
+                    </p>
+                  )}
+                </div>
               </div>
             </form>
           </div>

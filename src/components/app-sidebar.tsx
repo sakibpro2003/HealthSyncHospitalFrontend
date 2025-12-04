@@ -61,6 +61,15 @@ export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
       case "receptionist":
         setNavItems([
           {
+            title: "Appointments",
+            url: "/receptionist/appointments",
+            icon: ClipboardList,
+            items: [
+              { title: "Book appointment", url: "/receptionist/appointments" },
+              { title: "Doctor appointment list", url: "/receptionist/doctor-appointments" },
+            ],
+          },
+          {
             title: "Patient",
             url: "#",
             icon: SquareTerminal,

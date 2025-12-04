@@ -130,7 +130,7 @@ export default function AboutPage() {
         </div>
       </section>
 
-      <section className="grid gap-6 md:grid-cols-3">
+      <section className="mx-auto w-full max-w-6xl grid gap-6 px-4 py-12 sm:px-6 lg:px-8 md:grid-cols-3">
         {pillars.map(({ title, description }) => (
           <Card key={title} className="h-full rounded-3xl border border-white/60 bg-white/85 shadow-lg backdrop-blur">
             <CardContent className="space-y-3 p-6">
@@ -142,7 +142,7 @@ export default function AboutPage() {
         ))}
       </section>
 
-      <section className="space-y-6">
+      <section className="mx-auto w-full max-w-6xl space-y-6 px-4 py-12 sm:px-6 lg:px-8">
         <header className="space-y-2">
           <h2 className="text-2xl font-bold text-slate-900 sm:text-3xl">Our journey in milestones</h2>
           <p className="max-w-3xl text-sm text-slate-600 sm:text-base">
@@ -163,7 +163,7 @@ export default function AboutPage() {
         </ol>
       </section>
 
-      <section className="space-y-6">
+      <section className="mx-auto w-full max-w-6xl space-y-6 px-4 py-12 sm:px-6 lg:px-8">
         <header className="flex flex-wrap items-end justify-between gap-4">
           <div className="space-y-2">
             <h2 className="text-2xl font-bold text-slate-900 sm:text-3xl">Leadership who make it happen</h2>
@@ -189,7 +189,7 @@ export default function AboutPage() {
         </div>
       </section>
 
-      <section className="grid gap-6 rounded-[2.5rem] border border-white/15 bg-gradient-to-r from-violet-600 via-violet-500 to-purple-500 px-8 py-12 text-white shadow-[0_30px_70px_-45px_rgba(91,33,182,0.65)] sm:px-12 md:grid-cols-2 md:px-16">
+      <section className="mx-auto grid w-full max-w-6xl gap-6 rounded-[2.5rem] border border-white/15 bg-gradient-to-r from-violet-600 via-violet-500 to-purple-500 px-6 py-12 text-white shadow-[0_30px_70px_-45px_rgba(91,33,182,0.65)] sm:px-10 md:grid-cols-2 md:px-14 lg:px-16">
         <div className="space-y-4">
           <p className="inline-flex items-center gap-2 rounded-full bg-white/10 px-4 py-1 text-xs font-semibold uppercase tracking-[0.4em] text-violet-100">
             <Target className="size-4" />

@@ -161,102 +161,89 @@ const Banner = () => {
   const activeSlide = useMemo(() => slides[current], [current]);
 
   return (
-    <section className="relative isolate px-4 sm:px-6 lg:px-8">
-      <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-white via-white to-transparent" />
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_10%_12%,rgba(109,40,217,0.12),transparent_30%),radial-gradient(circle_at_88%_8%,rgba(124,58,237,0.12),transparent_25%),radial-gradient(circle_at_50%_90%,rgba(99,102,241,0.12),transparent_28%)]" />
+    <section className="relative w-425 mx-auto isolate px-4 sm:px-6 lg:px-8">
+      <div className="pointer-events-none radial-gradient(circle_at_85%_14%,rgba(129,140,248,0.12),transparent_38%)]" />
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_80%,rgba(139,92,246,0.12),transparent_40%)]" />
 
-      <div className="mx-auto mt-8 w-full max-w-[1180px]">
-        <div className="relative overflow-hidden rounded-[28px] border border-white/10 bg-slate-950 text-white shadow-[0_18px_60px_rgba(0,0,0,0.42)] ring-1 ring-purple-400/15">
-          <div className="absolute inset-0 bg-gradient-to-br from-[#0e0a1f] via-slate-950 to-[#1b1238]" aria-hidden />
+      <div className="mx-auto mt-8  w-full">
+        <div className="relative overflow-hidden rounded-[28px] border border-violet-100 bg-gradient-to-br from-violet-50 via-white to-indigo-50 text-slate-900 shadow-[0_18px_50px_-30px_rgba(109,40,217,0.35)]">
           <div
-            className="absolute inset-0 bg-[radial-gradient(circle_at_18%_20%,rgba(147,51,234,0.22),transparent_36%),radial-gradient(circle_at_82%_10%,rgba(99,102,241,0.18),transparent_32%),radial-gradient(circle_at_10%_78%,rgba(139,92,246,0.18),transparent_28%)]"
+            className="absolute inset-0 bg-[radial-gradient(circle_at_18%_20%,rgba(139,92,246,0.14),transparent_36%),radial-gradient(circle_at_78%_10%,rgba(129,140,248,0.12),transparent_32%)]"
             aria-hidden
           />
 
           <div className="relative grid items-start gap-8 px-7 py-8 sm:px-10 lg:grid-cols-[1.05fr_0.95fr] lg:px-12 lg:py-12">
-            <div className="space-y-6">
+            <div className="space-y-5">
               <div className="flex flex-wrap items-center gap-3">
-                <span className="inline-flex items-center gap-2 rounded-full bg-white text-purple-800 px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.35em] shadow-md shadow-purple-500/20">
+                <span className="inline-flex items-center gap-2 rounded-full bg-white px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.32em] text-violet-700 shadow-sm shadow-violet-200">
                   <Sparkles className="size-4" />
                   {activeSlide.eyebrow}
                 </span>
-                <span className="inline-flex items-center gap-2 rounded-full border border-white/25 bg-white/5 px-3 py-1.5 text-[11px] font-semibold text-purple-50">
-                  <BadgeCheck className="size-4 text-purple-200" />
+                <span className="inline-flex items-center gap-2 rounded-full border border-violet-100 bg-white px-3 py-1.5 text-[11px] font-semibold text-violet-700">
+                  <BadgeCheck className="size-4 text-violet-600" />
                   24/7 hospital desk
                 </span>
               </div>
 
-              <div className="space-y-2.5">
-                <h1 className="text-[32px] font-black leading-tight sm:text-4xl lg:text-[44px]">
+              <div className="space-y-2">
+                <h1 className="text-[32px] font-black leading-tight sm:text-4xl lg:text-[42px]">
                   {activeSlide.title}
                 </h1>
-                <p className="max-w-2xl text-[15px] text-purple-50/80 sm:text-base">
+                <p className="max-w-2xl text-[15px] text-slate-600 sm:text-base">
                   {activeSlide.description}
                 </p>
-              </div>
-
-              <div className="flex flex-wrap gap-2">
-                {activeSlide.tags.map((tag) => (
-                  <span
-                    key={`${activeSlide.id}-${tag}`}
-                    className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-3 py-1.5 text-[11px] font-semibold text-purple-50"
-                  >
-                    <ShieldCheck className="size-4 text-purple-200" />
-                    {tag}
-                  </span>
-                ))}
-              </div>
-
-              <div className="flex flex-wrap gap-3 pt-1">
-                <Button className="group rounded-full bg-white px-7 py-2 text-sm font-semibold text-purple-800 shadow-lg shadow-purple-500/20 transition hover:-translate-y-0.5 hover:bg-purple-50">
-                  <span className="flex items-center gap-2">
-                    {activeSlide.ctaPrimary}
-                    <ArrowUpRight className="size-4 text-purple-700 transition group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
-                  </span>
-                </Button>
-                <Button
-                  variant="outline"
-                  className="rounded-full border-white/25 bg-white/10 px-7 py-2 text-sm font-semibold text-white shadow-md shadow-purple-900/30 transition hover:-translate-y-0.5 hover:bg-white/15"
-                >
-                  {activeSlide.ctaSecondary}
-                </Button>
               </div>
 
               <div className="grid gap-3 sm:grid-cols-3">
                 {activeSlide.metrics.map((metric) => (
                   <div
                     key={`${activeSlide.id}-${metric.label}`}
-                    className="rounded-2xl border border-white/10 bg-white/5 p-3.5 shadow-inner shadow-purple-900/20"
+                    className="rounded-2xl border border-violet-100 bg-white/90 p-3.5 shadow-sm"
                   >
-                    <p className="text-[11px] font-semibold uppercase tracking-wide text-purple-100/70">
+                    <p className="text-[11px] font-semibold uppercase tracking-wide text-violet-500">
                       {metric.label}
                     </p>
-                    <p className="mt-1 text-xl font-bold text-white">{metric.value}</p>
-                    <p className="text-[11px] text-purple-50/70">{metric.detail}</p>
+                    <p className="mt-1 text-xl font-bold text-slate-900">{metric.value}</p>
+                    <p className="text-[11px] text-slate-500">{metric.detail}</p>
                   </div>
                 ))}
               </div>
 
-              <div className="flex flex-wrap items-center gap-3 text-sm text-purple-50/85">
-                <span className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-3 py-1.5">
-                  <ShieldCheck className="size-4 text-purple-200" />
+              <div className="flex flex-wrap gap-3 pt-1">
+                <Button className="group rounded-full bg-violet-600 px-7 py-2 text-sm font-semibold text-white shadow-lg shadow-violet-400/40 transition hover:-translate-y-0.5 hover:bg-violet-700">
+                  <span className="flex items-center gap-2">
+                    {activeSlide.ctaPrimary}
+                    <ArrowUpRight className="size-4 text-white transition group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+                  </span>
+                </Button>
+                <Button
+                  variant="outline"
+                  className="rounded-full border-violet-200 bg-white px-7 py-2 text-sm font-semibold text-violet-700 shadow-md shadow-violet-200 transition hover:-translate-y-0.5 hover:bg-violet-50"
+                >
+                  {activeSlide.ctaSecondary}
+                </Button>
+              </div>
+
+              <div className="flex flex-wrap items-center gap-3 text-sm text-slate-700">
+                <span className="inline-flex items-center gap-2 rounded-full border border-violet-100 bg-white px-3 py-1.5">
+                  <ShieldCheck className="size-4 text-violet-500" />
                   {activeSlide.highlight}
                 </span>
-                <span className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1.5">
-                  <Clock3 className="size-4 text-purple-200" />
+                <span className="inline-flex items-center gap-2 rounded-full border border-violet-100 bg-white px-3 py-1.5">
+                  <Clock3 className="size-4 text-violet-500" />
                   Next slot: {activeSlide.nextSlot}
                 </span>
-                <span className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1.5">
-                  <PhoneCall className="size-4 text-purple-200" />
+                <span className="inline-flex items-center gap-2 rounded-full border border-violet-100 bg-white px-3 py-1.5">
+                  <PhoneCall className="size-4 text-emerald-500" />
                   Hotline: {activeSlide.hotline}
                 </span>
               </div>
             </div>
 
             <div className="relative">
-              <div className="relative overflow-hidden rounded-[26px] border border-white/12 bg-white/5 backdrop-blur">
+              <div className="relative overflow-hidden rounded-[26px] border border-violet-100 bg-white/90 shadow-lg shadow-violet-200">
                 <div className={`absolute inset-0 bg-gradient-to-br ${activeSlide.accent}`} aria-hidden />
-                <div className="absolute inset-0 bg-gradient-to-t from-slate-950/70 via-slate-900/25 to-transparent" aria-hidden />
+                <div className="absolute inset-0 bg-gradient-to-t from-white/60 via-white/20 to-transparent" aria-hidden />
                 <Image
                   src={activeSlide.image}
                   alt="HealthSync care team"
@@ -299,23 +286,23 @@ const Banner = () => {
                 {activeSlide.kpis.map((kpi) => (
                   <div
                     key={`${activeSlide.id}-${kpi.label}`}
-                    className="rounded-2xl border border-white/12 bg-white/5 p-4 text-white shadow-inner shadow-purple-900/25"
+                    className="rounded-2xl border border-violet-100 bg-white p-4 text-slate-900 shadow-sm"
                   >
                     <div className="flex items-center justify-between">
-                      <p className="text-sm font-semibold text-purple-50/85">{kpi.label}</p>
-                      <BedDouble className="size-4 text-purple-200" />
+                      <p className="text-sm font-semibold text-violet-700">{kpi.label}</p>
+                      <BedDouble className="size-4 text-violet-500" />
                     </div>
-                    <p className="text-xl font-bold text-white">{kpi.value}</p>
-                    <p className="text-xs text-purple-100/75">{kpi.detail}</p>
+                    <p className="text-xl font-bold text-slate-900">{kpi.value}</p>
+                    <p className="text-xs text-slate-500">{kpi.detail}</p>
                   </div>
                 ))}
-                <div className="rounded-2xl border border-white/12 bg-gradient-to-br from-purple-500/30 via-purple-500/20 to-purple-500/10 p-4 text-white shadow-inner shadow-purple-900/25">
+                <div className="rounded-2xl border border-violet-100 bg-gradient-to-br from-violet-100 via-white to-indigo-50 p-4 text-slate-900 shadow-sm">
                   <div className="flex items-center gap-2 text-sm font-semibold">
-                    <HeartPulse className="size-4 text-white" />
+                    <HeartPulse className="size-4 text-rose-500" />
                     Patient safety focus
                   </div>
-                  <p className="mt-1 text-2xl font-bold text-white">4.8 / 5</p>
-                  <p className="text-xs text-purple-100/80">Recent patient experience score</p>
+                  <p className="mt-1 text-2xl font-bold text-violet-800">4.8 / 5</p>
+                  <p className="text-xs text-slate-600">Recent patient experience score</p>
                 </div>
               </div>
             </div>
@@ -330,8 +317,8 @@ const Banner = () => {
                   aria-label={`Go to slide ${index + 1}`}
                   className={`h-2.5 rounded-full transition ${
                     current === index
-                      ? "w-11 bg-purple-400 shadow-[0_0_18px_rgba(168,85,247,0.6)]"
-                      : "w-6 bg-white/30 hover:bg-white/50"
+                      ? "w-11 bg-violet-500 shadow-[0_0_18px_rgba(109,40,217,0.4)]"
+                      : "w-6 bg-violet-200/60 hover:bg-violet-300/80"
                   }`}
                 />
               ))}
@@ -340,14 +327,14 @@ const Banner = () => {
               <button
                 onClick={prevSlide}
                 aria-label="Previous slide"
-                className="flex size-10 items-center justify-center rounded-full border border-white/25 bg-white/10 text-white shadow-md backdrop-blur transition hover:-translate-y-0.5"
+                className="flex size-10 items-center justify-center rounded-full border border-violet-200 bg-white text-violet-700 shadow-sm transition hover:-translate-y-0.5 hover:bg-violet-50"
               >
                 <ChevronLeft className="size-5" />
               </button>
               <button
                 onClick={nextSlide}
                 aria-label="Next slide"
-                className="flex size-10 items-center justify-center rounded-full border border-white/25 bg-white/10 text-white shadow-md backdrop-blur transition hover:-translate-y-0.5"
+                className="flex size-10 items-center justify-center rounded-full border border-violet-200 bg-white text-violet-700 shadow-sm transition hover:-translate-y-0.5 hover:bg-violet-50"
               >
                 <ChevronRight className="size-5" />
               </button>

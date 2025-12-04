@@ -72,16 +72,30 @@ const patientApi = baseApi.injectEndpoints({
         };
       },
       transformResponse: (response: GetAllPatientResponse) => {
-        const items = Array.isArray(response?.data?.result)
-          ? response.data.result
-          : [];
-        const meta = response?.data?.meta ?? {
+        const fallbackMeta = {
           page: 1,
           limit: 0,
           total: 0,
           totalPage: 0,
         };
-        return { result: items, meta };
+
+        const payload = response?.data?.result as
+          | IPatient[]
+          | { result?: IPatient[]; meta?: TMeta }
+          | undefined;
+
+        if (Array.isArray(payload)) {
+          return { result: payload, meta: response?.meta ?? fallbackMeta };
+        }
+
+        if (payload && Array.isArray(payload.result)) {
+          return {
+            result: payload.result,
+            meta: response?.meta ?? payload.meta ?? fallbackMeta,
+          };
+        }
+
+        return { result: [], meta: response?.meta ?? fallbackMeta };
       },
       providesTags: (result) =>
         result?.result?.length

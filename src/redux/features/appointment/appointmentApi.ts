@@ -9,6 +9,18 @@ const appointmentApi = baseApi.injectEndpoints({
         body: appointmentInfo,
       }),
     }),
+    createAppointmentByStaff: builder.mutation({
+      query: (appointmentInfo) => ({
+        url: "/appointments/book",
+        method: "POST",
+        body: appointmentInfo,
+      }),
+      invalidatesTags: ["appointments"],
+    }),
+    getAppointmentsByDoctorId: builder.query({
+      query: (doctorId: string) => `/appointments/doctor/${doctorId}`,
+      providesTags: ["appointments"],
+    }),
     getAppointmentsByPatient: builder.query({
       query: (patientId: string) => `/appointments/patient/${patientId}`,
       providesTags: ["appointments"],
@@ -46,6 +58,8 @@ const appointmentApi = baseApi.injectEndpoints({
 
 export const {
   useCreateAppointmentCheckoutMutation,
+  useCreateAppointmentByStaffMutation,
+  useGetAppointmentsByDoctorIdQuery,
   useGetAppointmentsByPatientQuery,
   useCancelAppointmentMutation,
   useRescheduleAppointmentMutation,

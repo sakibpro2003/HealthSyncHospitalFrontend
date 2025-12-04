@@ -324,7 +324,7 @@ export default function CartPage() {
                 variant="ghost"
                 className="mt-4 w-full rounded-full text-sm text-slate-500 underline-offset-4 hover:text-violet-600 hover:underline"
               >
-                <Link href="/services">← Continue browsing services</Link>
+                <Link href="/medicine">← Continue browsing medicine</Link>
               </Button>
             </div>
           </aside>

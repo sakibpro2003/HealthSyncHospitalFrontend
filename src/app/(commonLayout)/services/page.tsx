@@ -192,7 +192,7 @@ export default function ServicesPage() {
         </div>
       </section>
 
-      <section className="space-y-8">
+      <section className="mx-auto w-full max-w-6xl space-y-8 px-4 pb-16 sm:px-6 lg:px-8">
         <div className="flex flex-wrap items-end justify-between gap-4">
           <div className="space-y-2">
             <h2 className="text-2xl font-bold text-slate-900 sm:text-3xl">Care pathways tailored to outcomes</h2>
@@ -226,7 +226,7 @@ export default function ServicesPage() {
         </div>
       </section>
 
-      <section className="relative overflow-hidden rounded-[2.5rem] border border-white/20 bg-gradient-to-r from-violet-600 via-violet-500 to-purple-500 px-8 py-12 text-white shadow-[0_30px_70px_-45px_rgba(91,33,182,0.65)] sm:px-12 md:px-16">
+      <section className="relative mx-auto w-full max-w-6xl overflow-hidden rounded-[2.5rem] border border-white/20 bg-gradient-to-r from-violet-600 via-violet-500 to-purple-500 px-6 py-12 text-white shadow-[0_30px_70px_-45px_rgba(91,33,182,0.65)] sm:px-10 md:px-14 lg:px-16">
         <div className="absolute -left-16 top-1/2 hidden h-56 w-56 -translate-y-1/2 rounded-full bg-white/20 blur-3xl md:block" aria-hidden />
         <div className="relative flex flex-col items-center gap-6 text-center lg:flex-row lg:justify-between lg:text-left">
           <div className="space-y-3 max-w-2xl">

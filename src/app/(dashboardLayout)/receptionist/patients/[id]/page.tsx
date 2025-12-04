@@ -1,12 +1,30 @@
 "use client";
+
+import React, { use, useEffect } from "react";
+import Link from "next/link";
+import { SubmitHandler, useForm } from "react-hook-form";
+import { toast } from "sonner";
+import {
+  AlertCircle,
+  Calendar,
+  Droplet,
+  HeartPulse,
+  MapPin,
+  Phone,
+  ShieldCheck,
+  UserRound,
+} from "lucide-react";
+
+import Loader from "@/components/shared/Loader";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import {
   Form,
   FormControl,
@@ -16,16 +34,14 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Separator } from "@/components/ui/separator";
 import { Textarea } from "@/components/ui/textarea";
-import React, { use, useEffect } from "react";
-import { SubmitHandler, useForm } from "react-hook-form";
-import { toast } from "sonner";
 import {
   useGetSinglePatientQuery,
   useUpdatePatientMutation,
   type IPatient,
 } from "@/redux/features/patient/patientApi";
-import Loader from "@/components/shared/Loader";
 
 interface IParams {
   params: Promise<{ id: string }>;
@@ -195,121 +211,307 @@ const PatientDetailsPage = ({ params }: IParams) => {
   };
 
   if (isLoading || isUpdating) {
-    return <Loader></Loader>;
+    return <Loader label="Loading patient profile" />;
   }
 
-  const fields: Array<{
-    name: keyof PatientFormValues;
-    label: string;
-    type?: "text" | "email" | "date" | "select" | "textarea";
-    options?: string[];
-  }> = [
-    { name: "name", label: "Full Name" },
-    { name: "phone", label: "Phone *" },
-    { name: "email", label: "Email", type: "email" },
-    {
-      name: "gender",
-      label: "Gender",
-      type: "select",
-      options: [...GENDER_OPTIONS],
-    },
-    { name: "address", label: "Address" },
-    { name: "dateOfBirth", label: "Date of Birth", type: "date" },
-    {
-      name: "bloodGroup",
-      label: "Blood Group",
-      type: "select",
-      options: [...BLOOD_GROUP_OPTIONS],
-    },
-    {
-      name: "maritalStatus",
-      label: "Marital Status",
-      type: "select",
-      options: [...MARITAL_STATUS_OPTIONS],
-    },
-    { name: "emergencyContactName", label: "Emergency Contact Name" },
-    { name: "emergencyContactPhone", label: "Emergency Contact Phone" },
+  if (!patientData) {
+    return (
+      <div className="px-4 py-10">
+        <Card className="mx-auto max-w-3xl border-red-200 bg-red-50/60">
+          <CardHeader>
+            <CardTitle className="text-xl text-red-900">Patient not found</CardTitle>
+            <CardDescription className="text-red-700">
+              We could not find this patient record. Return to the list and try again.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Link href="/receptionist/patients">
+              <Button variant="outline">Back to patient list</Button>
+            </Link>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
+  const formattedDob = patientData.dateOfBirth
+    ? new Date(patientData.dateOfBirth).toLocaleDateString(undefined, {
+        month: "short",
+        day: "numeric",
+        year: "numeric",
+      })
+    : "Not provided";
+
+  const profileHighlights = [
     {
-      name: "relationship",
-      label: "Emergency Contact Relationship",
+      label: "Blood group",
+      value: patientData.bloodGroup || "N/A",
+      icon: Droplet,
     },
-    { name: "occupation", label: "Occupation" },
-    { name: "medicalHistory", label: "Medical History", type: "textarea" },
-    { name: "allergies", label: "Allergies" },
     {
-      name: "currentMedications",
-      label: "Current Medications",
-      type: "textarea",
+      label: "Gender",
+      value: patientData.gender || "Not set",
+      icon: UserRound,
+    },
+    {
+      label: "Date of birth",
+      value: formattedDob,
+      icon: Calendar,
     },
   ];
 
-  return (
-    <div className="p-4 md:p-8">
-      <div className="mx-auto rounded-lg">
-        <h2 className="text-2xl md:text-3xl font-semibold mb-6 text-center">
-          Patient Registration
-        </h2>
-        
+  const contactFields: Array<{
+    name: keyof PatientFormValues;
+    label: string;
+    type?: "text" | "email" | "date" | "select" | "textarea";
+    options?: readonly string[];
+  }> = [
+    { name: "name", label: "Full name" },
+    { name: "phone", label: "Phone *" },
+    { name: "email", label: "Email", type: "email" },
+    { name: "address", label: "Address" },
+    { name: "dateOfBirth", label: "Date of birth", type: "date" },
+    { name: "occupation", label: "Occupation" },
+  ];
 
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)}>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              {fields.map(({ name, label, options, type = "text" }) => (
-                <FormField
-                  key={name}
-                  control={form.control}
-                  name={name}
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>{label}</FormLabel>
-                      <FormControl>
-                        {type === "textarea" ? (
-                          <Textarea
-                            {...field}
-                            placeholder=""
-                            value={field.value ?? ""}
-                          />
-                        ) : type === "select" ? (
-                          <Select
-                            onValueChange={(value) => field.onChange(value)}
-                            value={field.value ?? ""}
-                          >
-                            <SelectTrigger className="w-full">
-                              <SelectValue placeholder={`${label}`} />
-                            </SelectTrigger>
-                            <SelectContent>
-                              {(options ?? []).map((option) => (
-                                <SelectItem key={option} value={option}>
-                                  {option}
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                        ) : (
-                          <Input
-                            {...field}
-                            type={type}
-                            placeholder=""
-                            value={field.value ?? ""}
-                          />
-                        )}
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              ))}
+  const demographicsFields: Array<{
+    name: keyof PatientFormValues;
+    label: string;
+    type: "select";
+    options: readonly string[];
+  }> = [
+    { name: "gender", label: "Gender", type: "select", options: GENDER_OPTIONS },
+    { name: "bloodGroup", label: "Blood group", type: "select", options: BLOOD_GROUP_OPTIONS },
+    { name: "maritalStatus", label: "Marital status", type: "select", options: MARITAL_STATUS_OPTIONS },
+  ];
+
+  const emergencyFields: Array<{
+    name: keyof PatientFormValues;
+    label: string;
+    type?: "text";
+  }> = [
+    { name: "emergencyContactName", label: "Contact name" },
+    { name: "relationship", label: "Relationship" },
+    { name: "emergencyContactPhone", label: "Contact phone" },
+  ];
+
+  const clinicalFields: Array<{
+    name: keyof PatientFormValues;
+    label: string;
+    type?: "textarea";
+  }> = [
+    { name: "medicalHistory", label: "Medical history", type: "textarea" },
+    { name: "allergies", label: "Allergies", type: "textarea" },
+    { name: "currentMedications", label: "Current medications", type: "textarea" },
+  ];
+
+  const renderField = (
+    fieldConfig:
+      | {
+          name: keyof PatientFormValues;
+          label: string;
+          type?: "text" | "email" | "date" | "select" | "textarea";
+          options?: readonly string[];
+        }
+  ) => {
+    const { name, label, type = "text", options } = fieldConfig;
+
+    return (
+      <FormField
+        key={name}
+        control={form.control}
+        name={name}
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel className="text-sm font-semibold text-slate-700">{label}</FormLabel>
+            <FormControl>
+              {type === "textarea" ? (
+                <Textarea {...field} placeholder="" value={field.value ?? ""} className="min-h-[100px]" />
+              ) : type === "select" ? (
+                <Select onValueChange={(value) => field.onChange(value)} value={field.value ?? ""}>
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder={`Select ${label.toLowerCase()}`} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {(options ?? []).map((option) => (
+                      <SelectItem key={option} value={option}>
+                        {option}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              ) : (
+                <Input {...field} type={type} placeholder="" value={field.value ?? ""} />
+              )}
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+    );
+  };
+
+  return (
+    <section className="space-y-8 px-4 pb-12 pt-6 lg:px-10">
+      <div className="overflow-hidden rounded-3xl border border-white/10 bg-gradient-to-br from-violet-900 via-indigo-900 to-slate-950 p-8 text-white shadow-xl shadow-violet-900/25">
+        <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
+          <div className="space-y-3">
+            <Badge className="w-fit bg-white/15 text-xs uppercase tracking-[0.28em] text-white">
+              Patient profile
+            </Badge>
+            <div className="space-y-2">
+              <h1 className="text-3xl font-bold leading-tight sm:text-4xl">
+                {patientData.name || "Unnamed patient"}
+              </h1>
+              <p className="text-sm text-purple-100/85">
+                Update demographics, emergency contacts, and clinical notes. Changes are saved instantly for care teams.
+              </p>
             </div>
-            <div className="mt-8 text-center">
-              <Button type="submit" className="w-full md:w-1/3">
-                Submit
+            <div className="flex flex-wrap gap-2 text-xs sm:text-sm">
+              <span className="inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1.5">
+                <Phone className="h-4 w-4 text-purple-200" />
+                {patientData.phone || "No phone on file"}
+              </span>
+              <span className="inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1.5">
+                <MapPin className="h-4 w-4 text-purple-200" />
+                {patientData.address || "Address not provided"}
+              </span>
+            </div>
+          </div>
+          <div className="flex flex-wrap gap-3">
+            <Link href="/receptionist/patients">
+              <Button variant="outline" className="border-white/40 text-white hover:bg-white/10">
+                Back to list
               </Button>
-            </div>
-          </form>
-        </Form>
+            </Link>
+            <Button
+              onClick={form.handleSubmit(onSubmit)}
+              className="bg-white px-5 text-violet-800 hover:bg-violet-50"
+              disabled={isUpdating}
+            >
+              {isUpdating ? "Saving..." : "Save changes"}
+            </Button>
+          </div>
+        </div>
       </div>
-    </div>
+
+      <div className="grid gap-6 xl:grid-cols-[1.2fr_0.9fr]">
+        <Card className="border border-slate-200 shadow-sm">
+          <CardHeader className="space-y-1 border-b border-slate-100">
+            <CardTitle className="text-2xl font-semibold text-slate-900">Edit patient record</CardTitle>
+            <CardDescription className="text-slate-600">
+              Keep contact, demographic, and emergency details up to date.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-8 pt-6">
+            <Form {...form}>
+              <form className="space-y-8" onSubmit={form.handleSubmit(onSubmit)}>
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-sm font-semibold text-slate-800">Contact</p>
+                      <p className="text-xs text-slate-500">Reach the patient or guardian quickly.</p>
+                    </div>
+                    <Badge variant="outline" className="text-emerald-700 border-emerald-200">
+                      Required fields marked with *
+                    </Badge>
+                  </div>
+                  <div className="grid gap-4 md:grid-cols-2">{contactFields.map(renderField)}</div>
+                </div>
+
+                <Separator />
+
+                <div className="space-y-4">
+                  <p className="text-sm font-semibold text-slate-800">Demographics</p>
+                  <div className="grid gap-4 md:grid-cols-3">{demographicsFields.map(renderField)}</div>
+                </div>
+
+                <Separator />
+
+                <div className="space-y-4">
+                  <p className="text-sm font-semibold text-slate-800">Emergency contact</p>
+                  <div className="grid gap-4 md:grid-cols-3">{emergencyFields.map(renderField)}</div>
+                </div>
+
+                  <Separator />
+
+                <div className="space-y-4">
+                  <p className="text-sm font-semibold text-slate-800">Clinical notes</p>
+                  <div className="grid gap-4 md:grid-cols-3">
+                    {clinicalFields.map((field) => (
+                      <div key={field.name} className="md:col-span-3">
+                        {renderField(field)}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="flex flex-wrap items-center gap-3">
+                  <Button type="submit" className="rounded-full px-6" disabled={isUpdating}>
+                    {isUpdating ? "Saving..." : "Save updates"}
+                  </Button>
+                  <p className="text-xs text-slate-500">
+                    Changes sync instantly to attending doctors and billing.
+                  </p>
+                </div>
+              </form>
+            </Form>
+          </CardContent>
+        </Card>
+
+        <div className="space-y-4">
+          <Card className="border border-slate-200 shadow-sm">
+            <CardHeader className="space-y-1">
+              <CardTitle className="text-lg font-semibold">At-a-glance</CardTitle>
+              <CardDescription className="text-slate-600">
+                Quick facts shared with the care team.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              <div className="grid gap-3 sm:grid-cols-3">
+                {profileHighlights.map(({ label, value, icon: Icon }) => (
+                  <div
+                    key={label}
+                    className="rounded-2xl border border-slate-200 bg-slate-50/70 p-3 text-sm text-slate-700"
+                  >
+                    <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">
+                      <Icon className="h-4 w-4 text-violet-600" />
+                      {label}
+                    </div>
+                    <p className="mt-2 text-base font-semibold text-slate-900">{value}</p>
+                  </div>
+                ))}
+              </div>
+              <Separator />
+              <div className="flex flex-wrap gap-2 text-sm text-slate-600">
+                <span className="inline-flex items-center gap-2 rounded-full bg-violet-50 px-3 py-1 text-violet-700">
+                  <ShieldCheck className="h-4 w-4" />
+                  ID: {patientData._id}
+                </span>
+                {patientData.email && (
+                  <span className="inline-flex items-center gap-2 rounded-full bg-emerald-50 px-3 py-1 text-emerald-700">
+                    <HeartPulse className="h-4 w-4" />
+                    {patientData.email}
+                  </span>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="border border-amber-200 bg-amber-50/80 shadow-sm">
+            <CardContent className="flex items-start gap-3">
+              <AlertCircle className="mt-1 h-5 w-5 text-amber-600" />
+              <div className="space-y-1 text-sm text-amber-800">
+                <p className="font-semibold text-amber-900">Remind patients to update allergies.</p>
+                <p>
+                  Any medication changes should be added here to keep doctors informed before the next visit.
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    </section>
   );
 };
 
