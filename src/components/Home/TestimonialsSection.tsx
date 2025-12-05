@@ -1,11 +1,18 @@
 "use client";
 
-import { useMemo } from "react";
+import { useMemo, useState, type FormEvent } from "react";
 import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { useGetApprovedTestimonialsQuery } from "@/redux/features/testimonial/testimonialApi";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
+import { useClientUser } from "@/hooks/useClientUser";
+import {
+  useGetApprovedTestimonialsQuery,
+  useSubmitTestimonialMutation,
+} from "@/redux/features/testimonial/testimonialApi";
 import { Quote, Star, Sparkles } from "lucide-react";
+import { toast } from "sonner";
 
 const formatDisplayDate = (value?: string) => {
   if (!value) return "";
@@ -21,16 +28,66 @@ const formatDisplayDate = (value?: string) => {
 };
 
 const TestimonialsSection = () => {
+  const [formState, setFormState] = useState({ content: "", rating: 5 });
+  const { user } = useClientUser();
+
   const {
     data = [],
     isLoading,
     isError,
   } = useGetApprovedTestimonialsQuery({ limit: 8 });
 
+  const [submitTestimonial, { isLoading: isSubmitting }] =
+    useSubmitTestimonialMutation();
+
   const testimonials = useMemo(() => data ?? [], [data]);
 
+  const featured = testimonials[0] ?? {
+    patientName: "User 1",
+    content: "The care team was attentive and explained every step.",
+    updatedAt: "2025-12-04T00:00:00Z",
+    rating: 5,
+  };
+
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+
+    if (!formState.content.trim()) {
+      toast.error("Please share a few words about your experience");
+      return;
+    }
+
+    if (!user) {
+      toast.error("Please log in as a patient to submit a testimonial");
+      return;
+    }
+
+    try {
+      await submitTestimonial({
+        content: formState.content.trim(),
+        rating: formState.rating,
+        patientName: (user as { name?: string })?.name,
+      }).unwrap();
+
+      toast.success("Thanks! Your testimonial is awaiting approval.");
+      setFormState({ content: "", rating: 5 });
+    } catch (error: unknown) {
+      if (
+        typeof error === "object" &&
+        error !== null &&
+        "data" in error &&
+        typeof (error as { data?: { message?: unknown } }).data?.message === "string"
+      ) {
+        toast.error((error as { data: { message: string } }).data.message);
+        return;
+      }
+
+      toast.error("Unable to submit testimonial right now");
+    }
+  };
+
   return (
-    <section className="relative isolate mx-auto mt-20 w-full max-w-6xl overflow-hidden rounded-[2.5rem] border border-white/50 bg-gradient-to-br from-white via-white to-indigo-50/70 px-4 py-12 shadow-[0_35px_90px_-50px_rgba(79,70,229,0.5)] sm:px-8 lg:px-12">
+    <section className="relative isolate mx-auto mt-20 w-full overflow-hidden rounded-[2.5rem] border border-white/50 bg-gradient-to-br from-white via-white to-indigo-50/70 px-4 py-12 shadow-[0_35px_90px_-50px_rgba(79,70,229,0.5)] sm:px-6 lg:px-8">
       <div
         className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_10%_20%,rgba(124,58,237,0.08),transparent_35%),radial-gradient(circle_at_80%_0%,rgba(14,165,233,0.08),transparent_30%),radial-gradient(circle_at_20%_80%,rgba(99,102,241,0.08),transparent_32%)]"
         aria-hidden
@@ -58,12 +115,123 @@ const TestimonialsSection = () => {
               <span className="font-semibold">Share yours</span>
             </div>
             <p className="text-sm text-slate-600">
-              Head to your patient dashboard to write a few words and inspire others.
+              Write a few words right here and inspire others.
             </p>
             <Button asChild className="rounded-full bg-indigo-600 text-white shadow-md hover:bg-indigo-700">
-              <Link href="/patient">Write your story</Link>
+              <Link href="#share-testimonial-home">Write your story</Link>
             </Button>
           </div>
+        </div>
+
+        <div
+          id="share-testimonial-home"
+          className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr]"
+        >
+          <article className="rounded-3xl border border-violet-100 bg-gradient-to-br from-white via-violet-50 to-white p-6 shadow-lg ring-1 ring-violet-100">
+            <header className="flex items-start gap-3 text-violet-700">
+              <span className="flex size-10 items-center justify-center rounded-2xl bg-violet-100 text-violet-700 ring-1 ring-violet-200/70">
+                <Quote className="h-5 w-5" />
+              </span>
+              <div>
+                <p className="text-[11px] uppercase tracking-[0.3em] text-violet-600">Patient voice</p>
+                <h3 className="text-xl font-semibold text-slate-900">Share your experience</h3>
+                <p className="text-sm text-slate-600">
+                  Tell us how your care went. We will review your words before publishing them on the homepage.
+                </p>
+              </div>
+            </header>
+
+            <form className="mt-4 space-y-4" onSubmit={handleSubmit}>
+              <div className="space-y-2">
+                <Label htmlFor="testimonial-message">Your testimonial</Label>
+                <Textarea
+                  id="testimonial-message"
+                  rows={5}
+                  placeholder="E.g., The care team was attentive and explained every step."
+                  value={formState.content}
+                  onChange={(event) =>
+                    setFormState((prev) => ({
+                      ...prev,
+                      content: event.target.value,
+                    }))
+                  }
+                />
+              </div>
+
+              <div className="flex flex-col gap-3 rounded-2xl border border-violet-100 bg-white/70 px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
+                <div>
+                  <p className="text-sm font-semibold text-slate-900">Rate your experience</p>
+                  <p className="text-xs text-slate-500">Tap to select between 1 (poor) and 5 (excellent).</p>
+                </div>
+                <div className="flex items-center gap-1" role="group" aria-label="Select rating">
+                  {[1, 2, 3, 4, 5].map((value) => {
+                    const isActive = formState.rating >= value;
+                    return (
+                      <button
+                        key={value}
+                        type="button"
+                        onClick={() =>
+                          setFormState((prev) => ({
+                            ...prev,
+                            rating: value,
+                          }))
+                        }
+                        className={`rounded-full p-2 transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-violet-400 ${isActive ? "text-amber-500" : "text-slate-300 hover:text-amber-400"}`}
+                        aria-label={`${value} star rating`}
+                      >
+                        <Star
+                          className="h-5 w-5"
+                          fill={isActive ? "#f59e0b" : "none"}
+                          strokeWidth={isActive ? 1.5 : 2}
+                        />
+                      </button>
+                    );
+                  })}
+                  <span className="ml-2 text-xs font-semibold text-amber-700">
+                    {formState.rating}/5
+                  </span>
+                </div>
+              </div>
+
+              <div className="flex flex-wrap items-center gap-3 text-xs text-slate-500">
+                <Badge className="rounded-full bg-violet-100 text-violet-700 ring-1 ring-violet-200">
+                  Reviewed by admin before publishing
+                </Badge>
+                <span>We aim to approve testimonials within one business day.</span>
+              </div>
+
+              <Button
+                type="submit"
+                disabled={isSubmitting}
+                className="w-full"
+              >
+                {isSubmitting ? "Submitting..." : "Submit testimonial"}
+              </Button>
+            </form>
+          </article>
+
+          <article className="rounded-3xl border border-indigo-100 bg-white/90 p-6 shadow-lg">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-[11px] uppercase tracking-[0.3em] text-slate-500">Featured voice</p>
+                <h4 className="text-lg font-semibold text-slate-900">{featured.patientName ?? "HealthSync patient"}</h4>
+              </div>
+              <Badge className="rounded-full bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200">Verified patient</Badge>
+            </div>
+            <p className="mt-2 text-xs text-slate-500">{formatDisplayDate(featured.updatedAt)}</p>
+            <p className="mt-4 text-sm leading-relaxed text-slate-700">{featured.content}</p>
+            <div className="mt-4 flex items-center gap-1 text-amber-500">
+              {Array.from({ length: 5 }).map((_, index) => (
+                <Star
+                  key={`featured-${index}`}
+                  className="h-4 w-4"
+                  fill={index < Math.max(1, Math.round(featured.rating ?? 5)) ? "#f59e0b" : "none"}
+                  strokeWidth={index < Math.max(1, Math.round(featured.rating ?? 5)) ? 1.5 : 2}
+                />
+              ))}
+              <span className="ml-1 text-xs font-semibold text-amber-700">{Math.max(1, Math.round(featured.rating ?? 5))}/5</span>
+            </div>
+          </article>
         </div>
 
         {isLoading ? (

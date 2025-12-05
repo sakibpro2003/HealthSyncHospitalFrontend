@@ -52,7 +52,7 @@ const AccordioSection = () => {
   );
 
   return (
-    <section className="relative isolate mx-auto mt-20 w-full max-w-6xl overflow-hidden rounded-[2.5rem] border border-white/15 bg-gradient-to-br from-white/95 via-white/85 to-indigo-50/80 px-4 py-14 shadow-[0_35px_80px_-40px_rgba(79,70,229,0.45)] backdrop-blur sm:px-6 lg:px-10">
+    <section className="relative isolate mx-auto mt-20 w-full overflow-hidden rounded-[2.5rem] border border-white/15 bg-linear-to-br from-white/95 via-white/85 to-indigo-50/80 px-4 py-14 shadow-[0_35px_80px_-40px_rgba(79,70,229,0.45)] backdrop-blur sm:px-6 lg:px-10">
       <div
         className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_15%_20%,rgba(124,58,237,0.1),transparent_35%),radial-gradient(circle_at_80%_10%,rgba(59,130,246,0.08),transparent_32%),radial-gradient(circle_at_10%_80%,rgba(99,102,241,0.08),transparent_30%)]"
         aria-hidden

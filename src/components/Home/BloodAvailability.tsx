@@ -62,8 +62,8 @@ const BloodAvailability = () => {
   );
 
   return (
-    <section className="relative isolate mx-auto mt-20 w-full px-4 sm:px-6 lg:px-8">
-      <Card className="relative overflow-hidden rounded-[2.5rem] border border-white/70 bg-gradient-to-br from-violet-800 via-indigo-700 to-purple-800 shadow-2xl ring-1 ring-violet-200/40">
+    <section className="relative text-purple-800 overflow-hidden rounded-[2.5rem] border border-white/70 bg-linear-to-br from-violet-800 via-indigo-700 to-purple-800 shadow-2xl ring-1 ring-violet-200/40">
+      <Card className="">
         <div
           className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(255,255,255,0.16),transparent_34%),radial-gradient(circle_at_80%_0%,rgba(255,255,255,0.14),transparent_32%),radial-gradient(circle_at_12%_75%,rgba(109,40,217,0.18),transparent_30%)]"
           aria-hidden
@@ -72,22 +72,22 @@ const BloodAvailability = () => {
           <CardHeader className="flex flex-col gap-2 text-center">
             <Badge
               variant="outline"
-              className="mx-auto inline-flex items-center gap-2 rounded-full border-white/50 bg-white/20 px-4 py-1 text-xs font-semibold uppercase tracking-[0.35em] text-white backdrop-blur"
+              className="mx-auto inline-flex items-center gap-2 rounded-full border-white/50 bg-white/20 px-4 py-1 text-xs font-semibold uppercase tracking-[0.35em]  backdrop-blur"
             >
               <Droplets className="size-4" />
               Blood availability
             </Badge>
-            <CardTitle className="text-3xl font-black text-white sm:text-4xl">
+            <CardTitle className="text-3xl font-black  sm:text-4xl">
               Real-time stock across our blood bank
             </CardTitle>
-            <p className="mx-auto max-w-2xl text-sm text-white/85 sm:text-base">
+            <p className="mx-auto max-w-2xl text-sm /85 sm:text-base">
               Track available units by blood group before submitting a request. Low inventory groups are highlighted so you can plan ahead or consider alternative donors.
             </p>
           </CardHeader>
         </div>
         <CardContent>
           {isLoading ? (
-            <p className="text-center text-sm text-white/85">
+            <p className="text-center text-sm /85">
               Checking blood inventory...
             </p>
           ) : isError ? (
@@ -98,20 +98,20 @@ const BloodAvailability = () => {
           ) : (
             <div className="space-y-6">
               <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-                <div className="rounded-2xl border border-white/20 bg-white/10 px-4 py-3 text-left text-white backdrop-blur">
-                  <p className="text-xs uppercase tracking-[0.25em] text-white/70">Total units</p>
+                <div className="rounded-2xl border border-white/20 bg-white/10 px-4 py-3 text-left  backdrop-blur">
+                  <p className="text-xs uppercase tracking-[0.25em] /70">Total units</p>
                   <p className="text-2xl font-bold">{metrics.totalUnits}</p>
                 </div>
-                <div className="rounded-2xl border border-white/20 bg-white/10 px-4 py-3 text-left text-white backdrop-blur">
-                  <p className="text-xs uppercase tracking-[0.25em] text-white/70">Healthy groups</p>
+                <div className="rounded-2xl border border-white/20 bg-white/10 px-4 py-3 text-left  backdrop-blur">
+                  <p className="text-xs uppercase tracking-[0.25em] /70">Healthy groups</p>
                   <p className="text-2xl font-bold">{metrics.healthyGroups}</p>
                 </div>
-                <div className="rounded-2xl border border-white/20 bg-white/10 px-4 py-3 text-left text-white backdrop-blur">
-                  <p className="text-xs uppercase tracking-[0.25em] text-white/70">Low supply</p>
+                <div className="rounded-2xl border border-white/20 bg-white/10 px-4 py-3 text-left  backdrop-blur">
+                  <p className="text-xs uppercase tracking-[0.25em] /70">Low supply</p>
                   <p className="text-2xl font-bold">{metrics.lowGroups}</p>
                 </div>
-                <div className="rounded-2xl border border-white/20 bg-white/10 px-4 py-3 text-left text-white backdrop-blur">
-                  <p className="text-xs uppercase tracking-[0.25em] text-white/70">Critical</p>
+                <div className="rounded-2xl border border-white/20 bg-white/10 px-4 py-3 text-left  backdrop-blur">
+                  <p className="text-xs uppercase tracking-[0.25em] /70">Critical</p>
                   <p className="text-2xl font-bold">{metrics.criticalGroups}</p>
                 </div>
               </div>

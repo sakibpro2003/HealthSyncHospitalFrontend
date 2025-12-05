@@ -599,7 +599,10 @@ const PatientDashboardPage = () => {
             </article>
           </section>
 
-          <section className="grid gap-6 lg:grid-cols-[1.15fr_0.85fr]">
+          <section
+            id="share-testimonial"
+            className="grid gap-6 lg:grid-cols-[1.15fr_0.85fr]"
+          >
             <article className="rounded-3xl border border-violet-100 bg-gradient-to-br from-white via-violet-50 to-white p-6 shadow-lg ring-1 ring-violet-100">
               <header className="flex items-start gap-3 text-violet-700">
                 <span className="flex size-10 items-center justify-center rounded-2xl bg-violet-100 text-violet-700 ring-1 ring-violet-200/70">
