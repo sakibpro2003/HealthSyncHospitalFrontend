@@ -161,7 +161,7 @@ const Banner = () => {
   const activeSlide = useMemo(() => slides[current], [current]);
 
   return (
-    <section className="relative w-425 mx-auto isolate px-4 sm:px-6 lg:px-8">
+    <section className="relative mx-auto w-full max-w-[85vw] isolate overflow-hidden px-4 sm:px-6 lg:px-8 xl:max-w-6xl">
       <div className="pointer-events-none radial-gradient(circle_at_85%_14%,rgba(129,140,248,0.12),transparent_38%)]" />
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_80%,rgba(139,92,246,0.12),transparent_40%)]" />
 

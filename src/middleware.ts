@@ -1,5 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { jwtVerify } from "jose";
+import {
+  ACCESS_TOKEN_COOKIE,
+  CLIENT_TOKEN_COOKIE,
+  decodeTokenValue,
+} from "./utils/tokenCookie";
 
 // Routes that don't require authentication
 const publicRoutes = new Set([
@@ -16,17 +21,27 @@ const publicRoutes = new Set([
   "/departmentalDoctors",
   "/api/me",
 ]);
+
 const publicRoutePatterns: RegExp[] = [/^\/doctor-details\//];
+
 // Role-based access map
 const roleBasedAccess: Record<string, RegExp[]> = {
-  receptionist: [/^\/receptionist/, /^\//, /^\/additems/, /^\/success-payment/,/^\/failed-payment/],
+  receptionist: [
+    /^\/receptionist/,
+    /^\//,
+    /^\/additems/,
+    /^\/success-payment/,
+    /^\/failed-payment/,
+  ],
   admin: [/^\/receptionist/, /^\//, /^\//],
   user: [
     /^\/user/,
     /^\/profile/,
     /^\/departmentalDoctors/,
     /^\//,
-    /^\/additems/,/^\/success-payment/,/^\/failed-payment/
+    /^\/additems/,
+    /^\/success-payment/,
+    /^\/failed-payment/,
   ],
   doctor: [
     /^\/doctor/,
@@ -37,26 +52,30 @@ const roleBasedAccess: Record<string, RegExp[]> = {
   ],
 };
 
-// Secret for JWT verification
 const JWT_ACCESS_SECRET = process.env.JWT_ACCESS_SECRET!;
 
+const clearAuthCookies = (response: NextResponse) => {
+  response.cookies.set(ACCESS_TOKEN_COOKIE, "", { path: "/", maxAge: 0 });
+  response.cookies.set(CLIENT_TOKEN_COOKIE, "", { path: "/", maxAge: 0 });
+  return response;
+};
+
 export async function middleware(request: NextRequest) {
-  const token = request.cookies.get("token")?.value;
+  const rawToken = request.cookies.get(ACCESS_TOKEN_COOKIE)?.value;
+  const token = decodeTokenValue(rawToken);
   const pathname = request.nextUrl.pathname;
   const isPublicRoute =
     publicRoutes.has(pathname) ||
     publicRoutePatterns.some((pattern) => pattern.test(pathname));
 
-  // Public routes: let through. If a bad token exists, clear it silently.
   if (isPublicRoute) {
+    // Public routes: let through. If a bad token exists, clear it silently.
     if (token) {
       try {
         const secret = new TextEncoder().encode(JWT_ACCESS_SECRET);
         await jwtVerify(token, secret);
       } catch {
-        const response = NextResponse.next();
-        response.cookies.set("token", "", { path: "/", maxAge: 0 });
-        return response;
+        return clearAuthCookies(NextResponse.next());
       }
     }
     return NextResponse.next();
@@ -68,23 +87,19 @@ export async function middleware(request: NextRequest) {
       const { payload } = await jwtVerify(token, secret);
       const userRole = payload?.role as string;
 
-      // 🔐 Role-based route checking
+      // Role-based route checking
       const allowedRoutes = roleBasedAccess[userRole] || [];
-
       const isAllowed = allowedRoutes.some((pattern) => pattern.test(pathname));
 
       if (!isAllowed && pathname !== "/" && pathname !== "/unauthorized") {
-        console.warn(`🚫 ${userRole} cannot access ${pathname}`);
+        console.warn(`Blocked ${userRole} from ${pathname}`);
         return NextResponse.redirect(new URL("/unauthorized", request.url));
       }
     } catch (err) {
-      console.error("❌ Invalid or expired token:", err);
-      const response = NextResponse.redirect(new URL("/login", request.url));
-      response.cookies.set("token", "", {
-        path: "/",
-        maxAge: 0,
-      });
-      return response;
+      console.error("Invalid or expired token:", err);
+      return clearAuthCookies(
+        NextResponse.redirect(new URL("/login", request.url))
+      );
     }
   } else {
     // User is not authenticated

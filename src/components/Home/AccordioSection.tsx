@@ -7,6 +7,7 @@ import {
 } from "@/components/ui/accordion";
 import { Button } from "@/components/ui/button";
 import { HelpCircle, MessageSquare, PhoneCall } from "lucide-react";
+import Link from "next/link";
 
 const AccordioSection = () => {
   const faqs = useMemo(
@@ -98,15 +99,10 @@ const AccordioSection = () => {
           </div>
 
           <div className="flex flex-wrap gap-3">
-            <Button className="rounded-full bg-violet-600 px-6 py-2 text-sm font-semibold text-white shadow-lg transition hover:bg-violet-700">
+            <Link href={"/services"}  className="rounded-full bg-violet-600 px-6 py-2 text-sm font-semibold text-white shadow-lg transition hover:bg-violet-700">
               Connect with support
-            </Button>
-            <Button
-              variant="outline"
-              className="rounded-full border-violet-200 px-6 py-2 text-sm font-semibold text-slate-700 hover:border-violet-300 hover:bg-white"
-            >
-              Download patient guide
-            </Button>
+            </Link>
+           
           </div>
         </div>
 

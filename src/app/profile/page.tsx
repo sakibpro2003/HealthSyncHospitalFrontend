@@ -1,6 +1,7 @@
 // app/profile/page.tsx or pages/profile.tsx (based on your routing)
 import { cookies } from "next/headers";
 import { jwtVerify, type JWTPayload } from "jose";
+import { ACCESS_TOKEN_COOKIE, decodeTokenValue } from "@/utils/tokenCookie";
 
 const JWT_ACCESS_SECRET = process.env.JWT_ACCESS_SECRET!;
 
@@ -11,7 +12,8 @@ type AuthPayload = JWTPayload & {
 
 export default async function ProfilePage() {
   const cookieStore = await cookies();
-  const token = cookieStore.get("token")?.value;
+  const rawToken = cookieStore.get(ACCESS_TOKEN_COOKIE)?.value;
+  const token = decodeTokenValue(rawToken);
 
   let user: AuthPayload | null = null;
 

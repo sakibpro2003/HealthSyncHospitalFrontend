@@ -1,11 +1,12 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import { jwtVerify } from 'jose';
+import { decodeTokenValue, ACCESS_TOKEN_COOKIE } from './tokenCookie';
 
 const JWT_ACCESS_SECRET = process.env.JWT_ACCESS_SECRET!;
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   try {
-    const token = req.cookies.token; // httpOnly cookie
+    const token = decodeTokenValue(req.cookies[ACCESS_TOKEN_COOKIE]); // httpOnly cookie
     if (!token) return res.status(401).json({ error: 'Not authenticated' });
 
     const secret = new TextEncoder().encode(JWT_ACCESS_SECRET);

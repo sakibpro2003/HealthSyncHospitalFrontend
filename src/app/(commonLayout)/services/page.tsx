@@ -242,7 +242,7 @@ export default function ServicesPage() {
             </Button>
             <Button
               variant="outline"
-              className="rounded-full border-white/70 px-6 py-2 text-sm font-semibold text-white hover:bg-white/10"
+              className="rounded-full bg-white px-6 py-2 text-sm font-semibold text-violet-600 shadow-md transition hover:bg-violet-100"
             >
               Schedule a visit
             </Button>

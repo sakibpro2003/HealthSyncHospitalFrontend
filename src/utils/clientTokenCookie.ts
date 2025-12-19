@@ -1,10 +1,14 @@
-const CLIENT_TOKEN_COOKIE = "client_token";
-const ACCESS_TOKEN_COOKIE = "token";
+import { ACCESS_TOKEN_COOKIE, CLIENT_TOKEN_COOKIE } from "./tokenCookie";
 
-const resolveSameSite = () =>
-  process.env.NODE_ENV === "production"
-    ? ["Secure", "SameSite=None"]
-    : ["SameSite=Lax"];
+const resolveSameSite = () => {
+  // In local HTTP (even if NODE_ENV=production), avoid Secure to allow the cookie to stick.
+  const isHttps =
+    typeof window !== "undefined"
+      ? window.location.protocol === "https:"
+      : process.env.NODE_ENV === "production";
+
+  return isHttps ? ["Secure", "SameSite=None"] : ["SameSite=Lax"];
+};
 
 const buildCookie = (name: string, value: string, maxAge: number) => {
   const segments = [
@@ -25,10 +29,10 @@ export const setClientTokenCookie = (
     return;
   }
 
-  const encoded = encodeURIComponent(token);
-  document.cookie = buildCookie(CLIENT_TOKEN_COOKIE, encoded, maxAgeSeconds);
+  const tokenValue = token.trim();
+  document.cookie = buildCookie(CLIENT_TOKEN_COOKIE, tokenValue, maxAgeSeconds);
   // Set the main token cookie so middleware can read it
-  document.cookie = buildCookie(ACCESS_TOKEN_COOKIE, encoded, maxAgeSeconds);
+  document.cookie = buildCookie(ACCESS_TOKEN_COOKIE, tokenValue, maxAgeSeconds);
 };
 
 export const clearClientTokenCookie = () => {
@@ -57,4 +61,4 @@ export const readClientTokenCookie = (): string | null => {
   );
 };
 
-export { CLIENT_TOKEN_COOKIE };
+export { CLIENT_TOKEN_COOKIE, ACCESS_TOKEN_COOKIE };
