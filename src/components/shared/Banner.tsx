@@ -34,7 +34,6 @@ type Slide = {
   ctaPrimary: string;
   ctaSecondary: string;
   tags: string[];
-  metrics: SlideMetric[];
   spotlight: {
     label: string;
     value: string;
@@ -58,11 +57,7 @@ const slides: Slide[] = [
     ctaPrimary: "Book an appointment",
     ctaSecondary: "Explore departments",
     tags: ["Smart triage", "Live capacity", "Family updates"],
-    metrics: [
-      { label: "Bed readiness", value: "92%", detail: "Updated live across wards" },
-      { label: "ER triage time", value: "4m", detail: "Median response to intake" },
-      { label: "No-show drop", value: "-28%", detail: "Automated reminders" },
-    ],
+    
     spotlight: {
       label: "Critical care board",
       value: "Under 5 min response",
@@ -87,11 +82,7 @@ const slides: Slide[] = [
     ctaPrimary: "View care pathways",
     ctaSecondary: "Meet our specialists",
     tags: ["Unified history", "Mobile updates", "Escalation guardrails"],
-    metrics: [
-      { label: "Handover accuracy", value: "99.2%", detail: "Structured templates" },
-      { label: "Rounds completed", value: "48", detail: "Past 24 hours" },
-      { label: "Delayed consults", value: "2", detail: "Flagged for today" },
-    ],
+    
     spotlight: {
       label: "Rounds briefing",
       value: "All teams synced",
@@ -116,11 +107,7 @@ const slides: Slide[] = [
     ctaPrimary: "Start a virtual consult",
     ctaSecondary: "Download brochure",
     tags: ["Patient concierge", "Billing clarity", "Recovery coaching"],
-    metrics: [
-      { label: "Follow-up completion", value: "88%", detail: "Within 72 hours" },
-      { label: "Missed calls", value: "-41%", detail: "Automated updates" },
-      { label: "Billing disputes", value: "1.2%", detail: "Transparent steps" },
-    ],
+    
     spotlight: {
       label: "Experience desk",
       value: "Live multilingual support",
@@ -195,18 +182,7 @@ const Banner = () => {
               </div>
 
               <div className="grid gap-3 sm:grid-cols-3">
-                {activeSlide.metrics.map((metric) => (
-                  <div
-                    key={`${activeSlide.id}-${metric.label}`}
-                    className="rounded-2xl border border-violet-100 bg-white/90 p-3.5 shadow-sm"
-                  >
-                    <p className="text-[11px] font-semibold uppercase tracking-wide text-violet-500">
-                      {metric.label}
-                    </p>
-                    <p className="mt-1 text-xl font-bold text-slate-900">{metric.value}</p>
-                    <p className="text-[11px] text-slate-500">{metric.detail}</p>
-                  </div>
-                ))}
+               
               </div>
 
               <div className="flex flex-wrap gap-3 pt-1">

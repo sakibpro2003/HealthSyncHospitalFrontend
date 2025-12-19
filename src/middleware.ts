@@ -16,6 +16,7 @@ const publicRoutes = new Set([
   "/failed-payment",
   "/about",
   "/services",
+  "/health-packages",
   "/contact",
   "/medicine",
   "/departmentalDoctors",
